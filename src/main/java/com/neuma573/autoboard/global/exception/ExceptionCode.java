@@ -20,7 +20,8 @@ public enum ExceptionCode {
     BAD_CREDENTIALS(HttpStatus.UNAUTHORIZED, "비밀번호가 불일치 합니다."),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     USER_ALREADY_ACTIVE(HttpStatus.BAD_REQUEST, "이미 활성된 유저입니다."),
-    NOT_ENOUGH_ROLE(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+    NOT_ENOUGH_ROLE(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+    NOT_FOUND_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다");
 
     private final HttpStatus status;
     private final String message;
