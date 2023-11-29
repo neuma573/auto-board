@@ -7,7 +7,8 @@ import lombok.*;
 
 import java.util.Set;
 
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
 @Entity
@@ -25,11 +26,11 @@ public class User extends BaseEntity {
 
     private String status;
 
+    private String password;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<LinkedAccount> linkedAccounts;
-
-
 }
