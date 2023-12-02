@@ -1,6 +1,7 @@
 package com.neuma573.autoboard.user.model.entity;
 
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
+import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,7 +25,8 @@ public class User extends BaseEntity {
 
     private String name;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     private String password;
 
