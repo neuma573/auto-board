@@ -2,6 +2,7 @@ package com.neuma573.autoboard.user.model.entity;
 
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.global.model.enums.Status;
+import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,4 +36,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<LinkedAccount> linkedAccounts;
+
+    public UserResponse toResponse() {
+        return UserResponse.builder()
+                .loginId(this.loginId)
+                .build();
+    }
 }
