@@ -69,11 +69,9 @@ public class SecurityConfig {
 
             .and()
                 .formLogin()
-                .loginPage("/로그인페이지")
-                .loginProcessingUrl("/실제 로그인이 되는 url")
-                .permitAll()
-                .successHandler()
-                .failureHandler();
+                .loginPage("/api/v1/login")
+                .loginProcessingUrl("/api/v1/perform-login")
+                .permitAll();
         ;
         return httpSecurity.build();
     }
