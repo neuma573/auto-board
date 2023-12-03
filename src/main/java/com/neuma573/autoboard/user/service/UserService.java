@@ -3,6 +3,7 @@ package com.neuma573.autoboard.user.service;
 import com.neuma573.autoboard.user.model.dto.UserRequest;
 import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +29,7 @@ public class UserService {
         userRepository.save(
                 userRequest.toEntity()
         );
-        return userRepository.findByLoginId(userRequest.getLoginId()).get();
+        return userRepository.findByLoginId(userRequest.getLoginId()).orElseThrow(() -> new EntityNotFoundException("User not found")).toResponse();
+
     }
 }
