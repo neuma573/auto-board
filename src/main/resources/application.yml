@@ -25,3 +25,10 @@ app:
     refresh-token-expire-time-for-redis: 604800 # 7일
     token-prefix: "Bearer "
     header-string: "Authorization"
+  oauth:
+    naver:
+      client-id: ${NAVER_CLIENT_ID}
+      client-secret: ${NAVER_CLIENT_SECRET}
+    google:
+      client-id: ${GOOGLE_CLIENT_ID}
+      client-secret: ${GOOGLE_CLIENT_SECRET}
