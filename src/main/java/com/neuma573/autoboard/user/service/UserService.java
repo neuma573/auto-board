@@ -1,9 +1,8 @@
 package com.neuma573.autoboard.user.service;
 
 import com.neuma573.autoboard.security.model.dto.VerifyResponse;
-import com.neuma573.autoboard.security.utils.JwtProvider;
+import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
-import com.neuma573.autoboard.user.model.dto.LoginResponse;
 import com.neuma573.autoboard.user.model.dto.UserRequest;
 import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.model.entity.User;
@@ -13,8 +12,6 @@ import com.neuma573.autoboard.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -26,7 +23,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtProvider jwtProvider;
 
     @Transactional
     public UserResponse signUp(UserRequest userRequest) {
@@ -52,18 +48,6 @@ public class UserService {
     }
 
     @Transactional
-    public LoginResponse signIn(LoginRequest loginRequest) {
-
-        User user = userRepository.findByLoginId(loginRequest.getLoginId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid password");
-        }
-
-        return null;
-    }
-
-    @Transactional
     public VerifyResponse verifyUser(LoginRequest loginRequest){
         User user = userRepository.findByLoginId(loginRequest.getLoginId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
@@ -72,7 +56,6 @@ public class UserService {
                     .builder()
                     .isValid(false)
                     .build();
-            throw new BadCredentialsException("Invalid password");
         }
 
         return VerifyResponse
