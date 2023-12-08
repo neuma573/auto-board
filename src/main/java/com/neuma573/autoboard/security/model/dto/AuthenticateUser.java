@@ -9,6 +9,6 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 public class AuthenticateUser {
-    private String email;
+    private String loginId;
     private Set<Role> roles;
 }
