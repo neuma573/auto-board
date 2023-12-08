@@ -1,8 +1,9 @@
 package com.neuma573.autoboard.security.model.entity;
 
-import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 @Getter
@@ -11,8 +12,9 @@ import org.springframework.data.redis.core.RedisHash;
 public class RefreshToken {
 
     @Id
-    private String userId;
+    private String loginId;
 
+    @Setter
     private String token;
 
 }
