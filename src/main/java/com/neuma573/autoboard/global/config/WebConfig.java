@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 public class WebConfig {
 
     @Bean
-    public FilterRegistrationBean verifyUserFilter(ObjectMapper mapper, UserService userService) {
+    public FilterRegistrationBean verifyUserFilterForFilter(ObjectMapper mapper, UserService userService) {
         FilterRegistrationBean<Filter> filterRegistrationBean = new
                 FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new VerifyUserFilter(mapper,userService));
