@@ -12,8 +12,8 @@ public class LoginLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "login_id")
+    private Long loginId;
 
     @Column(name = "login_time")
     private LocalDateTime loginTime;
