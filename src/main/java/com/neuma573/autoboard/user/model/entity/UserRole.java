@@ -2,14 +2,13 @@ package com.neuma573.autoboard.user.model.entity;
 
 import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity
 @Builder
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "user_role")
 public class UserRole {
     @Id
