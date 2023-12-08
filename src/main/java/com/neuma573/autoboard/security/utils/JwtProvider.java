@@ -1,11 +1,11 @@
-package com.neuma573.autoboard.global.utils;
+package com.neuma573.autoboard.security.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neuma573.autoboard.global.exception.ExceptionCode;
 import com.neuma573.autoboard.global.model.dto.Response;
-import com.neuma573.autoboard.security.model.dto.LoginUser;
-import com.neuma573.autoboard.user.model.entity.User;
+import com.neuma573.autoboard.security.model.dto.Jwt;
 import com.neuma573.autoboard.user.model.enums.Role;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -27,7 +27,7 @@ import static com.neuma573.autoboard.global.exception.ExceptionCode.*;
 
 @Slf4j
 @Component
-public class JwtUtils {
+public class JwtProvider {
 
     @Value("${app.jwt.secret}")
     private String jwtSecret;
@@ -54,33 +54,50 @@ public class JwtUtils {
         this.objectMapper = new ObjectMapper();
     }
 
-    public String generateJwtToken(String username) {
-        return Jwts.builder().subject(username)
-                .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + accessTokenExpirationMs))
+    public String createToken(Claims claims, Date expireDate) {
+        return Jwts.builder()
+                .claims(claims)
+                .expiration(expireDate)
                 .signWith(key)
                 .compact();
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public Claims getClaims(String token) {
 
         return Jwts.parser()
                 .verifyWith((SecretKey) key)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-
+                .getPayload();
     }
 
-    public boolean validateJwtToken(String authToken, HttpServletResponse response) throws IOException {
+    public Jwt createJwt(Claims claims) {
+        String accessToken = createToken(claims, getExpireDateAccessToken());
+        String refreshToken = createToken(Jwts.claims().build(), getExpireDateRefreshToken());
+        return Jwt.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public Date getExpireDateAccessToken() {
+        return new Date(System.currentTimeMillis() + accessTokenExpirationMs);
+    }
+
+    public Date getExpireDateRefreshToken() {
+        long expireTimeMils = 1000L * 60 * 60 * 24 * 60;
+        return new Date(System.currentTimeMillis() + refreshTokenExpirationMs);
+    }
+
+
+    public boolean validateToken(String authToken, HttpServletResponse response) throws IOException {
         try {
             Jwts.parser()
                     .verifyWith((SecretKey) key)
                     .build()
                     .parseSignedClaims(authToken);
             return true;
-        } catch (MalformedJwtException e) {
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException e) {
             setResponse(response, INVALID_JWT_TOKEN, e);
         } catch (ExpiredJwtException e) {
             setResponse(response, EXPIRED_ACCESS_TOKEN, e);
@@ -108,23 +125,4 @@ public class JwtUtils {
         response.getWriter().write(objectMapper.writeValueAsString(fail));
     }
 
-    public LoginUser verify(String token) {
-
-        Claims claims = Jwts.parser().verifyWith((SecretKey) key).build().parseUnsecuredClaims(token).getPayload();
-
-        Long id = claims.get("id", Long.class);
-        String email = claims.get("email", String.class);
-        String loginId = claims.get("loginId", String.class);
-        String name = claims.get("name", String.class);
-        String role = claims.get("role", String.class);
-
-        User user = User.builder()
-                .id(id)
-                .loginId(loginId)
-                .name(name)
-                .role(Role.valueOf(role))
-                .build();
-
-        return new LoginUser(user);
-    }
 }

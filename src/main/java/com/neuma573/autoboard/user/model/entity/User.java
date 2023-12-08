@@ -5,8 +5,10 @@ import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -26,13 +28,18 @@ public class User extends BaseEntity {
 
     private String name;
 
+    @Email
+    private String email;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private Long failCount;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    private Set<UserRole> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<LinkedAccount> linkedAccounts;
@@ -40,6 +47,16 @@ public class User extends BaseEntity {
     public UserResponse toResponse() {
         return UserResponse.builder()
                 .loginId(this.loginId)
+                .email(this.email)
+                .name(this.name)
                 .build();
+    }
+
+    public void addRole(UserRole userRole){
+        roles.add(userRole);
+    }
+
+    public void addFailCount() {
+        failCount++;
     }
 }

@@ -3,6 +3,7 @@ package com.neuma573.autoboard.user.model.dto;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.model.enums.Role;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,13 +25,16 @@ public class UserRequest {
     @Setter
     private String password;
 
+    @Email(message = "email 양식을 맞춰주세요.")
+    private String email;
+
     public User toEntity() {
         return User.builder()
                 .loginId(this.loginId)
                 .name(this.name)
+                .email(this.email)
                 .password(this.password)
                 .status(Status.ACTIVE)
-                .role(Role.USER)
                 .build();
     }
 }

@@ -24,16 +24,7 @@ public class LinkedAccount extends BaseEntity {
     @Column(name = "profile_picture")
     private String profilePicture;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
