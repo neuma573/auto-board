@@ -40,9 +40,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private Set<UserRole> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<LinkedAccount> linkedAccounts;
-
     public UserResponse toResponse() {
         return UserResponse.builder()
                 .loginId(this.loginId)
