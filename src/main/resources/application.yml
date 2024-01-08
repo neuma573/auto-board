@@ -17,6 +17,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      username: ${REDIS_USERNAME}
 app:
   jwt:
     secret: ${JWT_SECRET}
@@ -25,10 +27,3 @@ app:
     refresh-token-expire-time-for-redis: 604800 # 7일
     token-prefix: "Bearer "
     header-string: "Authorization"
-  oauth:
-    naver:
-      client-id: ${NAVER_CLIENT_ID}
-      client-secret: ${NAVER_CLIENT_SECRET}
-    google:
-      client-id: ${GOOGLE_CLIENT_ID}
-      client-secret: ${GOOGLE_CLIENT_SECRET}
