@@ -22,8 +22,9 @@ spring:
 app:
   jwt:
     secret: ${JWT_SECRET}
-    access-token-expiration-ms: 86400000 # 1일
-    refresh-token-expiration-ms: 604800000 # 7일
-    refresh-token-expire-time-for-redis: 604800 # 7일
+    access-token-expiration-ms: 60000 # 1분
+    refresh-token-expiration-ms: 300000 # 5분
+    refresh-token-expire-time-for-redis: 300 # 5분 (초 단위)
     token-prefix: "Bearer "
     header-string: "Authorization"
+    issuer: ${JWT_ISSUER}
