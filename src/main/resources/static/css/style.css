@@ -1,0 +1,17 @@
+body {
+    background-color: #000; color: #fff;
+}
+.card {
+    background-color: #212529;
+}
+.btn-primary {
+    border-color: #198754;
+}
+.navbar {
+    background-color: #212529;
+}
+.table {
+    color: #fff;
+}
+.table thead { background-color: #212529;
+}
