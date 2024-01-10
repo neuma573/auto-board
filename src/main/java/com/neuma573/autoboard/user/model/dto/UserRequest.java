@@ -2,13 +2,14 @@ package com.neuma573.autoboard.user.model.dto;
 
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.user.model.entity.User;
-import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.HashSet;
 
 @Getter
 @Builder
@@ -35,6 +36,8 @@ public class UserRequest {
                 .email(this.email)
                 .password(this.password)
                 .status(Status.ACTIVE)
+                .roles(new HashSet<>())
+                .failCount(0L)
                 .build();
     }
 }
