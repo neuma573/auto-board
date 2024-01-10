@@ -1,7 +1,7 @@
 package com.neuma573.autoboard.security.utils;
 
 import com.neuma573.autoboard.global.utils.ResponseUtils;
-import com.neuma573.autoboard.security.model.dto.Jwt;
+import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.repository.RefreshTokenRepository;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
@@ -89,7 +89,7 @@ public class JwtProvider {
                 .getPayload();
     }
 
-    public Jwt createJwt(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
+    public AccessTokenResponse createJwt(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
         Claims accessTokenClaims = Jwts.claims()
                 .subject(loginRequest.getLoginId())
                 .add("type", "access")
@@ -116,7 +116,7 @@ public class JwtProvider {
                 )
         );
 
-        return Jwt.builder()
+        return AccessTokenResponse.builder()
                 .accessToken(accessToken)
                 .build();
     }
@@ -182,7 +182,7 @@ public class JwtProvider {
         return token;
     }
 
-    public Jwt refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse response) throws IOException {
+    public AccessTokenResponse refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse response) throws IOException {
         String refreshToken = CookieUtils.getCookieValue(httpServletRequest, "refreshToken");
         if (validateRefreshToken(refreshToken, response)) {
             Claims accessTokenClaims = Jwts.claims()
@@ -191,7 +191,7 @@ public class JwtProvider {
                     .add("type", "access")
                     .build();
 
-            return Jwt.builder()
+            return AccessTokenResponse.builder()
                     .accessToken(createAccessToken(accessTokenClaims))
                     .build();
         }

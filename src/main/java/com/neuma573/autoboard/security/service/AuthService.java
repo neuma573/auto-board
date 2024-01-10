@@ -2,7 +2,7 @@ package com.neuma573.autoboard.security.service;
 
 import com.neuma573.autoboard.global.exception.InvalidLoginException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
-import com.neuma573.autoboard.security.model.dto.Jwt;
+import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
 import com.neuma573.autoboard.security.repository.LoginLogRepository;
 import com.neuma573.autoboard.security.utils.JwtProvider;
@@ -36,7 +36,7 @@ public class AuthService {
 
 
 
-    public Jwt verifyUser(LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public AccessTokenResponse verifyUser(LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         User user = userRepository.findByLoginId(loginRequest.getLoginId())
                 .orElseThrow(() -> new InvalidLoginException("Invalid user or password"));
 

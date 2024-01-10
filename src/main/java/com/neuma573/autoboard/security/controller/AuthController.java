@@ -2,7 +2,7 @@ package com.neuma573.autoboard.security.controller;
 
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
-import com.neuma573.autoboard.security.model.dto.Jwt;
+import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.security.service.TokenService;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
@@ -31,7 +31,7 @@ public class AuthController {
     private final ResponseUtils responseUtils;
 
     @PostMapping("/refresh/token")
-    public ResponseEntity<Response<Jwt>> tokenRefresh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    public ResponseEntity<Response<AccessTokenResponse>> tokenRefresh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
 
         return ResponseEntity.ok(responseUtils.success(
                 tokenService.refreshAccessToken(httpServletRequest, httpServletResponse)
