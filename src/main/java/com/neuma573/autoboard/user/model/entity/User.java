@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -22,7 +22,6 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_id", unique = true)
     private String loginId;
 
     private String name;
@@ -35,10 +34,12 @@ public class User extends BaseEntity {
 
     private String password;
 
-    private Long failCount;
+    private Long failCount = 0L;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
-    private Set<UserRole> roles = new HashSet<>();
+    private LocalDateTime lastLoginAt;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private Set<UserRole> roles;
 
     public UserResponse toResponse() {
         return UserResponse.builder()
@@ -54,5 +55,9 @@ public class User extends BaseEntity {
 
     public void addFailCount() {
         failCount++;
+    }
+
+    public void setLoginAt() {
+        this.lastLoginAt = LocalDateTime.now();
     }
 }
