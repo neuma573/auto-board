@@ -1,31 +1,50 @@
 package com.neuma573.autoboard.global.handler;
 
-import com.neuma573.autoboard.global.exception.ExceptionCode;
-import com.neuma573.autoboard.global.model.dto.CustomErrorResponse;
+import com.neuma573.autoboard.global.exception.InvalidLoginException;
+import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.global.model.dto.Response;
+import com.neuma573.autoboard.global.utils.ResponseUtils;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
-@RestControllerAdvice
+import static com.neuma573.autoboard.global.exception.ExceptionCode.*;
+
 @Slf4j
+@RequiredArgsConstructor
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ProblemDetail handleAnyException(Exception ex, WebRequest request) {
-        log.error("Exception : {}, Message : {}",ex.getClass(), ex.getMessage());
-        log.error("Request URL: {}", request.getDescription(false));
+    private final ResponseUtils responseUtils;
 
-
-
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Response<String>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(ENTITY_NOT_FOUND, ex);
+        return new ResponseEntity<>(response, ENTITY_NOT_FOUND.getStatus());
     }
 
+    @ExceptionHandler(InvalidLoginException.class)
+    public ResponseEntity<Response<String>> handleAuthenticationException(InvalidLoginException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(INVALID_LOGIN, ex);
+        return new ResponseEntity<>(response, INVALID_LOGIN.getStatus());
+    }
+
+    @ExceptionHandler(TooManyLoginAttemptException.class)
+    public ResponseEntity<Response<String>> handleTooManyAttemptException(TooManyLoginAttemptException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(TOO_MANY_LOGIN_ATTEMPT, ex);
+        return new ResponseEntity<>(response, TOO_MANY_LOGIN_ATTEMPT.getStatus());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Response<String>> handleException(Exception ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(INTERNAL_SERVER_ERROR, ex);
+        return new ResponseEntity<>(response, INTERNAL_SERVER_ERROR.getStatus());
+    }
 }
