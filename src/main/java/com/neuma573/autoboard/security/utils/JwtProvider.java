@@ -1,19 +1,19 @@
 package com.neuma573.autoboard.security.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.neuma573.autoboard.global.exception.ExceptionCode;
-import com.neuma573.autoboard.global.model.dto.Response;
+import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.model.dto.Jwt;
-import com.neuma573.autoboard.user.model.enums.Role;
+import com.neuma573.autoboard.security.model.entity.RefreshToken;
+import com.neuma573.autoboard.security.repository.RefreshTokenRepository;
+import com.neuma573.autoboard.user.model.dto.LoginRequest;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -26,6 +26,7 @@ import static com.neuma573.autoboard.global.exception.ExceptionCode.*;
 
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class JwtProvider {
 
@@ -44,23 +45,40 @@ public class JwtProvider {
     @Value("${app.jwt.header-string}")
     private String headerString;
 
+    @Value("${app.jwt.issuer}")
+    private String iss;
+
     private Key key;
 
-    private ObjectMapper objectMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    private final ResponseUtils responseUtils;
 
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        this.objectMapper = new ObjectMapper();
     }
 
-    public String createToken(Claims claims, Date expireDate) {
+    public String createRefreshToken(Claims claims) {
         return Jwts.builder()
                 .claims(claims)
-                .expiration(expireDate)
+                .expiration(getExpireDate(refreshTokenExpirationMs))
                 .signWith(key)
+                .issuer(iss)
+                .issuedAt(new Date())
                 .compact();
     }
+
+    public String createAccessToken(Claims claims) {
+        return Jwts.builder()
+                .claims(claims)
+                .expiration(getExpireDate(accessTokenExpirationMs))
+                .signWith(key)
+                .issuer(iss)
+                .issuedAt(new Date())
+                .compact();
+    }
+
 
     public Claims getClaims(String token) {
 
@@ -71,38 +89,86 @@ public class JwtProvider {
                 .getPayload();
     }
 
-    public Jwt createJwt(Claims claims) {
-        String accessToken = createToken(claims, getExpireDateAccessToken());
-        String refreshToken = createToken(Jwts.claims().build(), getExpireDateRefreshToken());
+    public Jwt createJwt(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
+        Claims accessTokenClaims = Jwts.claims()
+                .subject(loginRequest.getLoginId())
+                .add("type", "access")
+                .build();
+        Claims refreshTokenClaims = Jwts.claims()
+                .add("type", "refresh")
+                .build();
+        String accessToken = createAccessToken(accessTokenClaims);
+        String refreshToken = createRefreshToken(refreshTokenClaims);
+
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .loginId(loginRequest.getLoginId())
+                        .token(refreshToken)
+                        .build()
+        );
+        CookieUtils.addCookie(httpServletResponse,
+                CookieUtils.createCookie(
+                        "refreshToken",
+                        refreshToken,
+                        60 * 60 * 24,
+                        false,
+                        true
+                )
+        );
+
         return Jwt.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .build();
     }
 
-    public Date getExpireDateAccessToken() {
-        return new Date(System.currentTimeMillis() + accessTokenExpirationMs);
+    public Date getExpireDate(Long expirationMs) {
+        return new Date(System.currentTimeMillis() + expirationMs);
     }
 
-    public Date getExpireDateRefreshToken() {
-        long expireTimeMils = 1000L * 60 * 60 * 24 * 60;
-        return new Date(System.currentTimeMillis() + refreshTokenExpirationMs);
-    }
-
-
-    public boolean validateToken(String authToken, HttpServletResponse response) throws IOException {
+    public boolean validateAccessToken(String accessToken, HttpServletResponse response) throws IOException {
         try {
+
+            Claims claims = getClaims(accessToken);
+
             Jwts.parser()
                     .verifyWith((SecretKey) key)
                     .build()
-                    .parseSignedClaims(authToken);
+                    .parseSignedClaims(accessToken);
+
+            if (!iss.equals(claims.getIssuer())) {
+                responseUtils.setResponse(response, INVALID_JWT_ISSUER, null);
+                return false;
+            } else if(!"access".equals(claims.get("type"))) {
+                responseUtils.setResponse(response, INVALID_JWT_TOKEN, null);
+                return false;
+            }
+            return true;
+
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException e) {
+            responseUtils.setResponse(response, INVALID_JWT_TOKEN, e);
+        } catch (ExpiredJwtException e) {
+            responseUtils.setResponse(response, EXPIRED_ACCESS_TOKEN, e);
+        } catch (UnsupportedJwtException e) {
+            responseUtils.setResponse(response, UNSUPPORTED_JWT_TOKEN, e);
+        }
+
+        return false;
+    }
+
+    public boolean validateRefreshToken(String refreshToken, HttpServletResponse response) throws IOException {
+        try {
+
+            getClaims(refreshToken);
+            refreshTokenRepository.findByToken(refreshToken)
+                    .orElseThrow(() -> new JwtException("Token not found"));
+
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException e) {
-            setResponse(response, INVALID_JWT_TOKEN, e);
+            responseUtils.setResponse(response, INVALID_JWT_TOKEN, e);
         } catch (ExpiredJwtException e) {
-            setResponse(response, EXPIRED_ACCESS_TOKEN, e);
+            responseUtils.setResponse(response, EXPIRED_ACCESS_TOKEN, e);
         } catch (UnsupportedJwtException e) {
-            setResponse(response, UNSUPPORTED_JWT_TOKEN, e);
+            responseUtils.setResponse(response, UNSUPPORTED_JWT_TOKEN, e);
         }
 
         return false;
@@ -116,13 +182,21 @@ public class JwtProvider {
         return token;
     }
 
-    private void setResponse(HttpServletResponse response, ExceptionCode exceptionCode, Exception e) throws IOException {
-        log.error("error message {}", exceptionCode.getMessage(), e);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        Response<Void> fail = Response.error(exceptionCode.getStatus().toString(), exceptionCode.getMessage());
-        response.getWriter().write(objectMapper.writeValueAsString(fail));
-    }
+    public Jwt refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse response) throws IOException {
+        String refreshToken = CookieUtils.getCookieValue(httpServletRequest, "refreshToken");
+        if (validateRefreshToken(refreshToken, response)) {
+            Claims accessTokenClaims = Jwts.claims()
+                    .subject(refreshTokenRepository.findByToken(refreshToken)
+                            .orElseThrow(() -> new JwtException("Token not found")).getLoginId())
+                    .add("type", "access")
+                    .build();
 
+            return Jwt.builder()
+                    .accessToken(createAccessToken(accessTokenClaims))
+                    .build();
+        }
+        else {
+            throw new JwtException("invalid token");
+        }
+    }
 }
