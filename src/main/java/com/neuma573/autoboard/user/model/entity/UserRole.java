@@ -11,13 +11,16 @@ import lombok.*;
 @NoArgsConstructor
 @Table(name = "user_role")
 public class UserRole {
+
     @Id
-    @Column(name = "user_role_id", length = 50)
-    private Long userRoleId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
 
 }
