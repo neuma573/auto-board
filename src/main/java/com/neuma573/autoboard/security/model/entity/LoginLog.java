@@ -1,10 +1,16 @@
 package com.neuma573.autoboard.security.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "login_log")
 public class LoginLog {
 
@@ -13,7 +19,7 @@ public class LoginLog {
     private Long id;
 
     @Column(name = "login_id")
-    private Long loginId;
+    private String loginId;
 
     @Column(name = "login_time")
     private LocalDateTime loginTime;
@@ -29,8 +35,5 @@ public class LoginLog {
 
     @Column(name = "device_info")
     private String deviceInfo;
-
-    @Column(name = "session_id")
-    private String sessionId;
 
 }
