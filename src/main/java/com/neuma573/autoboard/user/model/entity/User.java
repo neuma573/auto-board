@@ -22,12 +22,10 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String loginId;
-
-    private String name;
-
     @Email
     private String email;
+
+    private String name;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -43,7 +41,6 @@ public class User extends BaseEntity {
 
     public UserResponse toResponse() {
         return UserResponse.builder()
-                .loginId(this.loginId)
                 .email(this.email)
                 .name(this.name)
                 .build();

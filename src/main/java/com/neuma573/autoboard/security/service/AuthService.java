@@ -37,8 +37,8 @@ public class AuthService {
 
 
     public AccessTokenResponse verifyUser(LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        User user = userRepository.findByLoginId(loginRequest.getLoginId())
-                .orElseThrow(() -> new InvalidLoginException("Invalid user or password"));
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new InvalidLoginException("Invalid email or password"));
 
         try {
             checkLoginAttempts(user);
@@ -73,7 +73,7 @@ public class AuthService {
     public void recordLoginAttempt(LoginRequest loginRequest, HttpServletRequest httpServletRequest, String result, Exception ex) {
 
         LoginLog loginLog = LoginLog.builder()
-                .loginId(loginRequest.getLoginId())
+                .email(loginRequest.getEmail())
                 .loginTime(LocalDateTime.now())
                 .ipAddress(getClientIpAddress(httpServletRequest))
                 .loginResult(result)

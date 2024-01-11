@@ -18,8 +18,8 @@ public class LoginLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_id")
-    private String loginId;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "login_time")
     private LocalDateTime loginTime;

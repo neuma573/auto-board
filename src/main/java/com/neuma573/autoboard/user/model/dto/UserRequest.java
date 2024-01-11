@@ -16,8 +16,9 @@ import java.util.HashSet;
 @AllArgsConstructor
 public class UserRequest {
 
-    @NotEmpty(message = "아이디는 비어있을 수 없습니다.")
-    private String loginId;
+    @Email(message = "email 양식을 맞춰주세요.")
+    @NotEmpty(message = "이메일은 비어있을 수 없습니다.")
+    private String email;
 
     @NotEmpty(message = "이름은 비어있을 수 없습니다.")
     private String name;
@@ -26,14 +27,10 @@ public class UserRequest {
     @Setter
     private String password;
 
-    @Email(message = "email 양식을 맞춰주세요.")
-    private String email;
-
     public User toEntity() {
         return User.builder()
-                .loginId(this.loginId)
-                .name(this.name)
                 .email(this.email)
+                .name(this.name)
                 .password(this.password)
                 .status(Status.ACTIVE)
                 .roles(new HashSet<>())

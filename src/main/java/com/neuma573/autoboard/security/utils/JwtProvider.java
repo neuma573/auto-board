@@ -91,7 +91,7 @@ public class JwtProvider {
 
     public AccessTokenResponse createJwt(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
         Claims accessTokenClaims = Jwts.claims()
-                .subject(loginRequest.getLoginId())
+                .subject(loginRequest.getEmail())
                 .add("type", "access")
                 .build();
         Claims refreshTokenClaims = Jwts.claims()
@@ -102,7 +102,7 @@ public class JwtProvider {
 
         refreshTokenRepository.save(
                 RefreshToken.builder()
-                        .loginId(loginRequest.getLoginId())
+                        .email(loginRequest.getEmail())
                         .token(refreshToken)
                         .build()
         );
@@ -187,7 +187,7 @@ public class JwtProvider {
         if (validateRefreshToken(refreshToken, response)) {
             Claims accessTokenClaims = Jwts.claims()
                     .subject(refreshTokenRepository.findByToken(refreshToken)
-                            .orElseThrow(() -> new JwtException("Token not found")).getLoginId())
+                            .orElseThrow(() -> new JwtException("Token not found")).getEmail())
                     .add("type", "access")
                     .build();
 
