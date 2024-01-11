@@ -32,7 +32,7 @@ public class UserRequest {
                 .email(this.email)
                 .name(this.name)
                 .password(this.password)
-                .status(Status.ACTIVE)
+                .status(Status.INACTIVE)
                 .roles(new HashSet<>())
                 .failCount(0L)
                 .build();
