@@ -25,7 +25,8 @@ public enum ExceptionCode {
 
     TOO_MANY_LOGIN_ATTEMPT(HttpStatus.FORBIDDEN, "너무 많은 로그인 시도를 하여 계정이 잠겼습니다. 잠시 후 시도해주세요"),
 
-    NOT_ENOUGH_ROLE(HttpStatus.FORBIDDEN, "권한이 없습니다");
+    NOT_ENOUGH_ROLE(HttpStatus.FORBIDDEN, "권한이 없습니다"),
+    INVALID_EMAIL_FORM(HttpStatus.BAD_REQUEST, "이메일 형식이 잘못됐습니다.");
 
 
 
