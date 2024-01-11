@@ -7,9 +7,15 @@ import com.neuma573.autoboard.global.utils.ResponseUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.stream.Collectors;
 
 import static com.neuma573.autoboard.global.exception.ExceptionCode.*;
 
@@ -39,6 +45,30 @@ public class GlobalExceptionHandler {
         log.info(ex.getMessage());
         Response<String> response = responseUtils.error(TOO_MANY_LOGIN_ATTEMPT, ex);
         return new ResponseEntity<>(response, TOO_MANY_LOGIN_ATTEMPT.getStatus());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Response<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        log.info(ex.getMessage());
+
+
+        String errorMessages = ex.getBindingResult().getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        Response<String> response = Response.<String>builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .data(ex.getClass().getSimpleName())
+                .message(errorMessages)
+                .build();
+        return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Response<String>> handleMethodArgumentNotValidException(DataIntegrityViolationException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(BAD_REQUEST, ex);
+        return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
