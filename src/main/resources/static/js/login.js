@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        let username = document.getElementById('username').value;
+        let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
 
         fetch('/api/v1/auth/authenticate', {
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ loginId: username, password: password }),
+            body: JSON.stringify({ email: email, password: password }),
         })
             .then(response => {
                 // status 코드에 따라 다른 처리를 합니다.
