@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/auto-board?serverTimezone=UTC
-    username: root
-    password: 1234
+    url: jdbc:mysql://${DB_HOST}/auto-board?serverTimezone=UTC
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -15,5 +15,16 @@ spring:
     store-type: redis
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      username: ${REDIS_USERNAME}
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration-ms: 60000 # 1분
+    refresh-token-expiration-ms: 300000 # 5분
+    refresh-token-expire-time-for-redis: 300 # 5분 (초 단위)
+    token-prefix: "Bearer "
+    header-string: "Authorization"
+    issuer: ${JWT_ISSUER}

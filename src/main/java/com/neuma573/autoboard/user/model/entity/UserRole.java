@@ -1,0 +1,26 @@
+package com.neuma573.autoboard.user.model.entity;
+
+import com.neuma573.autoboard.user.model.enums.Role;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "user_role")
+public class UserRole {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+}

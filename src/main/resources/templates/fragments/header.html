@@ -1,0 +1,12 @@
+<nav th:fragment="header" class="navbar navbar-expand-lg navbar-dark">
+  <a class="navbar-brand" href="/">AUTO BOARD</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto">
+      <a class="nav-item nav-link btn btn-outline-success my-2 my-lg-0 mr-md-2" th:href="@{/login}">로그인</a>
+      <a class="nav-item nav-link btn btn-outline-success my-2 my-lg-0" th:href="@{/join}">회원가입</a>
+    </div>
+  </div>
+</nav>
