@@ -24,10 +24,13 @@ public class JwtRequestFilter implements Filter {
     static {
 
         ALLOWED_PATHS.add("/api/v1/users");
+        ALLOWED_PATHS.add("/api/v1/users/email-check");
         ALLOWED_PATHS.add("/api/v1/auth/authenticate");
         ALLOWED_PATHS.add("/api/v1/auth/refresh/token");
+        ALLOWED_PATHS.add("/join");
         ALLOWED_PATHS.add("/login");
         ALLOWED_PATHS.add("/main");
+
         ALLOWED_PATHS.add("/");
 
         ALLOWED_PATHS.add("/static");
@@ -44,7 +47,9 @@ public class JwtRequestFilter implements Filter {
 
         String requestURI = httpRequest.getRequestURI();
 
-        log.info("Request URI : {}", requestURI);
+        String httpMethod = httpRequest.getMethod();
+
+        log.info("Request URI : [{}] {}", httpMethod, requestURI);
 
         if (isProtectedUrl(requestURI)) {
             String jwt = jwtProvider.parseJwtToken(httpRequest);
