@@ -17,4 +17,9 @@ public class MvcController {
         return new ModelAndView("main");
     }
 
+    @GetMapping("/join")
+    public ModelAndView showJoin() {
+        return new ModelAndView("join");
+    }
+
 }
