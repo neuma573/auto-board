@@ -42,4 +42,9 @@ public class UserService {
 
     }
 
+    @Transactional
+    public boolean isEmailAvailable(String email) {
+        return !userRepository.existsByEmail(email);
+    }
+
 }
