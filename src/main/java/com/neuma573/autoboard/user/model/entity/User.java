@@ -58,4 +58,8 @@ public class User extends BaseEntity {
     public void setLoginAt() {
         this.lastLoginAt = LocalDateTime.now();
     }
+
+    public String getStatus() {
+        return status.getStatus();
+    }
 }
