@@ -19,6 +19,19 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
       username: ${REDIS_USERNAME}
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${GOOGLE_MAIL_ADDRESS}
+    password: ${GOOGLE_APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl: false
+          starttls:
+            enable: true
+            required: true
 app:
   jwt:
     secret: ${JWT_SECRET}
