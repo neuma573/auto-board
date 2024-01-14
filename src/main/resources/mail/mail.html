@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>계정 인증</title>
+    <style>
+        body {
+            background-color: #000;
+            color: white;
+            font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<h1>계정 인증</h1>
+<p>{name}님 안녕하세요. auto-board에 등록해 주셔서 감사합니다. 아래 링크를 클릭하여 계정을 활성화하세요:</p>
+<a href="{domain}/api/v1/auth/verify?token={token}" target="_blank">{domain}/api/v1/auth/verify?token={token}</a>
+<p>본 이메일에 대한 요청을 하지 않으셨다면, 본 메일을 무시해 주세요.</p>
+</body>
+</html>
