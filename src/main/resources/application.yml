@@ -26,12 +26,16 @@ spring:
     password: ${GOOGLE_APP_PASSWORD}
     properties:
       mail:
+        transport:
+          protocol: smtp
+        debug: true
         smtp:
           auth: true
           ssl: false
           starttls:
             enable: true
             required: true
+
 app:
   jwt:
     secret: ${JWT_SECRET}
@@ -41,3 +45,6 @@ app:
     token-prefix: "Bearer "
     header-string: "Authorization"
     issuer: ${JWT_ISSUER}
+  mail:
+    path: ${MAIL_PATH}
+  domain: ${DOMAIN}
