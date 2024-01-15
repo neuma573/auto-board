@@ -2,8 +2,6 @@ package com.neuma573.autoboard.user.service;
 
 import com.neuma573.autoboard.email.model.dto.MailRequest;
 import com.neuma573.autoboard.email.service.MailService;
-import com.neuma573.autoboard.global.exception.TokenNotFoundException;
-import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
 import com.neuma573.autoboard.security.repository.VerificationTokenRepository;
@@ -84,22 +82,29 @@ public class UserService {
     public boolean activateUserAccount(String token) {
         VerificationToken verificationToken = findByToken(token);
 
-        if (isValidVerificationToken(verificationToken)) {
-            User user = userRepository.findByEmail(verificationToken.getEmail())
-                    .orElseThrow(() -> new UserNotFoundException("User not found with email: " + verificationToken.getEmail()));
-
-            user.setStatus(Status.ACTIVE);
-            userRepository.save(user);
-            verificationTokenRepository.delete(verificationToken);
-            return true;
-        } else {
+        if (verificationToken == null || isValidVerificationToken(verificationToken)) {
             return false;
         }
+
+        return activateUser(verificationToken);
     }
+
+    private boolean activateUser(VerificationToken verificationToken) {
+        User user = userRepository.findByEmail(verificationToken.getEmail()).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        user.setStatus(Status.ACTIVE);
+        userRepository.save(user);
+        verificationTokenRepository.delete(verificationToken);
+        return true;
+    }
+
 
     public VerificationToken findByToken(String token) {
         return verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new TokenNotFoundException("Token not found: " + token));
+                .orElse(null);
     }
 
     public boolean isValidVerificationToken(VerificationToken verificationToken) {
