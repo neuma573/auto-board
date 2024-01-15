@@ -19,12 +19,12 @@ public class AuthMvcController {
     public String verifyAccount(@RequestParam("token") String token, RedirectAttributes redirectAttributes) {
         if (userService.activateUserAccount(token)) {
 
-            redirectAttributes.addFlashAttribute("successMessage", "Your account has been successfully activated.");
+            redirectAttributes.addFlashAttribute("message", "계정이 성공적으로 활성화 되었습니다.");
             return "redirect:/login";
         } else {
 
-            redirectAttributes.addFlashAttribute("errorMessage", "Invalid or expired activation token.");
-            return "redirect:/error";
+            redirectAttributes.addFlashAttribute("message", "유효하지 않거나 만료된 활성화 토큰입니다.");
+            return "redirect:/login";
         }
     }
 }
