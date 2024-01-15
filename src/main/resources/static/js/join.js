@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function handleSignupSubmit(event) {
+    showSpinner();
     event.preventDefault();
 
     const email = document.getElementById('email').value;
@@ -27,8 +28,10 @@ async function handleSignupSubmit(event) {
         alert(`가입 신청이 완료되었으며 ${result.data.email} 이메일로 인증 링크가 전송되었습니다. 확인해주세요.`);
 
         // 성공 후 메인 페이지로 리디렉션
+        hideSpinner();
         window.location.href = '/main';
     } catch (error) {
+        hideSpinner();
         console.error('An error occurred:', error);
     }
 }

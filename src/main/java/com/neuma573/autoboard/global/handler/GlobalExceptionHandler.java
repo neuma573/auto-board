@@ -1,6 +1,8 @@
 package com.neuma573.autoboard.global.handler;
 
 import com.neuma573.autoboard.global.exception.InvalidLoginException;
+import com.neuma573.autoboard.global.exception.NotActivatedUserException;
+import com.neuma573.autoboard.global.exception.TokenNotFoundException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
@@ -50,8 +52,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Response<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.info(ex.getMessage());
-
-
         String errorMessages = ex.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
@@ -71,9 +71,25 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
     }
 
+    @ExceptionHandler(NotActivatedUserException.class)
+    public ResponseEntity<Response<String>> handleNotActivatedUserException(NotActivatedUserException ex){
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(NOT_ACTIVATED_USER, ex);
+        return new ResponseEntity<>(response, NOT_ACTIVATED_USER.getStatus());
+    }
+
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ResponseEntity<Response<String>> handleTokenNotFoundException(TokenNotFoundException ex){
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(BAD_REQUEST, ex);
+        return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
+    }
+
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Response<String>> handleException(Exception ex) {
         log.info(ex.getMessage());
+        ex.printStackTrace();
         Response<String> response = responseUtils.error(INTERNAL_SERVER_ERROR, ex);
         return new ResponseEntity<>(response, INTERNAL_SERVER_ERROR.getStatus());
     }

@@ -19,12 +19,32 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
       username: ${REDIS_USERNAME}
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${GOOGLE_MAIL_ADDRESS}
+    password: ${GOOGLE_APP_PASSWORD}
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        debug: true
+        smtp:
+          auth: true
+          ssl: false
+          starttls:
+            enable: true
+            required: true
+
 app:
   jwt:
     secret: ${JWT_SECRET}
-    access-token-expiration-ms: 60000 # 1분
-    refresh-token-expiration-ms: 300000 # 5분
-    refresh-token-expire-time-for-redis: 300 # 5분 (초 단위)
+    access-token-expiration-ms: 600000 # 10분
+    refresh-token-expiration-ms: 3000000 # 50분
+    refresh-token-expire-time-for-redis: 3000 # 50분 (초 단위)
     token-prefix: "Bearer "
     header-string: "Authorization"
     issuer: ${JWT_ISSUER}
+  mail:
+    path: ${MAIL_PATH}
+  domain: ${DOMAIN}

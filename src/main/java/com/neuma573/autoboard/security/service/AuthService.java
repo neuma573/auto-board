@@ -1,10 +1,14 @@
 package com.neuma573.autoboard.security.service;
 
 import com.neuma573.autoboard.global.exception.InvalidLoginException;
+import com.neuma573.autoboard.global.exception.NotActivatedUserException;
+import com.neuma573.autoboard.global.exception.TokenNotFoundException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
 import com.neuma573.autoboard.security.repository.LoginLogRepository;
+import com.neuma573.autoboard.security.repository.RefreshTokenRepository;
+import com.neuma573.autoboard.security.utils.CookieUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
@@ -30,9 +34,15 @@ public class AuthService {
 
     private final LoginLogRepository loginLogRepository;
 
-    private final String FAIL = "FAIL";
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    private final String SUCCESS = "SUCCESS";
+    private final String FAIL_STATE = "FAIL";
+
+    private final String SUCCESS_STATE = "SUCCESS";
+
+    private final String ACTIVATED_STATE = "Active";
+
+    private final String INACTIVATED_STATE = "Inactive";
 
 
 
@@ -42,17 +52,21 @@ public class AuthService {
 
         try {
             checkLoginAttempts(user);
-            validatePassword(loginRequest.getPassword(), user.getPassword());
-            recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS, null);
-            updateLoginAt(user);
 
-            return jwtProvider.createJwt(loginRequest, httpServletResponse);
+            if (isActivatedUser(user)) {
+                validatePassword(loginRequest.getPassword(), user.getPassword());
+                recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS_STATE, null);
+                updateLoginAt(user);
 
+                return jwtProvider.createJwt(loginRequest, httpServletResponse);
+            } else {
+                throw new NotActivatedUserException("not activatd");
+            }
         } catch (InvalidLoginException ex) {
             handleInvalidLogin(user, loginRequest, httpServletRequest, ex);
             throw ex;
         } catch (Exception ex) {
-            recordLoginAttempt(loginRequest, httpServletRequest, FAIL, ex);
+            recordLoginAttempt(loginRequest, httpServletRequest, FAIL_STATE, ex);
             throw ex;
         }
     }
@@ -94,7 +108,7 @@ public class AuthService {
 
     @Transactional
     public void handleInvalidLogin(User user, LoginRequest loginRequest, HttpServletRequest httpServletRequest, InvalidLoginException ex) {
-        recordLoginAttempt(loginRequest, httpServletRequest, FAIL, ex);
+        recordLoginAttempt(loginRequest, httpServletRequest, FAIL_STATE, ex);
         user.addFailCount();
         userRepository.save(user);
     }
@@ -103,6 +117,28 @@ public class AuthService {
     public void updateLoginAt(User user) {
         user.setLoginAt();
         userRepository.save(user);
+    }
+
+    @Transactional
+    public boolean isActivatedUser(User user) {
+        return switch (user.getStatus()) {
+            case ACTIVATED_STATE -> true;
+            case INACTIVATED_STATE -> false;
+            default -> false;
+        };
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtils.getCookieValue(request, "refreshToken");
+
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            refreshTokenRepository.delete(
+                    refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new TokenNotFoundException("No token"))
+            );
+        }
+
+        CookieUtils.deleteCookie(response, "refreshToken");
+
     }
 
 }

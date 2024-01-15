@@ -26,6 +26,7 @@ public class JwtRequestFilter implements Filter {
         ALLOWED_PATHS.add("/api/v1/users");
         ALLOWED_PATHS.add("/api/v1/users/email-check");
         ALLOWED_PATHS.add("/api/v1/auth/authenticate");
+        ALLOWED_PATHS.add("/api/v1/auth/verify");
         ALLOWED_PATHS.add("/api/v1/auth/refresh/token");
         ALLOWED_PATHS.add("/join");
         ALLOWED_PATHS.add("/login");

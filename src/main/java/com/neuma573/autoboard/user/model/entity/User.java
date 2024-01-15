@@ -2,6 +2,7 @@ package com.neuma573.autoboard.user.model.entity;
 
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.global.model.enums.Status;
+import com.neuma573.autoboard.security.model.entity.VerificationToken;
 import com.neuma573.autoboard.user.model.dto.UserResponse;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -9,6 +10,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +30,7 @@ public class User extends BaseEntity {
 
     private String name;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Status status;
 
@@ -58,4 +61,18 @@ public class User extends BaseEntity {
     public void setLoginAt() {
         this.lastLoginAt = LocalDateTime.now();
     }
+
+    public String getStatus() {
+        return status.getStatus();
+    }
+
+    public VerificationToken generateVerificationToken() {
+        return VerificationToken
+                .builder()
+                .token(UUID.randomUUID().toString())
+                .email(email)
+                .expiryDate(LocalDateTime.now().plusHours(1))
+                .build();
+    }
+
 }

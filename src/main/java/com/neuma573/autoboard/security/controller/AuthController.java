@@ -32,7 +32,6 @@ public class AuthController {
 
     @PostMapping("/refresh/token")
     public ResponseEntity<Response<AccessTokenResponse>> tokenRefresh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-
         return ResponseEntity.ok(responseUtils.success(
                 tokenService.refreshAccessToken(httpServletRequest, httpServletResponse)
         ));
@@ -40,9 +39,14 @@ public class AuthController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<Response<?>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-
         return ResponseEntity.ok(responseUtils.success(
                 authService.verifyUser(loginRequest, httpServletRequest, httpServletResponse)
         ));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Response<?>> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        authService.logout(httpServletRequest, httpServletResponse);
+        return ResponseEntity.ok(responseUtils.success("로그아웃 성공"));
     }
 }
