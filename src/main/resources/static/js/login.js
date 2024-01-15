@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('loginForm').addEventListener('submit', function(e) {
+        showSpinner();
         e.preventDefault();
         let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
@@ -31,5 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert(errMessage.message); // 에러 메시지 표시
                 });
             });
+        hideSpinner();
     });
 });

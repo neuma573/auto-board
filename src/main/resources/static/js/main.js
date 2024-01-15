@@ -40,3 +40,13 @@ async function logout() {
     }
 
 }
+
+// 스피너 표시 함수
+function showSpinner() {
+    document.getElementById('spinner-container').style.display = 'block';
+}
+
+// 스피너 숨기기 함수
+function hideSpinner() {
+    document.getElementById('spinner-container').style.display = 'none';
+}
