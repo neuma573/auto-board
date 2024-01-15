@@ -2,10 +2,13 @@ package com.neuma573.autoboard.security.service;
 
 import com.neuma573.autoboard.global.exception.InvalidLoginException;
 import com.neuma573.autoboard.global.exception.NotActivatedUserException;
+import com.neuma573.autoboard.global.exception.TokenNotFoundException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
 import com.neuma573.autoboard.security.repository.LoginLogRepository;
+import com.neuma573.autoboard.security.repository.RefreshTokenRepository;
+import com.neuma573.autoboard.security.utils.CookieUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
@@ -30,6 +33,8 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     private final LoginLogRepository loginLogRepository;
+
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private final String FAIL_STATE = "FAIL";
 
@@ -121,6 +126,19 @@ public class AuthService {
             case INACTIVATED_STATE -> false;
             default -> false;
         };
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = CookieUtils.getCookieValue(request, "refreshToken");
+
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            refreshTokenRepository.delete(
+                    refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new TokenNotFoundException("No token"))
+            );
+        }
+
+        CookieUtils.deleteCookie(response, "refreshToken");
+
     }
 
 }
