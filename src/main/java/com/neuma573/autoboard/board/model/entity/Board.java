@@ -1,6 +1,7 @@
 package com.neuma573.autoboard.board.model.entity;
 
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
+import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 
@@ -21,4 +22,6 @@ public class Board extends BaseEntity {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Post> posts;
+
+    private boolean isPublic;
 }
