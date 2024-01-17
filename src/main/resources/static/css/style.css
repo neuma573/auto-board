@@ -26,3 +26,52 @@ body {
     justify-content: center;
     align-items: center;
 }
+
+
+
+/* 모바일 화면용 스타일 */
+@media only screen and (max-width: 768px) {
+    .list-group-item {
+        display: block; /* 모바일에서는 리스트 아이템을 표시 */
+        background-color: #343a40;
+        color: white;
+        margin-bottom: 2px;
+        padding: 5px;
+    }
+    .post-title {
+        font-weight: bold;
+        color: white; /* 흰색 글씨 */
+        background-color: #343a40; /* 검정색 계열 배경 */
+        padding: 5px 10px; /* 패딩 추가 */
+    }
+
+    .post-details {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem; /* 작은 글씨로 세부사항 표시 */
+        color: white; /* 흰색 글씨 */
+        background-color: #343a40; /* 검정색 계열 배경 */
+        padding: 5px 10px; /* 패딩 추가 */
+    }
+
+    .author {
+        text-align: left;
+    }
+
+    .stats {
+        text-align: right;
+    }
+    .table-responsive {
+        display: none;
+    }
+}
+
+/* PC 화면용 스타일 */
+@media only screen and (min-width: 769px) {
+    .list-group {
+        display: none; /* PC에서는 리스트 그룹을 숨김 */
+    }
+    .table-responsive {
+        display: block; /* PC에서만 테이블을 표시 */
+    }
+}

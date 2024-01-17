@@ -13,20 +13,69 @@
     <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="container mt-3">
-        <h2 class="mb-3">게시판</h2>
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">제목</th>
-                <th scope="col">작성자</th>
-                <th scope="col">작성일</th>
-            </tr>
-            </thead>
-            <tbody>
+        <div class="container mt-3">
+            <select class="custom-select mb-3" id="boardSelect">
+            </select>
+        </div>
+        <div class="container mt-3">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">번호</th>
+                        <th scope="col">제목</th>
+                        <th scope="col">작성자</th>
+                        <th scope="col">작성일</th>
+                        <th scope="col">조회수</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>123</td>
+                            <td>제목</td>
+                            <td>작성자</td>
+                            <td>2023-10-13</td>
+                            <td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-            </tbody>
-        </table>
+            <!-- 모바일 화면용 리스트 (기존 구조) -->
+            <div class="list-group">
+                <div class="list-group-item">
+                    <div class="post-title">게시글 제목 [1]</div>
+                    <div class="post-details">
+                        <span class="author">작성자 이름</span>
+                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                    </div>
+                </div>
+                <div class="list-group-item">
+                    <div class="post-title">게시글 제목 [1]</div>
+                    <div class="post-details">
+                        <span class="author">작성자 이름</span>
+                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                    </div>
+                </div>
+                <div class="list-group-item">
+                    <div class="post-title">게시글 제목 [1]</div>
+                    <div class="post-details">
+                        <span class="author">작성자 이름</span>
+                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                    </div>
+                </div>
+                <div class="list-group-item">
+                    <div class="post-title">게시글 제목 [1]</div>
+                    <div class="post-details">
+                        <span class="author">작성자 이름</span>
+                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-3">
+                <button id="writeButton" class="btn btn-dark" type="button">글쓰기</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
