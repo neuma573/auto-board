@@ -1,5 +1,6 @@
-package com.neuma573.autoboard.board.model.entity;
+package com.neuma573.autoboard.post.model.entity;
 
+import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
@@ -23,5 +24,7 @@ public class Post extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "created_user_id")
     private User createdBy;
+
+    private Long views = 0L;
 
 }

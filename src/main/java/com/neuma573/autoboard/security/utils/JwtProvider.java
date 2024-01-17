@@ -199,4 +199,8 @@ public class JwtProvider {
             throw new JwtException("invalid token");
         }
     }
+
+    public String parseEmailFrom(String accessToken) {
+        return getClaims(accessToken).getSubject();
+    }
 }
