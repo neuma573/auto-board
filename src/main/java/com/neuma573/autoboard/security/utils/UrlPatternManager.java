@@ -24,6 +24,7 @@ public class UrlPatternManager {
                 "/api/v1/auth/authenticate",
                 "/api/v1/auth/verify",
                 "/api/v1/auth/refresh/token",
+                "/api/v1/board",
                 "/join",
                 "/login",
                 "/main",
