@@ -200,7 +200,19 @@ public class JwtProvider {
         }
     }
 
-    public String parseEmailFrom(String accessToken) {
-        return getClaims(accessToken).getSubject();
+    public String parseEmailFrom(HttpServletRequest httpServletRequest) {
+        try {
+            return getClaims(
+                    parseJwtToken(httpServletRequest)
+            ).getSubject();
+        } catch (IllegalArgumentException | JwtException ignore) {
+            return "";
+        }
+    }
+
+    public String parseEmailWithValidation(HttpServletRequest httpServletRequest) {
+        return getClaims(
+                parseJwtToken(httpServletRequest)
+        ).getSubject();
     }
 }
