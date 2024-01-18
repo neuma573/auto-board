@@ -17,9 +17,9 @@ pipeline {
         JWT_ISSUER = credentials('jwt-issuer-credential-id')
         MAIL_PATH = credentials('mail-path-credential-id')
         DOMAIN = credentials('domain-credential-id')
-        KEY_STORE = credentials('key-store')
-        KEY_STORE_PASSWORD = credentials('key-store-password')
-        KEY_TYPE = credentials('key-type')
+        KEY_STORE = credentials('key-store-credential-id')
+        KEY_STORE_PASSWORD = credentials('key-store-password-credential-id')
+        KEY_TYPE = credentials('key-type-credential-id')
     }
 
     stages {
