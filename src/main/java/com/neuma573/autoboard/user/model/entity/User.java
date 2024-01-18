@@ -36,6 +36,7 @@ public class User extends BaseEntity {
 
     private String password;
 
+    @Builder.Default
     private Long failCount = 0L;
 
     private LocalDateTime lastLoginAt;
