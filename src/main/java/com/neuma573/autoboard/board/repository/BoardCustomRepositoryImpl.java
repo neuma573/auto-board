@@ -23,7 +23,7 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository{
         BooleanBuilder conditions = new BooleanBuilder(qBoard.isDeleted.isFalse())
                 .and(qBoard.isPublic.isTrue());
 
-        userOptional.ifPresent(user -> conditions.and(qBoard.users.contains(user)));
+        userOptional.ifPresent(user -> conditions.or(qBoard.users.contains(user)));
 
         return jpaQueryFactory
                 .selectFrom(qBoard)
