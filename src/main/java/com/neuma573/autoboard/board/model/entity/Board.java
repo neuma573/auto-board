@@ -4,13 +4,16 @@ import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Entity
+@Table
 public class Board extends BaseEntity {
 
     @Id
@@ -32,7 +35,7 @@ public class Board extends BaseEntity {
             joinColumns = @JoinColumn(name = "board_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> users = ConcurrentHashMap.newKeySet();
+    private Set<User> users;
 
     private boolean isPublic;
 
