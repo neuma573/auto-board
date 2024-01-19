@@ -4,7 +4,6 @@ import com.neuma573.autoboard.email.model.dto.MailRequest;
 import com.neuma573.autoboard.email.service.MailService;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
-import com.neuma573.autoboard.security.repository.VerificationTokenRepository;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.UserRequest;
 import com.neuma573.autoboard.user.model.dto.UserResponse;
@@ -15,6 +14,7 @@ import com.neuma573.autoboard.user.repository.UserRepository;
 import com.neuma573.autoboard.user.repository.UserRoleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public class UserService {
 
     private final MailService mailService;
 
-    private final VerificationTokenRepository verificationTokenRepository;
+    private final RedisTemplate<String, VerificationToken> verificationTokenRedisTemplate;
 
     @Transactional
     public UserResponse signUp(UserRequest userRequest) {
@@ -67,22 +67,18 @@ public class UserService {
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(email);
     }
-
-    @Transactional
+    
     public VerificationToken generateVerificationToken(User user) {
 
         VerificationToken verificationToken = user.generateVerificationToken();
-        verificationTokenRepository.save(verificationToken);
-
+        verificationTokenRedisTemplate.opsForValue().set(verificationToken.getToken(), verificationToken);
         return verificationToken;
 
     }
 
-    @Transactional
     public boolean activateUserAccount(String token) {
         VerificationToken verificationToken = findByToken(token);
-
-        if (verificationToken == null || isValidVerificationToken(verificationToken)) {
+        if (verificationToken == null || !isValidVerificationToken(verificationToken)) {
             return false;
         }
 
@@ -94,17 +90,15 @@ public class UserService {
         if (user == null) {
             return false;
         }
-
         user.setStatus(Status.ACTIVE);
         userRepository.save(user);
-        verificationTokenRepository.delete(verificationToken);
+        verificationTokenRedisTemplate.delete(verificationToken.getToken());
         return true;
     }
 
 
     public VerificationToken findByToken(String token) {
-        return verificationTokenRepository.findByToken(token)
-                .orElse(null);
+        return verificationTokenRedisTemplate.opsForValue().get(token);
     }
 
     public boolean isValidVerificationToken(VerificationToken verificationToken) {

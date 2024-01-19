@@ -1,27 +1,27 @@
 package com.neuma573.autoboard.security.model.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.index.Indexed;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Builder
-@RedisHash("VerificationToken")
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class VerificationToken {
 
-    @Id
-    private String id;
-
-    @Indexed
     @Getter
     private String token;
 
     @Getter
     private String email;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Getter
     private LocalDateTime expiryDate;
 

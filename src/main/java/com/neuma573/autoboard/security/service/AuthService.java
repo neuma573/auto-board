@@ -6,8 +6,8 @@ import com.neuma573.autoboard.global.exception.TokenNotFoundException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
+import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.repository.LoginLogRepository;
-import com.neuma573.autoboard.security.repository.RefreshTokenRepository;
 import com.neuma573.autoboard.security.utils.CookieUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ public class AuthService {
 
     private final LoginLogRepository loginLogRepository;
 
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, RefreshToken> refreshTokenRedisTemplate;
 
     private final String FAIL_STATE = "FAIL";
 
@@ -132,9 +133,11 @@ public class AuthService {
         String refreshToken = CookieUtils.getCookieValue(request, "refreshToken");
 
         if (refreshToken != null && !refreshToken.isEmpty()) {
-            refreshTokenRepository.delete(
-                    refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new TokenNotFoundException("No token"))
-            );
+            RefreshToken token = refreshTokenRedisTemplate.opsForValue().get(refreshToken);
+            if (token == null) {
+                throw new TokenNotFoundException("No token");
+            }
+            refreshTokenRedisTemplate.delete(refreshToken);
         }
 
         CookieUtils.deleteCookie(response, "refreshToken");
