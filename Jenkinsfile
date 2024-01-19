@@ -18,7 +18,6 @@ pipeline {
         MAIL_PATH = credentials('mail-path-credential-id')
         DOMAIN = credentials('domain-credential-id')
 
-        // SSL 인증서 관련 환경변수
         KEY_STORE = credentials('key-store-credential-id')
         KEY_STORE_PASSWORD = credentials('key-store-password-credential-id')
         KEY_TYPE = credentials('key-type-credential-id')
@@ -33,18 +32,16 @@ pipeline {
 
         stage('Prepare SSL') {
             steps {
-                withCredentials([
-                    file(credentialsId: 'key-store-credential-id', variable: 'KEY_STORE_FILE')
-                ]) {
-                    // Jenkins 크레덴셜 저장소에서 파일을 가져와 src/main/resources로 복사합니다.
-                    sh 'cp $KEY_STORE_FILE src/main/resources/keystore.jks'
+                withCredentials([file(credentialsId: 'ssl_file', variable: 'SSL_FILE')]) {
+
+                    sh 'cp $SSL_FILE src/main/resources/autoboard.site.pfx'
                 }
             }
         }
 
         stage('Build') {
             steps {
-                sh './gradlew build'
+                sh './gradlew clean build'
             }
         }
 
@@ -54,19 +51,22 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Run JAR') {
             steps {
-                // 배포 관련 스크립트를 여기에 추가합니다.
+                script {
+                    def jarPath = 'build/libs/auto-board-0.0.1-SNAPSHOT.jar'
+                    sh "java -jar ${jarPath}"
+                }
             }
         }
     }
 
     post {
         success {
-            // 빌드 성공 시 실행될 작업들을 여기에 추가합니다.
+            echo 'Build and run succeeded.'
         }
         failure {
-            // 빌드 실패 시 실행될 작업들을 여기에 추가합니다.
+            echo 'Build and run failed.'
         }
     }
 }
