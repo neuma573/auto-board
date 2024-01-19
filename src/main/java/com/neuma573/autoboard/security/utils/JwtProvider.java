@@ -3,7 +3,6 @@ package com.neuma573.autoboard.security.utils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
-import com.neuma573.autoboard.security.repository.RefreshTokenRepository;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
 
 import io.jsonwebtoken.*;
@@ -14,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -21,6 +21,7 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
+import java.util.Objects;
 
 import static com.neuma573.autoboard.global.exception.ExceptionCode.*;
 
@@ -50,9 +51,9 @@ public class JwtProvider {
 
     private Key key;
 
-    private final RefreshTokenRepository refreshTokenRepository;
-
     private final ResponseUtils responseUtils;
+
+    private final RedisTemplate<String, RefreshToken> refreshTokenRedisTemplate;
 
     @PostConstruct
     public void init() {
@@ -100,7 +101,7 @@ public class JwtProvider {
         String accessToken = createAccessToken(accessTokenClaims);
         String refreshToken = createRefreshToken(refreshTokenClaims);
 
-        refreshTokenRepository.save(
+        refreshTokenRedisTemplate.opsForValue().set(refreshToken,
                 RefreshToken.builder()
                         .email(loginRequest.getEmail())
                         .token(refreshToken)
@@ -159,8 +160,10 @@ public class JwtProvider {
         try {
 
             getClaims(refreshToken);
-            refreshTokenRepository.findByToken(refreshToken)
-                    .orElseThrow(() -> new JwtException("Token not found"));
+            RefreshToken token = refreshTokenRedisTemplate.opsForValue().get(refreshToken);
+            if (token == null) {
+                throw new JwtException("Token not found");
+            }
 
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException e) {
@@ -184,10 +187,13 @@ public class JwtProvider {
 
     public AccessTokenResponse refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse response) throws IOException {
         String refreshToken = CookieUtils.getCookieValue(httpServletRequest, "refreshToken");
+        RefreshToken token = refreshTokenRedisTemplate.opsForValue().get(Objects.requireNonNull(refreshToken));
+        if (token == null) {
+            throw new JwtException("Token not found");
+        }
         if (validateRefreshToken(refreshToken, response)) {
             Claims accessTokenClaims = Jwts.claims()
-                    .subject(refreshTokenRepository.findByToken(refreshToken)
-                            .orElseThrow(() -> new JwtException("Token not found")).getEmail())
+                    .subject(token.getEmail())
                     .add("type", "access")
                     .build();
 
