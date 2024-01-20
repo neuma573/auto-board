@@ -30,14 +30,18 @@ public class JwtRequestFilter implements Filter {
         log.info("Request URI : [{}] {}", httpRequest.getMethod(), requestURI);
 
         if (urlPatternManager.isProtectedUrl(requestURI)) {
-            String jwt = jwtProvider.parseJwtToken(httpRequest);
-            if (jwt == null || !jwtProvider.validateAccessToken(jwt, httpResponse)) {
+            if (urlPatternManager.isProtectedUrl(requestURI) && !isAuthorizedRequest(httpRequest, httpResponse)) {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or Missing JWT Token");
                 return;
             }
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
-
     }
+
+    private boolean isAuthorizedRequest(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
+        String jwt = jwtProvider.parseJwtToken(httpRequest);
+        return jwt != null && jwtProvider.validateAccessToken(jwt, httpRequest ,httpResponse);
+    }
+
 }
