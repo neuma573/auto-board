@@ -36,4 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-**/*.pfx
+
+### certificate
+*.pfx
