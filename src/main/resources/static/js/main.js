@@ -30,7 +30,7 @@ async function logout() {
             }
         });
 
-        if (response.status === 401 || response.ok) {
+        if (response.status === 401 || response.status === 500 || response.ok) {
             alert("로그아웃 되었습니다");
             localStorage.removeItem("accessToken");
             location.reload();
