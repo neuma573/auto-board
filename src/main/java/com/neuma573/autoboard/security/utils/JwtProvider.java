@@ -21,7 +21,6 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
-import java.util.Objects;
 
 import static com.neuma573.autoboard.global.exception.ExceptionCode.*;
 
@@ -99,6 +98,15 @@ public class JwtProvider {
                 .add("type", "refresh")
                 .build();
         String accessToken = createAccessToken(accessTokenClaims);
+        CookieUtils.addCookie(httpServletResponse,
+                CookieUtils.createCookie(
+                        "accessToken",
+                        accessToken,
+                        10 * 60,
+                        true,
+                        true
+                )
+        );
         String refreshToken = createRefreshToken(refreshTokenClaims);
 
         refreshTokenRedisTemplate.opsForValue().set(refreshToken,
@@ -107,16 +115,6 @@ public class JwtProvider {
                         .token(refreshToken)
                         .build()
         );
-        CookieUtils.addCookie(httpServletResponse,
-                CookieUtils.createCookie(
-                        "refreshToken",
-                        refreshToken,
-                        60 * 60 * 24,
-                        false,
-                        true
-                )
-        );
-
         return AccessTokenResponse.builder()
                 .accessToken(accessToken)
                 .build();
@@ -126,7 +124,7 @@ public class JwtProvider {
         return new Date(System.currentTimeMillis() + expirationMs);
     }
 
-    public boolean validateAccessToken(String accessToken, HttpServletResponse response) throws IOException {
+    public boolean validateAccessToken(String accessToken,HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         try {
 
             Claims claims = getClaims(accessToken);
@@ -137,20 +135,21 @@ public class JwtProvider {
                     .parseSignedClaims(accessToken);
 
             if (!iss.equals(claims.getIssuer())) {
-                responseUtils.setResponse(response, INVALID_JWT_ISSUER, null);
+                responseUtils.setResponse(httpServletResponse, INVALID_JWT_ISSUER, null);
                 return false;
             } else if(!"access".equals(claims.get("type"))) {
-                responseUtils.setResponse(response, INVALID_JWT_TOKEN, null);
+                responseUtils.setResponse(httpServletResponse, INVALID_JWT_TOKEN, null);
                 return false;
             }
             return true;
 
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException e) {
-            responseUtils.setResponse(response, INVALID_JWT_TOKEN, e);
+            responseUtils.setResponse(httpServletResponse, INVALID_JWT_TOKEN, e);
         } catch (ExpiredJwtException e) {
-            responseUtils.setResponse(response, EXPIRED_ACCESS_TOKEN, e);
+            refreshAccessToken(httpServletRequest, httpServletResponse);
+            return true;
         } catch (UnsupportedJwtException e) {
-            responseUtils.setResponse(response, UNSUPPORTED_JWT_TOKEN, e);
+            responseUtils.setResponse(httpServletResponse, UNSUPPORTED_JWT_TOKEN, e);
         }
 
         return false;
@@ -181,28 +180,46 @@ public class JwtProvider {
         String token = request.getHeader(headerString);
         if (StringUtils.hasText(token) && token.startsWith(tokenPrefix)) {
             token = token.replace(tokenPrefix, "");
+        } else {
+            token = CookieUtils.getCookieValue(request, "accessToken");
         }
         return token;
     }
 
-    public AccessTokenResponse refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse response) throws IOException {
-        String refreshToken = CookieUtils.getCookieValue(httpServletRequest, "refreshToken");
-        RefreshToken token = refreshTokenRedisTemplate.opsForValue().get(Objects.requireNonNull(refreshToken));
+    public AccessTokenResponse refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+
+        String email = parseEmailFrom(httpServletRequest);
+
+        RefreshToken token = refreshTokenRedisTemplate.opsForValue().get(email);
         if (token == null) {
-            throw new JwtException("Token not found");
+            CookieUtils.deleteCookie(httpServletResponse, "accessToken");
+            throw new JwtException("Refresh Token not found");
         }
-        if (validateRefreshToken(refreshToken, response)) {
+        if (validateRefreshToken(token.getToken(), httpServletResponse)) {
             Claims accessTokenClaims = Jwts.claims()
                     .subject(token.getEmail())
                     .add("type", "access")
                     .build();
 
+            String accessToken = createAccessToken(accessTokenClaims);
+            CookieUtils.deleteCookie(httpServletResponse, "accessToken");
+
+            CookieUtils.addCookie(httpServletResponse,
+                    CookieUtils.createCookie(
+                            "accessToken",
+                            accessToken,
+                            10 * 60,
+                            true,
+                            true
+                    )
+            );
+
             return AccessTokenResponse.builder()
-                    .accessToken(createAccessToken(accessTokenClaims))
+                    .accessToken(accessToken)
                     .build();
         }
         else {
-            throw new JwtException("invalid token");
+            throw new JwtException("invalid refresh token");
         }
     }
 
