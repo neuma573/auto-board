@@ -2,7 +2,6 @@ package com.neuma573.autoboard.security.service;
 
 import com.neuma573.autoboard.global.exception.InvalidLoginException;
 import com.neuma573.autoboard.global.exception.NotActivatedUserException;
-import com.neuma573.autoboard.global.exception.TokenNotFoundException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
@@ -129,19 +128,16 @@ public class AuthService {
         };
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = CookieUtils.getCookieValue(request, "refreshToken");
+    public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        String email = jwtProvider.parseEmailFrom(httpServletRequest);
 
-        if (refreshToken != null && !refreshToken.isEmpty()) {
-            RefreshToken token = refreshTokenRedisTemplate.opsForValue().get(refreshToken);
-            if (token == null) {
-                throw new TokenNotFoundException("No token");
-            }
-            refreshTokenRedisTemplate.delete(refreshToken);
+        RefreshToken token = refreshTokenRedisTemplate.opsForValue().get(email);
+
+        if (token != null) {
+            refreshTokenRedisTemplate.delete(email);
         }
 
-        CookieUtils.deleteCookie(response, "refreshToken");
-
+        CookieUtils.deleteCookie(httpServletResponse, "accessToken");
     }
 
 }
