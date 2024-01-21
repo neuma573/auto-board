@@ -26,22 +26,26 @@ public class JwtRequestFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
         String requestURI = httpRequest.getRequestURI();
-
         log.info("Request URI : [{}] {}", httpRequest.getMethod(), requestURI);
 
-        if (urlPatternManager.isProtectedUrl(requestURI)) {
-            if (urlPatternManager.isProtectedUrl(requestURI) && !isAuthorizedRequest(httpRequest, httpResponse)) {
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or Missing JWT Token");
-                return;
-            }
+        if (urlPatternManager.isProtectedUrl(requestURI) && !isAuthorizedRequest(httpRequest, httpResponse)) {
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or Missing JWT Token");
+            return;
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    private boolean isAuthorizedRequest(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
-        String jwt = jwtProvider.parseJwtToken(httpRequest);
-        return jwt != null && jwtProvider.validateAccessToken(jwt, httpRequest ,httpResponse);
+    private boolean isAuthorizedRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+        String accessToken = jwtProvider.parseJwtToken(httpServletRequest);
+
+        boolean isMvcRequest = !httpServletRequest.getRequestURI().startsWith("/api");
+
+        if (isMvcRequest || !jwtProvider.validateAccessTokenWithoutResponse(accessToken)) {
+            jwtProvider.refreshAccessToken(httpServletRequest, httpServletResponse);
+        }
+
+        return accessToken != null && jwtProvider.validateAccessToken(accessToken, httpServletResponse);
     }
 
 }
