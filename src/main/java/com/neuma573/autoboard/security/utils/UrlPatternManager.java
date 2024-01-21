@@ -14,7 +14,7 @@ public class UrlPatternManager {
     private static final Set<Pattern> ALLOWED_PATTERNS = new HashSet<>();
 
     static {
-        Arrays.asList("/static/.*", "/images/.*", "/js/.*", "/css/.*", "/favicon.ico").forEach(
+        Arrays.asList("/static/.*", "/images/.*", "/js/.*", "/css/.*", "/favicon.ico", "/ads.txt").forEach(
                 pattern -> ALLOWED_PATTERNS.add(Pattern.compile(pattern))
         );
 
