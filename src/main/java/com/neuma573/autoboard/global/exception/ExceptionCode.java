@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ExceptionCode {
 
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다"),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생했습니다"),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "대상이 존재하지 않습니다"),
 
