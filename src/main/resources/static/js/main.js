@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-
     checkLoginStatus();
     fetchBoards();
 });
@@ -20,7 +19,6 @@ function checkLoginStatus() {
 }
 
 async function logout() {
-
     try {
         const response = await fetch('/api/v1/auth/logout', {
             method: 'POST',

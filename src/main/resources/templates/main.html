@@ -1,35 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 부트스트랩 CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <title>Auto board</title>
-</head>
-<body>
-
-    <div th:replace="~{fragments/header :: header}"></div>
-
-    <div class="container mt-3">
-        <div class="container mt-3">
-            <select class="custom-select mb-3" id="boardSelect">
-            </select>
-        </div>
-        <div class="container mt-3">
-            <div class="table-responsive">
-                <table class="table table-dark table-hover">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">번호</th>
-                        <th scope="col">제목</th>
-                        <th scope="col">작성자</th>
-                        <th scope="col">작성일</th>
-                        <th scope="col">조회수</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+<html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
+    <title>AUTO BOARD</title>
+    <body>
+        <div th:fragment="content">
+            <div class="container mt-3">
+                <div class="container mt-3">
+                    <select class="custom-select mb-3" id="boardSelect">
+                    </select>
+                </div>
+            <div class="container mt-3">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">번호</th>
+                            <th scope="col">제목</th>
+                            <th scope="col">작성자</th>
+                            <th scope="col">작성일</th>
+                            <th scope="col">조회수</th>
+                        </tr>
+                        </thead>
+                        <tbody>
                         <tr>
                             <td>123</td>
                             <td>제목</td>
@@ -37,50 +28,46 @@
                             <td>2023-10-13</td>
                             <td>1</td>
                         </tr>
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
 
-            <!-- 모바일 화면용 리스트 (기존 구조) -->
-            <div class="list-group">
-                <div class="list-group-item">
-                    <div class="post-title">게시글 제목 [1]</div>
-                    <div class="post-details">
-                        <span class="author">작성자 이름</span>
-                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                <!-- 모바일 화면용 리스트 (기존 구조) -->
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="post-title">게시글 제목 [1]</div>
+                        <div class="post-details">
+                            <span class="author">작성자 이름</span>
+                            <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="post-title">게시글 제목 [1]</div>
+                        <div class="post-details">
+                            <span class="author">작성자 이름</span>
+                            <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="post-title">게시글 제목 [1]</div>
+                        <div class="post-details">
+                            <span class="author">작성자 이름</span>
+                            <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="post-title">게시글 제목 [1]</div>
+                        <div class="post-details">
+                            <span class="author">작성자 이름</span>
+                            <span class="stats">작성일: 2021-01-01 조회수: 100</span>
+                        </div>
                     </div>
                 </div>
-                <div class="list-group-item">
-                    <div class="post-title">게시글 제목 [1]</div>
-                    <div class="post-details">
-                        <span class="author">작성자 이름</span>
-                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
-                    </div>
-                </div>
-                <div class="list-group-item">
-                    <div class="post-title">게시글 제목 [1]</div>
-                    <div class="post-details">
-                        <span class="author">작성자 이름</span>
-                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
-                    </div>
-                </div>
-                <div class="list-group-item">
-                    <div class="post-title">게시글 제목 [1]</div>
-                    <div class="post-details">
-                        <span class="author">작성자 이름</span>
-                        <span class="stats">작성일: 2021-01-01 조회수: 100</span>
-                    </div>
+                <div class="d-flex justify-content-end mb-3">
+                    <a th:href="@{/write}" id="writeButton" class="btn btn-dark" type="button">글쓰기</a>
                 </div>
             </div>
-            <div class="d-flex justify-content-end mb-3">
-                <a th:href="@{/write}" id="writeButton" class="btn btn-dark" type="button">글쓰기</a>
             </div>
         </div>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <div th:replace="~{fragments/footer :: footer}"></div>
-</body>
+    </body>
 </html>
