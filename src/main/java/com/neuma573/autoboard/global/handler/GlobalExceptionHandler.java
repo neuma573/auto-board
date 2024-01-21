@@ -6,7 +6,11 @@ import com.neuma573.autoboard.global.exception.TokenNotFoundException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -16,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.stream.Collectors;
 
@@ -85,12 +90,47 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
     }
 
+    @ExceptionHandler({JwtException.class, ExpiredJwtException.class})
+    public Object handleJwtException(JwtException ex, HttpServletRequest httpServletRequest) {
+        log.info(ex.getMessage());
+        if (isApiRequest(httpServletRequest)) {
+            Response<String> response = responseUtils.error(UNAUTHORIZED, ex);
+            return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
+        } else {
+            ModelAndView modelAndView = new ModelAndView("error/error");
+
+            modelAndView.addObject("code", UNAUTHORIZED);
+            modelAndView.addObject("message", ex.getMessage());
+            return modelAndView;
+        }
+    }
+
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Response<String>> handleException(Exception ex) {
-        log.info(ex.getMessage());
+    public Object handleException(Exception ex, HttpServletRequest httpServletRequest) {
+
         ex.printStackTrace();
-        Response<String> response = responseUtils.error(INTERNAL_SERVER_ERROR, ex);
-        return new ResponseEntity<>(response, INTERNAL_SERVER_ERROR.getStatus());
+
+        if (isApiRequest(httpServletRequest)) {
+            Response<String> response = responseUtils.error(INTERNAL_SERVER_ERROR, ex);
+            return new ResponseEntity<>(response, INTERNAL_SERVER_ERROR.getStatus());
+        } else {
+            ModelAndView modelAndView = new ModelAndView("error/error");
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            Object statusObject = httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+            if (statusObject != null) {
+                int statusCode = Integer.parseInt(statusObject.toString());
+                status = HttpStatus.valueOf(statusCode);
+            }
+
+            modelAndView.addObject("code", status.value());
+            modelAndView.addObject("message", status.getReasonPhrase());
+            return modelAndView;
+        }
+
+    }
+
+    private boolean isApiRequest(HttpServletRequest request) {
+        return request.getServletPath().startsWith("/api");
     }
 }
