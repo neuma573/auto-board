@@ -10,10 +10,10 @@ import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.repository.PostRepository;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor

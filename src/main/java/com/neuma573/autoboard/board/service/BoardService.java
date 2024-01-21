@@ -8,10 +8,10 @@ import com.neuma573.autoboard.global.exception.BoardNotFoundException;
 import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;

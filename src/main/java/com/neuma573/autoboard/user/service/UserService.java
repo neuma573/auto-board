@@ -12,10 +12,10 @@ import com.neuma573.autoboard.user.model.entity.UserRole;
 import com.neuma573.autoboard.user.model.enums.Role;
 import com.neuma573.autoboard.user.repository.UserRepository;
 import com.neuma573.autoboard.user.repository.UserRoleRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
