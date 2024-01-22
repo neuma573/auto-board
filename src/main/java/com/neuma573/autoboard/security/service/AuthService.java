@@ -114,9 +114,9 @@ public class AuthService {
     }
 
     public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        String email = jwtProvider.parseEmailFrom(httpServletRequest);
-        refreshTokenRedisTemplate.delete(email);
+        refreshTokenRedisTemplate.delete(Objects.requireNonNull(CookieUtils.getCookieValue(httpServletRequest, "uuid")));
         CookieUtils.deleteCookie(httpServletResponse, "accessToken");
+        CookieUtils.deleteCookie(httpServletResponse, "uuid");
     }
 
 }
