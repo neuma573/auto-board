@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RefreshToken {
 
-    private String email;
+    private String uuid;
 
     private String token;
 
