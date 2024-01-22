@@ -2,6 +2,7 @@ package com.neuma573.autoboard.security.controller;
 
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
+import com.neuma573.autoboard.security.model.dto.AccessTokenRequest;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.security.service.TokenService;
@@ -45,5 +46,10 @@ public class AuthController {
     public ResponseEntity<Response<?>> logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         authService.logout(httpServletRequest, httpServletResponse);
         return ResponseEntity.ok(responseUtils.success("로그아웃 성공"));
+    }
+
+    @PostMapping("/verify-token")
+    public ResponseEntity<Response<Boolean>> verify(@RequestBody AccessTokenRequest accessTokenRequest) {
+        return ResponseEntity.ok(responseUtils.success(tokenService.validateToken(accessTokenRequest)));
     }
 }
