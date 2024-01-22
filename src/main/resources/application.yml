@@ -48,7 +48,6 @@ app:
     secret: ${JWT_SECRET}
     access-token-expiration-ms: 600000 # 10분
     refresh-token-expiration-ms: 3000000 # 50분
-    refresh-token-expire-time-for-redis: 3000 # 50분 (초 단위)
     token-prefix: "Bearer "
     header-string: "Authorization"
     issuer: ${JWT_ISSUER}
