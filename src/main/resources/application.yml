@@ -1,3 +1,7 @@
+#logging.level:
+#  org.hibernate.orm.jdbc.bind: trace
+
+
 server:
   port: 443
   ssl:
