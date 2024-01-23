@@ -7,6 +7,7 @@ import com.neuma573.autoboard.global.exception.BoardNotFoundException;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
+import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
 import com.neuma573.autoboard.post.model.dto.PostResponse;
 import com.neuma573.autoboard.post.model.entity.Post;
@@ -51,16 +52,13 @@ public class PostService {
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
 
     public List<PostResponse> getPostList(Long boardId, Pageable pageable, Long userId) {
-        Page<Post> posts = postRepository.findAllByBoardId(boardId, pageable);
-
-        List<PostResponse> postResponseList = posts.map(this::convertToPostResponse).getContent();
-
         User user = userRepository.findById(userId).orElse(null);
-        if(user == null || !user.isAdmin()){
-            postResponseList = subtractDeleted(postResponseList);
-        }
 
-        return postResponseList;
+        Page<Post> posts = (user != null && user.isAdmin())
+                ? postRepository.findAllByBoardId(boardId, pageable)
+                : postRepository.findAllByBoardIdAndIsDeletedFalse(boardId, pageable);
+
+        return posts.map(this::convertToPostResponse).getContent();
     }
 
     @Transactional
@@ -178,4 +176,22 @@ public class PostService {
         post.setDeleted(true);
         post.setDeletedAt(LocalDateTime.now());
     }
+
+    public PostPermissionResponse getPermissionFrom(Long postId, Long userId) {
+        if (userId == -1L) {
+            return PostPermissionResponse.builder()
+                    .isAbleToDelete(false)
+                    .isAbleToModify(false)
+                    .build();
+        }
+        User user = userService.getUserById(userId);
+        Post post = getPostById(postId);
+
+        return PostPermissionResponse.builder()
+                .isAbleToDelete(!post.isDeleted() && isAbleToDelete(post, user))
+                .isAbleToModify(isAbleToModify(post, user))
+                .build();
+
+    }
+
 }
