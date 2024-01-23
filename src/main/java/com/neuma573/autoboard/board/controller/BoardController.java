@@ -31,13 +31,13 @@ public class BoardController {
 
     @GetMapping("")
     public ResponseEntity<Response<List<BoardResponse>>> getBoardList(HttpServletRequest httpServletRequest) {
-        String email = jwtProvider.parseEmailFrom(httpServletRequest);
-        return ResponseEntity.ok().body(responseUtils.success(boardService.getBoardList(email)));
+        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
+        return ResponseEntity.ok().body(responseUtils.success(boardService.getBoardList(userId)));
     }
 
     @PostMapping("")
     public ResponseEntity<Response<BoardResponse>> saveBoard(@Valid @RequestBody BoardRequest boardRequest, HttpServletRequest httpServletRequest) {
-        String email = jwtProvider.parseEmailWithValidation(httpServletRequest);
-        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(boardService.saveBoard(email, boardRequest)));
+        Long userId = jwtProvider.getUserId(httpServletRequest);
+        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(boardService.saveBoard(userId, boardRequest)));
     }
 }
