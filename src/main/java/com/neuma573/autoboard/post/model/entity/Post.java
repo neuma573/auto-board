@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.time.format.DateTimeFormatter;
 
 @Builder
 @Entity
@@ -36,5 +37,13 @@ public class Post extends BaseEntity {
     private Long views = 0L;
 
     private boolean isDeleted;
+
+    public void addViews() {
+        views++;
+    }
+
+    public String getFormattedCreatedAt() {
+        return getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
 
 }
