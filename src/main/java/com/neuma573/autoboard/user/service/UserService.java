@@ -2,6 +2,7 @@ package com.neuma573.autoboard.user.service;
 
 import com.neuma573.autoboard.email.model.dto.MailRequest;
 import com.neuma573.autoboard.email.service.MailService;
+import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
@@ -103,6 +104,10 @@ public class UserService {
 
     public boolean isValidVerificationToken(VerificationToken verificationToken) {
         return verificationToken.getExpiryDate().isAfter(LocalDateTime.now());
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
     }
 
 }
