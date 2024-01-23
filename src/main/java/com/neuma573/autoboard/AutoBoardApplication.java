@@ -11,9 +11,11 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableJpaAuditing
 @EnableRedisRepositories
+@EnableAsync
 @SpringBootApplication
 public class AutoBoardApplication {
 
