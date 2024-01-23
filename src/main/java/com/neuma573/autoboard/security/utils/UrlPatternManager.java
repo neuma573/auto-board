@@ -26,9 +26,12 @@ public class UrlPatternManager {
                 "/api/v1/auth/verify-token",
                 "/api/v1/auth/refresh/token",
                 "/api/v1/board",
+                "/api/v1/post/list",
+                "/api/v1/post",
                 "/join",
                 "/login",
                 "/main",
+                "/post",
                 "/"
         ));
     }
