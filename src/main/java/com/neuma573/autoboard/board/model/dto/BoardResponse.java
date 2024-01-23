@@ -27,4 +27,20 @@ public class BoardResponse {
                 .isPublic(board.isPublic())
                 .build();
     }
+
+    public static BoardResponse ofWithoutDeleted(Board board) {
+        long countNotDeletedPosts = Optional.ofNullable(board.getPosts())
+                .map(posts -> posts.stream()
+                        .filter(post -> !post.isDeleted())
+                        .count())
+                .orElse(0L);
+
+        return BoardResponse.builder()
+                .id(board.getId())
+                .boardName(board.getName())
+                .postCount(countNotDeletedPosts)
+                .isPublic(board.isPublic())
+                .build();
+    }
+
 }
