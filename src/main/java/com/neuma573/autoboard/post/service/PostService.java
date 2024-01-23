@@ -6,6 +6,7 @@ import com.neuma573.autoboard.global.exception.BoardNotAccessibleException;
 import com.neuma573.autoboard.global.exception.BoardNotFoundException;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.exception.UserNotFoundException;
+import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
 import com.neuma573.autoboard.post.model.dto.PostResponse;
 import com.neuma573.autoboard.post.model.entity.Post;
@@ -13,6 +14,7 @@ import com.neuma573.autoboard.post.repository.PostRepository;
 import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.repository.UserRepository;
+import com.neuma573.autoboard.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -41,6 +44,8 @@ public class PostService {
     private final StringRedisTemplate stringRedisTemplate;
 
     private final AuthService authService;
+
+    private final UserService userService;
 
     private final static String VIEW_COUNT_KEY_PREFIX = "view:count:";
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
@@ -102,18 +107,18 @@ public class PostService {
     }
 
     public boolean checkAccessible(Long postId, Long userId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotAccessibleException("접근할 수 없는 게시글입니다."));
+        Post post = getPostById(postId);
 
         if (userId == -1L) {
             return post.getBoard().isPublic() && !post.isDeleted();
         }
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
 
-        return post.getBoard().isAccessible(user) && !post.isDeleted();
+        return user.isAdmin() || (post.getBoard().isAccessible(user) && !post.isDeleted());
     }
 
     public PostResponse getPost(HttpServletRequest httpServletRequest, Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotAccessibleException("접근할 수 없는 게시글입니다."));
+        Post post = getPostById(postId);
         increaseViewCount(httpServletRequest, postId);
         return PostResponse.of(post);
     }
@@ -125,10 +130,52 @@ public class PostService {
         Boolean alreadyViewed = stringRedisTemplate.opsForValue().setIfAbsent(cacheKey, "1", VIEW_COUNT_EXPIRATION, TimeUnit.SECONDS);
 
         if (Boolean.TRUE.equals(alreadyViewed)) {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new PostNotAccessibleException("Post not found with id " + postId));
+            Post post = getPostById(postId);
             post.addViews();
             postRepository.save(post);
         }
+    }
+
+    @Transactional
+    public void modifyPost(PostModifyRequest postModifyRequest, Long userId) {
+        Post post = getPostById(postModifyRequest.getPostId());
+        if (isAbleToModify(post, userService.getUserById(userId))) {
+            modify(post, postModifyRequest);
+        } else {
+            throw new PostNotAccessibleException("수정할 수 있는 권한이 없습니다");
+        }
+    }
+
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Post post = getPostById(postId);
+        if (isAbleToDelete(post, userService.getUserById(userId))) {
+            delete(post);
+        } else {
+            throw new PostNotAccessibleException("삭제할 수 있는 권한이 없습니다");
+        }
+    }
+
+    public boolean isAbleToModify(Post post, User user) {
+        log.info(post.getCreatedBy().getEmail());
+        return post.getCreatedBy().getId().equals(user.getId());
+    }
+
+    public boolean isAbleToDelete(Post post, User user) {
+        return user.isAdmin() || isAbleToModify(post, user);
+    }
+
+    public Post getPostById(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() -> new PostNotAccessibleException("접근할 수 없는 게시글입니다."));
+    }
+
+    public void modify(Post post, PostModifyRequest postModifyRequest) {
+        post.setTitle(postModifyRequest.getTitle());
+        post.setContent(postModifyRequest.getContent());
+    }
+
+    public void delete(Post post) {
+        post.setDeleted(true);
+        post.setDeletedAt(LocalDateTime.now());
     }
 }
