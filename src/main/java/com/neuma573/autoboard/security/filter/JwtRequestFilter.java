@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.security.filter;
 
+import com.neuma573.autoboard.security.utils.CookieUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.UrlPatternManager;
 import jakarta.servlet.*;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -26,18 +28,26 @@ public class JwtRequestFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
         String requestURI = httpRequest.getRequestURI();
-
         log.info("Request URI : [{}] {}", httpRequest.getMethod(), requestURI);
 
-        if (urlPatternManager.isProtectedUrl(requestURI)) {
-            String jwt = jwtProvider.parseJwtToken(httpRequest);
-            if (jwt == null || !jwtProvider.validateAccessToken(jwt, httpResponse)) {
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or Missing JWT Token");
-                return;
-            }
+        if (urlPatternManager.isProtectedUrl(requestURI) && !isAuthorizedRequest(httpRequest, httpResponse)) {
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or Missing JWT Token");
+            return;
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
-
     }
+
+    private boolean isAuthorizedRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+        Optional<String> accessTokenOpt = jwtProvider.parseJwtToken(httpServletRequest);
+
+        boolean isMvcRequest = !httpServletRequest.getRequestURI().startsWith("/api");
+
+        if (CookieUtils.getCookieValue(httpServletRequest, "uuid").isPresent() && (isMvcRequest || accessTokenOpt.map(token -> !jwtProvider.validateAccessTokenWithoutResponse(token)).orElse(true))) {
+            jwtProvider.refreshAccessToken(httpServletRequest, httpServletResponse);
+        }
+
+        return accessTokenOpt.isPresent() && jwtProvider.validateAccessToken(accessTokenOpt.get(), httpServletResponse);
+    }
+
 }

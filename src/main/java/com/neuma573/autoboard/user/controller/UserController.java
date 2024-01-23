@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -33,12 +33,12 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(value = "/users")
+    @PostMapping(value = "")
     public ResponseEntity<Response<UserResponse>> join(@Valid @RequestBody UserRequest userRequest) {
         return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(userService.signUp(userRequest)));
     }
 
-    @GetMapping(value = "/users/email-check")
+    @GetMapping(value = "/email-check")
     public ResponseEntity<Response<?>> checkEmailAvailability(@Valid @ModelAttribute EmailRequest emailRequest) {
         return ResponseEntity.ok().body(responseUtils.success(userService.isEmailAvailable(emailRequest.getEmail())));
     }

@@ -4,6 +4,8 @@ import com.neuma573.autoboard.board.model.entity.Board;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Optional;
+
 @Builder
 @Getter
 public class BoardResponse {
@@ -14,12 +16,15 @@ public class BoardResponse {
 
     private Long postCount;
 
+    private boolean isPublic;
+
 
     public static BoardResponse of(Board board) {
         return BoardResponse.builder()
                 .id(board.getId())
                 .boardName(board.getName())
-                .postCount((long) board.getPosts().size())
+                .postCount(Optional.ofNullable(board.getPosts()).map(posts -> (long) posts.size()).orElse(0L))
+                .isPublic(board.isPublic())
                 .build();
     }
 }

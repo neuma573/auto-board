@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<title>게시글</title>
+<body>
+<div th:fragment="content">
+  <div class="container mt-5">
+    <article class="post-card">
+      <header class="post-card-header">
+        <span id="title" class="post-title"></span>
+        <div class="user-info post-meta">
+          <a href="#"><span id="user" class="post-user"></span></a>
+        </div>
+        <div class="post-meta">
+          <div class="post-info">
+            <span id="views" class="post-views"></span> |
+            <time datetime="2024-01-23T04:22:56"></time>
+          </div>
+        </div>
+      </header>
+      <section id="content" class="post-content">
+        <p></p>
+      </section>
+    </article>
+  </div>
+  <script src="/js/post.js"></script>
+</div>
+</body>
+</html>

@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-  <title>Error</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/style.css">
-</head>
+<html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<title>ERROR!</title>
 <body>
-  <h1>Something went wrong!</h1>
-  <div th:if="${message} != null">
-    <p><span th:text="${message}"></span></p>
-  </div>
+    <div th:fragment="content" class="container mt-3">
+        <h3>Something went wrong!</h3>
+        <div th:if="${message} != null">
+            <p><span th:text="${message}"></span></p>
+        </div>
+    </div>
 </body>
 </html>

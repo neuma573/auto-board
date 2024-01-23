@@ -4,8 +4,17 @@ import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import java.time.format.DateTimeFormatter;
 
+@Builder
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Table(name = "post")
 public class Post extends BaseEntity {
     @Id
@@ -26,5 +35,15 @@ public class Post extends BaseEntity {
     private User createdBy;
 
     private Long views = 0L;
+
+    private boolean isDeleted;
+
+    public void addViews() {
+        views++;
+    }
+
+    public String getFormattedCreatedAt() {
+        return getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
 
 }

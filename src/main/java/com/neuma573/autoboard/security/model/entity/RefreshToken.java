@@ -1,20 +1,20 @@
 package com.neuma573.autoboard.security.model.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.index.Indexed;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@RedisHash("RefreshToken")
 public class RefreshToken {
 
-    @Id
-    private String email;
+    private String uuid;
 
-    @Indexed
     private String token;
+
+    private Long id;
 
 }

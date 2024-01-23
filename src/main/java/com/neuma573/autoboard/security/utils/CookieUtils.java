@@ -4,6 +4,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public class CookieUtils {
 
     public static Cookie createCookie(String name, String value, int maxAge, boolean isSecure, boolean isHttpOnly) {
@@ -19,17 +22,15 @@ public class CookieUtils {
         response.addCookie(cookie);
     }
 
-    public static String getCookieValue(HttpServletRequest request, String cookieName) {
+    public static Optional<String> getCookieValue(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(cookieName)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
+        return cookies == null ? Optional.empty() :
+                Arrays.stream(cookies)
+                        .filter(cookie -> cookieName.equals(cookie.getName()))
+                        .findFirst()
+                        .map(Cookie::getValue);
     }
+
 
     public static void deleteCookie(HttpServletResponse response, String cookieName) {
         Cookie cookie = new Cookie(cookieName, null);
