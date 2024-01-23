@@ -15,4 +15,6 @@ public class RefreshToken {
 
     private String token;
 
+    private Long id;
+
 }

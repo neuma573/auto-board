@@ -1,10 +1,9 @@
 package com.neuma573.autoboard.security.utils;
 
+import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
-import com.neuma573.autoboard.user.model.dto.LoginRequest;
-
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -21,7 +20,8 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
-import java.util.Objects;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -94,9 +94,9 @@ public class JwtProvider {
                 .getPayload();
     }
 
-    public AccessTokenResponse createJwt(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
+    public AccessTokenResponse createJwt(HttpServletResponse httpServletResponse, Long userId) {
         Claims accessTokenClaims = Jwts.claims()
-                .subject(loginRequest.getEmail())
+                .subject(String.valueOf(userId))
                 .add("type", "access")
                 .build();
         Claims refreshTokenClaims = Jwts.claims()
@@ -130,6 +130,7 @@ public class JwtProvider {
                 RefreshToken.builder()
                         .uuid(initialUuid)
                         .token(refreshToken)
+                        .id(userId)
                         .build(),
                 refreshTokenExpireTime,
                 TimeUnit.MILLISECONDS
@@ -156,7 +157,7 @@ public class JwtProvider {
             if (!iss.equals(claims.getIssuer())) {
                 responseUtils.setResponse(httpServletResponse, INVALID_JWT_ISSUER, null);
                 return false;
-            } else if(!"access".equals(claims.get("type"))) {
+            } else if (!"access".equals(claims.get("type"))) {
                 throw new io.jsonwebtoken.security.SecurityException("Access Token is not valid");
             }
             return true;
@@ -183,7 +184,8 @@ public class JwtProvider {
 
             return iss.equals(claims.getIssuer()) && "access".equals(claims.get("type"));
 
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException | ExpiredJwtException | UnsupportedJwtException e) {
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException |
+                 ExpiredJwtException | UnsupportedJwtException | NoSuchElementException e) {
             return false;
         }
 
@@ -206,24 +208,24 @@ public class JwtProvider {
         return false;
     }
 
-    public String parseJwtToken(HttpServletRequest request) {
-        String token = request.getHeader(headerString);
-        if (StringUtils.hasText(token) && token.startsWith(tokenPrefix)) {
-            token = token.replace(tokenPrefix, "");
-        } else {
-            token = CookieUtils.getCookieValue(request, "accessToken");
-        }
-        return token;
+    public Optional<String> parseJwtToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(headerString))
+                .filter(StringUtils::hasText)
+                .filter(token -> token.startsWith(tokenPrefix))
+                .map(token -> token.replace(tokenPrefix, ""))
+                .or(() -> CookieUtils.getCookieValue(request, "accessToken"));
     }
 
-    public AccessTokenResponse refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        String uuid = CookieUtils.getCookieValue(httpServletRequest, "uuid");
 
-        if (uuid == null || uuid.isEmpty()) {
+    public AccessTokenResponse refreshAccessToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+
+        Optional<String> uuid = CookieUtils.getCookieValue(httpServletRequest, "uuid");
+
+        if (uuid.isEmpty()) {
             throw new JwtException("UUID is missing or empty");
         }
         log.info("TOKEN REFRESH ATTEMPT :: UUID :: {}", uuid);
-        RefreshToken refreshToken = refreshTokenRedisTemplate.opsForValue().get(Objects.requireNonNull(uuid));
+        RefreshToken refreshToken = refreshTokenRedisTemplate.opsForValue().get(uuid.get());
         if (refreshToken == null) {
             throw new JwtException("Refresh Token not found");
         }
@@ -231,7 +233,7 @@ public class JwtProvider {
             throw new JwtException("Invalid refresh token");
         }
         Claims accessTokenClaims = Jwts.claims()
-                .subject(refreshToken.getUuid())
+                .subject(String.valueOf(refreshToken.getId()))
                 .add("type", "access")
                 .build();
 
@@ -252,19 +254,39 @@ public class JwtProvider {
                 .build();
     }
 
-    public String parseEmailFrom(HttpServletRequest httpServletRequest) {
+    public Long parseIdFrom(HttpServletRequest httpServletRequest) {
         try {
-            return getClaims(
-                    parseJwtToken(httpServletRequest)
-            ).getSubject();
-        } catch (IllegalArgumentException | JwtException ignore) {
-            return "";
+            return parseJwtToken(httpServletRequest)
+                    .map(this::getClaims)
+                    .map(Claims::getSubject)
+                    .map(Long::valueOf)
+                    .orElse(-1L);
+        } catch (IllegalArgumentException | JwtException e) {
+            return -1L;
         }
     }
 
-    public String parseEmailWithValidation(HttpServletRequest httpServletRequest) {
-        return getClaims(
-                parseJwtToken(httpServletRequest)
-        ).getSubject();
+
+    public Optional<Long> parseIdWithValidation(HttpServletRequest httpServletRequest) {
+        return parseJwtToken(httpServletRequest)
+                .map(this::getClaims)
+                .map(Claims::getSubject)
+                .flatMap(this::parseLongSafely);
+    }
+
+    private Optional<Long> parseLongSafely(String subject) {
+        try {
+            return Optional.of(Long.parseLong(subject));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Long getUserId(HttpServletRequest httpServletRequest) {
+        Optional<Long> userId = parseIdWithValidation(httpServletRequest);
+        if (userId.isEmpty()) {
+            throw new UserNotFoundException("User ID not found in JWT token");
+        }
+        return userId.get();
     }
 }

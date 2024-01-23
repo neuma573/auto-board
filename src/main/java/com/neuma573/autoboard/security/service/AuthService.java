@@ -52,7 +52,7 @@ public class AuthService {
                 recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS_STATE, null);
                 updateLoginAt(user);
 
-                return jwtProvider.createJwt(loginRequest, httpServletResponse);
+                return jwtProvider.createJwt(httpServletResponse, user.getId());
             } else {
                 throw new NotActivatedUserException("not activated");
             }
@@ -90,7 +90,7 @@ public class AuthService {
         loginLogRepository.save(loginLog);
     }
 
-    private String getClientIpAddress(HttpServletRequest request) {
+    public String getClientIpAddress(HttpServletRequest request) {
         String xForwardedForHeader = request.getHeader("X-Forwarded-For");
         if (xForwardedForHeader != null) {
             return xForwardedForHeader.split(",")[0];
@@ -114,7 +114,8 @@ public class AuthService {
     }
 
     public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        refreshTokenRedisTemplate.delete(Objects.requireNonNull(CookieUtils.getCookieValue(httpServletRequest, "uuid")));
+        CookieUtils.getCookieValue(httpServletRequest, "uuid")
+                .ifPresent(refreshTokenRedisTemplate::delete);
         CookieUtils.deleteCookie(httpServletResponse, "accessToken");
         CookieUtils.deleteCookie(httpServletResponse, "uuid");
     }

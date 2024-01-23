@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.security.filter;
 
+import com.neuma573.autoboard.security.utils.CookieUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.UrlPatternManager;
 import jakarta.servlet.*;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -37,15 +39,15 @@ public class JwtRequestFilter implements Filter {
     }
 
     private boolean isAuthorizedRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        String accessToken = jwtProvider.parseJwtToken(httpServletRequest);
+        Optional<String> accessTokenOpt = jwtProvider.parseJwtToken(httpServletRequest);
 
         boolean isMvcRequest = !httpServletRequest.getRequestURI().startsWith("/api");
 
-        if (isMvcRequest || !jwtProvider.validateAccessTokenWithoutResponse(accessToken)) {
+        if (CookieUtils.getCookieValue(httpServletRequest, "uuid").isPresent() && (isMvcRequest || accessTokenOpt.map(token -> !jwtProvider.validateAccessTokenWithoutResponse(token)).orElse(true))) {
             jwtProvider.refreshAccessToken(httpServletRequest, httpServletResponse);
         }
 
-        return accessToken != null && jwtProvider.validateAccessToken(accessToken, httpServletResponse);
+        return accessTokenOpt.isPresent() && jwtProvider.validateAccessToken(accessTokenOpt.get(), httpServletResponse);
     }
 
 }
