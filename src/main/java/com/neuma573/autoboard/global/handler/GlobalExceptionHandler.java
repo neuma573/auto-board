@@ -1,9 +1,6 @@
 package com.neuma573.autoboard.global.handler;
 
-import com.neuma573.autoboard.global.exception.InvalidLoginException;
-import com.neuma573.autoboard.global.exception.NotActivatedUserException;
-import com.neuma573.autoboard.global.exception.TokenNotFoundException;
-import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
+import com.neuma573.autoboard.global.exception.*;
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.utils.CookieUtils;
@@ -34,6 +31,13 @@ import static com.neuma573.autoboard.global.exception.ExceptionCode.*;
 public class GlobalExceptionHandler {
 
     private final ResponseUtils responseUtils;
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Response<String>> handleAccessDeniedException(AccessDeniedException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(NOT_ENOUGH_ROLE, ex);
+        return new ResponseEntity<>(response, NOT_ENOUGH_ROLE.getStatus());
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Response<String>> handleEntityNotFoundException(EntityNotFoundException ex) {
