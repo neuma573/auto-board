@@ -3,7 +3,6 @@ package com.neuma573.autoboard.board.model.entity;
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.user.model.entity.User;
-import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,11 +42,9 @@ public class Board extends BaseEntity {
     private boolean isDeleted;
 
     public boolean isAccessible(User user) {
-        boolean isAdmin = user.getRoles().stream()
-                .anyMatch(userRole -> userRole.getRole() == Role.ADMIN);
         boolean isContainedUser = getUsers().contains(user);
 
-        if (isAdmin) return true;
+        if (user.isAdmin()) return true;
 
         if (isDeleted()) return false;
 
