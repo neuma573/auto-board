@@ -4,16 +4,15 @@ import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.format.DateTimeFormatter;
 
 @Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Getter
 @Table(name = "post")
 public class Post extends BaseEntity {
@@ -25,8 +24,10 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    @Setter
     private String title;
 
+    @Setter
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -36,6 +37,7 @@ public class Post extends BaseEntity {
 
     private Long views = 0L;
 
+    @Setter
     private boolean isDeleted;
 
     public void addViews() {
