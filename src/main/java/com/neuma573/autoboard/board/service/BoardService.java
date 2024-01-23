@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,9 +31,26 @@ public class BoardService {
 
     @Transactional
     public List<BoardResponse> getBoardList(Long id) {
-        return boardRepository.findPublicAndNotDeletedBoardWith(userRepository.findById(id))
-                .stream()
-                .map(BoardResponse::of).collect(Collectors.toList());
+        Optional<User> userOptional = userRepository.findById(id);
+        List<Board> boards;
+
+        if (userOptional.isPresent() && userOptional.get().isAdmin()) {
+            Iterable<Board> boardIterable = boardRepository.findAll();
+            boards = StreamSupport.stream(boardIterable.spliterator(), false)
+                    .collect(Collectors.toList());
+            return boards.stream()
+                    .map(BoardResponse::of)
+                    .collect(Collectors.toList());
+
+        } else {
+            boards = boardRepository.findPublicAndNotDeletedBoardWith(userOptional);
+
+            return boards.stream()
+                    .map(BoardResponse::ofWithoutDeleted)
+                    .collect(Collectors.toList());
+        }
+
+
     }
 
     @Transactional
