@@ -36,8 +36,8 @@ public class MvcController {
 
     @GetMapping("/write")
     public ModelAndView showWriteForm(@RequestParam(name = "boardId") Long boardId, HttpServletRequest httpServletRequest) {
-        String email = jwtProvider.parseEmailWithValidation(httpServletRequest);
-        if(boardService.checkAccessible(boardId, email)) {
+        Long userId = jwtProvider.getUserId(httpServletRequest);
+        if(boardService.checkAccessible(boardId, userId)) {
             ModelAndView modelAndView = new ModelAndView("write");
             modelAndView.addObject("boardInfo", boardService.getBoardInfo(boardId));
             return modelAndView;
@@ -45,6 +45,11 @@ public class MvcController {
             return new ModelAndView("error/error");
         }
 
+    }
+
+    @GetMapping("/post")
+    public ModelAndView showPost() {
+        return new ModelAndView("post");
     }
 
 }
