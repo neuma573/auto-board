@@ -4,6 +4,7 @@ import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
+import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
 import com.neuma573.autoboard.post.model.dto.PostResponse;
 import com.neuma573.autoboard.post.service.PostService;
@@ -79,7 +80,7 @@ public class PostController {
     public ResponseEntity<Void> modifyPost(
             @Valid @RequestBody PostModifyRequest postModifyRequest,
             HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
+        Long userId = jwtProvider.getUserId(httpServletRequest);
         postService.checkAccessibleAndThrow(postModifyRequest.getPostId(), userId);
 
         postService.modifyPost(postModifyRequest, userId);
@@ -91,11 +92,20 @@ public class PostController {
     public ResponseEntity<Void> deletePost(
             @RequestParam(name = "postId") Long postId,
             HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
+        Long userId = jwtProvider.getUserId(httpServletRequest);
         postService.checkAccessibleAndThrow(postId, userId);
 
         postService.deletePost(postId, userId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("permission")
+    public ResponseEntity<Response<PostPermissionResponse>> checkPermission(
+            @RequestParam(name = "postId") Long postId,
+            HttpServletRequest httpServletRequest) {
+        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
+
+        return ResponseEntity.ok().body(responseUtils.success(postService.getPermissionFrom(postId, userId)));
     }
 }
