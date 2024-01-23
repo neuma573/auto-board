@@ -1,20 +1,15 @@
 let currentBoard = -1;
 
-document.addEventListener('DOMContentLoaded', function() {
-    verifyToken(localStorage.getItem("accessToken")).then(() => {
-        if(localStorage.getItem("accessToken") === null) {
+document.addEventListener('DOMContentLoaded', async function () {
+    try {
+        await fetchBoards();
+        handleBoardSelectChange();
+        if (localStorage.getItem("accessToken") === null) {
             document.getElementById('writeButton').style.display = 'none';
         }
-    })
-
-
-    const savedBoardId = localStorage.getItem('currentBoardId');
-    if (savedBoardId) {
-        currentBoard = parseInt(savedBoardId, 10);
+    } catch (error) {
+        console.error('Error after fetching boards:', error);
     }
-    fetchBoards().then(() => {
-        setupWriteButtonLink();
-    });
 });
 
 async function fetchBoards() {
@@ -42,9 +37,6 @@ async function fetchBoards() {
                 currentBoard = localStorage.getItem('currentBoardId');
             }
             hideSpinner();
-            await fetchPosts(currentBoard, 1, 10, 'desc');
-
-
         }
     } catch (error) {
         hideSpinner();
@@ -68,25 +60,24 @@ function updateBoardSelect(boards) {
         }
     });
 
-    if (localStorage.getItem('currentBoardId') === null) {
+    const storedBoardId = localStorage.getItem('currentBoardId');
+    if (storedBoardId !== null) {
+        currentBoard = storedBoardId;
+        select.value = storedBoardId;
+    } else {
         select.value = firstPublicBoardId;
         currentBoard = firstPublicBoardId;
         localStorage.setItem('currentBoardId', currentBoard);
-        document.getElementById('writeButton').href = `/write?boardId=${currentBoard}`;
-    } else {
-        select.value = localStorage.getItem('currentBoardId');
-        document.getElementById('writeButton').href = `/write?boardId=${currentBoard}`;
     }
-}
 
-function setupWriteButtonLink() {
-    const select = document.getElementById('boardSelect');
-    select.removeEventListener('change', handleBoardSelectChange);
+    document.getElementById('writeButton').href = `/write?boardId=${currentBoard}`;
+
+    // 이벤트 리스너 추가
     select.addEventListener('change', handleBoardSelectChange);
 }
 
 function handleBoardSelectChange() {
-    const selectedBoardId = this.value;
+    const selectedBoardId = document.getElementById('boardSelect').value;
     currentBoard = selectedBoardId;
     localStorage.setItem('currentBoardId', selectedBoardId);
     const writeButton = document.getElementById('writeButton');
@@ -126,6 +117,7 @@ async function fetchPosts(boardId, page, size, order) {
         currentBoard = -1;
         hideSpinner();
         await fetchBoards();
+        await fetchPosts(document.getElementById('boardSelect').value, 1, 10, 'desc');
     }
 }
 

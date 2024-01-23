@@ -154,9 +154,6 @@ a:hover {
 
 /* 반응형 디자인 */
 @media only screen and (max-width: 768px) {
-    .post-card {
-        margin: 0 10px; /* 모바일 화면에 맞게 좌우 여백 조정 */
-    }
 
     .post-title {
         font-size: 1.0rem; /* 모바일 화면에 맞게 제목 폰트 크기 조정 */
@@ -218,4 +215,14 @@ a:hover {
 
 .post-content {
     white-space: pre-wrap; /* 공백과 줄바꿈을 유지하면서 필요에 따라 줄바꿈 */
+}
+
+.btn + .btn {
+    margin-left: 10px;
+}
+
+@media only screen and (max-width: 768px) {
+    .navbar .btn + .btn {
+        margin-left: 0;
+    }
 }

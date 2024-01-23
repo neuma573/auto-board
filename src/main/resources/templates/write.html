@@ -3,6 +3,11 @@
 <title>글쓰기</title>
     <body>
         <div th:fragment="content" class="container mt-5">
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                let mode = [[${mode}]];
+                /*]]>*/
+            </script>
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <div class="card">

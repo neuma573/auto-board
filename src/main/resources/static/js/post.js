@@ -1,3 +1,11 @@
+document.addEventListener('DOMContentLoaded', function() {
+    initializePost();
+    checkPermission();
+
+    const modifyButton = document.getElementById('modify');
+    modifyButton.href = `/modify?postId=${localStorage.getItem("dest")}`;
+
+});
 
 async function initializePost() {
     showSpinner();
@@ -34,5 +42,53 @@ function updatePostContent(postData) {
     postDateElement.setAttribute("datetime", postData.createdAt);
     hideSpinner();
 }
+function checkPermission() {
+    const postId = localStorage.getItem("dest");
+    fetch('/api/v1/post/permission?postId=' + postId)
+        .then(response => {
+            if (response.status === 401) {
+                // 인증되지 않은 사용자의 경우 모든 버튼 숨기기
+                toggleButton('modify', false);
+                toggleButton('delete', false);
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                const permissionData = data.data;
+                toggleButton('modify', permissionData.ableToModify);
+                toggleButton('delete', permissionData.ableToDelete);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
 
-document.addEventListener('DOMContentLoaded', initializePost);
+function toggleButton(buttonId, isVisible) {
+    const button = document.getElementById(buttonId);
+    if (button) {
+        button.style.display = isVisible ? '' : 'none';
+    }
+}
+
+function deletePost() {
+    const postId = localStorage.getItem("dest"); // 게시글 ID를 localStorage에서 가져옴
+
+    if (confirm("이 게시글을 삭제하시겠습니까?")) { // 사용자에게 삭제 확인 요청
+        fetch('/api/v1/post?postId=' + postId, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${getToken()}` // 적절한 토큰을 포함하여 인증
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("게시글이 삭제되었습니다.");
+                    window.location.href = '/main'; // 삭제 후 메인 페이지로 리디렉션
+                } else {
+                    alert("게시글 삭제에 실패하였습니다.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+}
