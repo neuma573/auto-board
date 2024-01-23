@@ -3,6 +3,7 @@ package com.neuma573.autoboard.post.controller;
 import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
+import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
 import com.neuma573.autoboard.post.model.dto.PostResponse;
 import com.neuma573.autoboard.post.service.PostService;
@@ -72,5 +73,29 @@ public class PostController {
         postService.checkAccessibleAndThrow(postId, userId);
 
         return ResponseEntity.ok().body(responseUtils.success(postService.getPost(httpServletRequest, postId)));
+    }
+
+    @PutMapping("")
+    public ResponseEntity<Void> modifyPost(
+            @Valid @RequestBody PostModifyRequest postModifyRequest,
+            HttpServletRequest httpServletRequest) {
+        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
+        postService.checkAccessibleAndThrow(postModifyRequest.getPostId(), userId);
+
+        postService.modifyPost(postModifyRequest, userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<Void> deletePost(
+            @RequestParam(name = "postId") Long postId,
+            HttpServletRequest httpServletRequest) {
+        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
+        postService.checkAccessibleAndThrow(postId, userId);
+
+        postService.deletePost(postId, userId);
+
+        return ResponseEntity.noContent().build();
     }
 }
