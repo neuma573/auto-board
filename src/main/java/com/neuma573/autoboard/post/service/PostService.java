@@ -51,6 +51,7 @@ public class PostService {
     private final static String VIEW_COUNT_KEY_PREFIX = "view:count:";
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
 
+    @Transactional
     public List<PostResponse> getPostList(Long boardId, Pageable pageable, Long userId) {
         User user = userRepository.findById(userId).orElse(null);
 
@@ -93,6 +94,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void checkAccessibleAndThrow(Long postId, Long userId) {
 
         if (userId != -1L && !checkAccessible(postId, userId)) {
@@ -104,6 +106,7 @@ public class PostService {
         }
     }
 
+    @Transactional
     public boolean checkAccessible(Long postId, Long userId) {
         Post post = getPostById(postId);
 
@@ -115,6 +118,7 @@ public class PostService {
         return user.isAdmin() || (post.getBoard().isAccessible(user) && !post.isDeleted());
     }
 
+    @Transactional
     public PostResponse getPost(HttpServletRequest httpServletRequest, Long postId) {
         Post post = getPostById(postId);
         increaseViewCount(httpServletRequest, postId);
@@ -177,6 +181,7 @@ public class PostService {
         post.setDeletedAt(LocalDateTime.now());
     }
 
+    @Transactional
     public PostPermissionResponse getPermissionFrom(Long postId, Long userId) {
         if (userId == -1L) {
             return PostPermissionResponse.builder()

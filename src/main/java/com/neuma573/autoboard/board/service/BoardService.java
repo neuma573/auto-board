@@ -70,6 +70,7 @@ public class BoardService {
         ));
     }
 
+    @Transactional
     public boolean checkAccessible(Long boardId, Long userId) {
         Board board  = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("존재하지 않는 게시판입니다."));
         if (userId == -1L) {
@@ -86,6 +87,7 @@ public class BoardService {
         return BoardResponse.of(boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("존재하지 않는 게시판입니다.")));
     }
 
+    @Transactional
     public void checkAccessibleAndThrow(Long boardId, Long userId) {
         if (userId != -1L && !checkAccessible(boardId, userId)) {
             throw new BoardNotAccessibleException("접근할 수 없는 게시판입니다.");
