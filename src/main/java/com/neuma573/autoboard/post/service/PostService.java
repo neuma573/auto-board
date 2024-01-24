@@ -26,7 +26,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -177,8 +176,7 @@ public class PostService {
     }
 
     public void delete(Post post) {
-        post.setDeleted(true);
-        post.setDeletedAt(LocalDateTime.now());
+        post.delete();
     }
 
     @Transactional

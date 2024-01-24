@@ -37,7 +37,6 @@ public class Post extends BaseEntity {
 
     private Long views = 0L;
 
-    @Setter
     private boolean isDeleted;
 
     public void addViews() {
@@ -46,6 +45,12 @@ public class Post extends BaseEntity {
 
     public String getFormattedCreatedAt() {
         return getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    @Override
+    public void delete() {
+        this.isDeleted = true;
+        super.delete();
     }
 
 }
