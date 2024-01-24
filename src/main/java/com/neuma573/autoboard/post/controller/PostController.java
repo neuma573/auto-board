@@ -100,7 +100,7 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("permission")
+    @GetMapping("/permission")
     public ResponseEntity<Response<PostPermissionResponse>> checkPermission(
             @RequestParam(name = "postId") Long postId,
             HttpServletRequest httpServletRequest) {
