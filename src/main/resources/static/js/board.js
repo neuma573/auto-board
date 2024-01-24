@@ -125,68 +125,99 @@ function updatePostsTable(posts) {
     const tableBody = document.querySelector('.table tbody');
     tableBody.innerHTML = ''; // Clear existing rows
 
-    posts.forEach((post, index) => {
+    if (posts.length === 0) {
+        // 게시글이 없을 경우 표시할 행 추가
         const row = tableBody.insertRow();
-        const numberCell = row.insertCell(0);
-        const titleCell = row.insertCell(1);
-        const authorCell = row.insertCell(2);
-        const dateCell = row.insertCell(3);
-        const viewsCell = row.insertCell(4);
+        const cell = row.insertCell(0);
+        cell.textContent = "게시글이 없습니다.";
+        cell.setAttribute('colspan', 5); // 모든 컬럼을 합친 하나의 셀로 표시
+        cell.style.textAlign = 'center';
+    } else {
+        posts.forEach((post, index) => {
+            const row = tableBody.insertRow();
+            const numberCell = row.insertCell(0);
+            const titleCell = row.insertCell(1);
+            const authorCell = row.insertCell(2);
+            const dateCell = row.insertCell(3);
+            const viewsCell = row.insertCell(4);
 
-        numberCell.textContent = index + 1;
+            numberCell.textContent = index + 1;
 
-        const titleLink = document.createElement('a');
-        titleLink.href = '#';
-        titleLink.textContent = post.title;
-        titleLink.onclick = function() { clickPost(post.id); };
-        titleCell.appendChild(titleLink);
+            const titleLink = document.createElement('a');
+            titleLink.href = '#';
 
-        authorCell.textContent = post.userResponse.name;
-        dateCell.textContent = getFormattedCreatedAt(post.createdAt);
-        viewsCell.textContent = post.views;
-    });
+            if (post.deleted) {
+                titleLink.textContent = `[삭제됨] ${post.title}`;
+                titleLink.style.fontStyle = 'italic'; // 이탤릭체 적용
+            } else {
+                titleLink.textContent = post.title;
+            }
+
+            titleLink.onclick = function() { clickPost(post.id); };
+            titleCell.appendChild(titleLink);
+
+            authorCell.textContent = post.userResponse.name;
+            dateCell.textContent = getFormattedCreatedAt(post.createdAt);
+            viewsCell.textContent = post.views;
+        });
+    }
+
+
 }
 
 function updateMobilePostsList(posts) {
     const listGroup = document.querySelector('.list-group');
     listGroup.innerHTML = '';
-    posts.forEach(post => {
+
+    if (posts.length === 0) {
+        // 게시글이 없을 경우 표시할 항목 추가
         const listItem = document.createElement('div');
         listItem.className = 'list-group-item';
-
-        const postTitleLink = document.createElement('a');
-        postTitleLink.href = '#';
-        postTitleLink.className = 'post-title';
-
-
-
-        if(post.title.length > 30) {
-            postTitleLink.textContent = post.title.substring(0, 30) + '...';
-        } else {
-            postTitleLink.textContent = post.title;
-        }
-
-
-
-        postTitleLink.onclick = function() { clickPost(post.id); };
-        listItem.appendChild(postTitleLink);
-
-        const postDetails = document.createElement('div');
-        postDetails.className = 'post-details';
-
-        const authorSpan = document.createElement('span');
-        authorSpan.className = 'author';
-        authorSpan.textContent = post.userResponse.name;
-        postDetails.appendChild(authorSpan);
-
-        const statsSpan = document.createElement('span');
-        statsSpan.className = 'stats';
-        statsSpan.textContent = `작성일: ${getFormattedCreatedAt(post.createdAt)} | 조회수: ${post.views}`;
-        postDetails.appendChild(statsSpan);
-
-        listItem.appendChild(postDetails);
+        listItem.textContent = "게시글이 없습니다.";
+        listItem.style.textAlign = 'center';
         listGroup.appendChild(listItem);
-    });
+    } else {
+        posts.forEach(post => {
+            const listItem = document.createElement('div');
+            listItem.className = 'list-group-item';
+
+            const postTitleLink = document.createElement('a');
+            postTitleLink.href = '#';
+            postTitleLink.className = 'post-title';
+
+
+
+            if (post.deleted) {
+                postTitleLink.textContent = `[삭제됨] ${post.title.substring(0, 30)}${post.title.length > 30 ? '...' : ''}`;
+                postTitleLink.style.fontStyle = 'italic'; // 이탤릭체 적용
+            } else {
+                postTitleLink.textContent = `${post.title.substring(0, 30)}${post.title.length > 30 ? '...' : ''}`;
+            }
+
+
+
+            postTitleLink.onclick = function() { clickPost(post.id); };
+            listItem.appendChild(postTitleLink);
+
+            const postDetails = document.createElement('div');
+            postDetails.className = 'post-details';
+
+            const authorSpan = document.createElement('span');
+            authorSpan.className = 'author';
+            authorSpan.textContent = post.userResponse.name;
+            postDetails.appendChild(authorSpan);
+
+            const statsSpan = document.createElement('span');
+            statsSpan.className = 'stats';
+            statsSpan.textContent = `작성일: ${getFormattedCreatedAt(post.createdAt)} | 조회수: ${post.views}`;
+            postDetails.appendChild(statsSpan);
+
+            listItem.appendChild(postDetails);
+            listGroup.appendChild(listItem);
+        });
+    }
+
+
 }
 
 function clickPost(postId) {
