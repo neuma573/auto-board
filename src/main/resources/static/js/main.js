@@ -141,9 +141,8 @@ function getFormattedCreatedAt(createdAt) {
     const createdAtDate = new Date(createdAt);
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 1, 0, 0);
 
-    if (now > yesterday && createdAtDate > yesterday) {
+    if (createdAtDate > yesterday) {
         return createdAtDate.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
     } else {
         return createdAtDate.toLocaleDateString([], { year: '2-digit', month: '2-digit', day: '2-digit' });
