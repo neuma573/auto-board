@@ -60,7 +60,7 @@ public class UserService {
         );
 
 
-        return user.toResponse();
+        return UserResponse.of(user);
 
     }
 
@@ -71,7 +71,7 @@ public class UserService {
     
     public VerificationToken generateVerificationToken(User user) {
 
-        VerificationToken verificationToken = user.generateVerificationToken();
+        VerificationToken verificationToken = VerificationToken.generateVerificationToken(user);
         verificationTokenRedisTemplate.opsForValue().set(verificationToken.getToken(), verificationToken);
         return verificationToken;
 

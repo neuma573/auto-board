@@ -25,7 +25,7 @@ public class PostResponse {
     public static PostResponse of(Post post) {
        return PostResponse.builder()
                 .id(post.getId())
-                .userResponse(post.getCreatedBy().toResponse())
+                .userResponse(UserResponse.of(post.getCreatedBy()))
                 .title(post.getTitle())
                 .content(post.getContent())
                 .views(post.getViews())

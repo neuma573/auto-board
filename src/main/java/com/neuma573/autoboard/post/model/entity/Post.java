@@ -6,13 +6,10 @@ import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.format.DateTimeFormatter;
-
 @Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Getter
 @Table(name = "post")
 public class Post extends BaseEntity {
@@ -37,15 +34,16 @@ public class Post extends BaseEntity {
 
     private Long views = 0L;
 
-    @Setter
     private boolean isDeleted;
 
     public void addViews() {
         views++;
     }
 
-    public String getFormattedCreatedAt() {
-        return getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    @Override
+    public void delete() {
+        this.isDeleted = true;
+        super.delete();
     }
 
 }

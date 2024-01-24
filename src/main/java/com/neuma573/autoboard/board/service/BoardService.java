@@ -49,8 +49,6 @@ public class BoardService {
                     .map(BoardResponse::ofWithoutDeleted)
                     .collect(Collectors.toList());
         }
-
-
     }
 
     @Transactional

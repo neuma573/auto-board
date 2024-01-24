@@ -26,7 +26,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -59,7 +58,7 @@ public class PostService {
                 ? postRepository.findAllByBoardId(boardId, pageable)
                 : postRepository.findAllByBoardIdAndIsDeletedFalse(boardId, pageable);
 
-        return posts.map(this::convertToPostResponse).getContent();
+        return posts.map(PostResponse::of).getContent();
     }
 
     @Transactional
@@ -74,18 +73,6 @@ public class PostService {
                 writer)
         );
         return PostResponse.of(post);
-    }
-
-    private PostResponse convertToPostResponse(Post post) {
-        return PostResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .isDeleted(post.isDeleted())
-                .userResponse(post.getCreatedBy().toResponse())
-                .views(post.getViews())
-                .createdAt(post.getFormattedCreatedAt())
-                .build();
     }
 
     private List<PostResponse> subtractDeleted(List<PostResponse> postResponseList) {
@@ -177,8 +164,7 @@ public class PostService {
     }
 
     public void delete(Post post) {
-        post.setDeleted(true);
-        post.setDeletedAt(LocalDateTime.now());
+        post.delete();
     }
 
     @Transactional
