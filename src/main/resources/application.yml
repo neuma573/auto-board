@@ -58,3 +58,5 @@ app:
   mail:
     path: ${MAIL_PATH}
   domain: ${DOMAIN}
+  openai:
+    key: ${OPENAI_KEY}
