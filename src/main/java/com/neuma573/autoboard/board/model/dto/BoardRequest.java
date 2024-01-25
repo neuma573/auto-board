@@ -11,8 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class BoardRequest {
 
+    private Long id;
+
     @NotEmpty(message = "게시판 이름은 비어있을 수 없습니다.")
-    private String boardName;
+    private String name;
 
     public Board toEntity(User user) {
         Set<User> initialUsers = ConcurrentHashMap.newKeySet();
@@ -21,7 +23,7 @@ public class BoardRequest {
         return Board.builder()
                 .isPublic(false)
                 .isDeleted(false)
-                .name(boardName)
+                .name(name)
                 .createdBy(user)
                 .users(initialUsers)
                 .build();
