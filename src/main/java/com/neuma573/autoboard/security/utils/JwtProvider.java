@@ -254,7 +254,15 @@ public class JwtProvider {
                 .build();
     }
 
-    public Long parseIdFrom(HttpServletRequest httpServletRequest) {
+    public Long parseUserId(HttpServletRequest httpServletRequest) {
+        Optional<Long> userId = parseIdWithValidation(httpServletRequest);
+        if (userId.isEmpty()) {
+            throw new UserNotFoundException("User ID not found in JWT token");
+        }
+        return userId.get();
+    }
+
+    public Long parseUserIdSafely(HttpServletRequest httpServletRequest) {
         try {
             return parseJwtToken(httpServletRequest)
                     .map(this::getClaims)
@@ -280,13 +288,5 @@ public class JwtProvider {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
-    }
-
-    public Long getUserId(HttpServletRequest httpServletRequest) {
-        Optional<Long> userId = parseIdWithValidation(httpServletRequest);
-        if (userId.isEmpty()) {
-            throw new UserNotFoundException("User ID not found in JWT token");
-        }
-        return userId.get();
     }
 }
