@@ -53,7 +53,7 @@ function updateBoardSelect(boards) {
         localStorage.setItem(board.id, board.postCount);
         const option = document.createElement('option');
         option.value = board.id;
-        option.textContent = `${board.boardName} (${board.postCount})`;
+        option.textContent = `${board.name} (${board.postCount})`;
         select.appendChild(option);
         if (board.public && firstPublicBoardId === null) {
             firstPublicBoardId = board.id;
