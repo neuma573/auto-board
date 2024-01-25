@@ -33,7 +33,7 @@ public class CommentController {
             @RequestBody @Valid CommentRequest commentRequest,
             HttpServletRequest httpServletRequest
             ) {
-        Long userId = jwtProvider.getUserId(httpServletRequest);
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
 
         return ResponseEntity.created(URI.create("/main")).body(responseUtils.success(commentService.savePost(commentRequest, userId)));
     }
