@@ -45,11 +45,4 @@ public class Post extends BaseEntity {
         this.isDeleted = true;
         super.delete();
     }
-
-    @Override
-    public void delete() {
-        this.isDeleted = true;
-        super.delete();
-    }
-
 }
