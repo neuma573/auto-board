@@ -1,11 +1,8 @@
 package com.neuma573.autoboard.post.service;
 
 import com.neuma573.autoboard.board.model.entity.Board;
-import com.neuma573.autoboard.board.repository.BoardRepository;
-import com.neuma573.autoboard.global.exception.BoardNotAccessibleException;
-import com.neuma573.autoboard.global.exception.BoardNotFoundException;
+import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
-import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
@@ -14,7 +11,6 @@ import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.repository.PostRepository;
 import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.user.model.entity.User;
-import com.neuma573.autoboard.user.repository.UserRepository;
 import com.neuma573.autoboard.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -37,24 +33,22 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    private final BoardRepository boardRepository;
-
-    private final UserRepository userRepository;
-
     private final StringRedisTemplate stringRedisTemplate;
 
     private final AuthService authService;
 
     private final UserService userService;
 
+    private final BoardService boardService;
+
     private final static String VIEW_COUNT_KEY_PREFIX = "view:count:";
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
 
     @Transactional
     public List<PostResponse> getPostList(Long boardId, Pageable pageable, Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userService.getUserByIdSafely(userId);
 
-        Page<Post> posts = (user != null && user.isAdmin())
+        Page<Post> posts = (user != null && userService.isAdmin(user))
                 ? postRepository.findAllByBoardId(boardId, pageable)
                 : postRepository.findAllByBoardIdAndIsDeletedFalse(boardId, pageable);
 
@@ -62,12 +56,9 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse savePost(Long id, PostRequest postRequest) {
-        Board destination = boardRepository.findById(postRequest.getBoardId()).orElseThrow(() -> new BoardNotFoundException(""));
-        User writer = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(""));
-        if (!destination.isAccessible(writer)) {
-            throw new BoardNotAccessibleException("이용할 수 없는 게시판입니다.");
-        }
+    public PostResponse savePost(Long userId, PostRequest postRequest) {
+        Board destination = boardService.getBoardById(postRequest.getBoardId());
+        User writer = userService.getUserById(userId);
         Post post = postRepository.save(postRequest.of(
                 destination,
                 writer)
@@ -98,11 +89,11 @@ public class PostService {
         Post post = getPostById(postId);
 
         if (userId == -1L) {
-            return post.getBoard().isPublic() && !post.isDeleted();
+            return post.getBoard().isDeleted() && !post.isDeleted();
         }
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+        User user = userService.getUserById(userId);
 
-        return user.isAdmin() || (post.getBoard().isAccessible(user) && !post.isDeleted());
+        return userService.isAdmin(user)  && !post.isDeleted();
     }
 
     @Transactional
@@ -146,12 +137,11 @@ public class PostService {
     }
 
     public boolean isAbleToModify(Post post, User user) {
-        log.info(post.getCreatedBy().getEmail());
         return post.getCreatedBy().getId().equals(user.getId());
     }
 
     public boolean isAbleToDelete(Post post, User user) {
-        return user.isAdmin() || isAbleToModify(post, user);
+        return userService.isAdmin(user) || isAbleToModify(post, user);
     }
 
     public Post getPostById(Long postId) {
@@ -183,6 +173,14 @@ public class PostService {
                 .isAbleToModify(isAbleToModify(post, user))
                 .build();
 
+    }
+
+    @Transactional
+    public Long findBoardIdByPostId(Long postId) {
+        return postRepository.findById(postId)
+                .map(Post::getBoard)
+                .map(Board::getId)
+                .orElse(null);
     }
 
 }
