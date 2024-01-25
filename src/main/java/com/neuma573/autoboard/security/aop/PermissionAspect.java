@@ -28,9 +28,9 @@ public class PermissionAspect {
 
     @Around("@annotation(checkPermission)")
     public Object checkUserPermission(ProceedingJoinPoint joinPoint, CheckPermission checkPermission) throws Throwable {
-        Role requiredRole = Role.valueOf(checkPermission.value());
+        Role requiredRole = checkPermission.role();
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
-        Long userId = jwtProvider.getUserId(request);
+        Long userId = jwtProvider.parseUserId(request);
         User user = userService.getUserById(userId);
 
         if (requiredRole == Role.ADMIN && !userService.isAdmin(user)) {
