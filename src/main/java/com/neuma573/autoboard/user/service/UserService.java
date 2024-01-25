@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -108,6 +109,17 @@ public class UserService {
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+    }
+
+
+    @Transactional(readOnly = true)
+    public boolean isAdmin(User user) {
+        return getRolesById(user.getId()).stream()
+                .anyMatch(userRole -> userRole.getRole() == Role.ADMIN);
+    }
+
+    public Set<UserRole> getRolesById(Long userId) {
+        return userRoleRepository.findByUserId(userId);
     }
 
 }

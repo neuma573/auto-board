@@ -2,7 +2,6 @@ package com.neuma573.autoboard.user.model.entity;
 
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.global.model.enums.Status;
-import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -58,8 +57,4 @@ public class User extends BaseEntity {
         return status.getStatus();
     }
 
-    public boolean isAdmin() {
-        return getRoles().stream()
-                .anyMatch(userRole -> userRole.getRole() == Role.ADMIN);
-    }
 }
