@@ -8,7 +8,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class BoardCustomRepositoryImpl implements BoardCustomRepository{
@@ -17,14 +16,16 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository{
 
 
     @Override
-    public List<Board> findPublicAndNotDeletedBoardWith(Optional<User> userOptional) {
+    public List<Board> findPublicAndNotDeletedBoardWith(User user) {
         QBoard qBoard = QBoard.board;
 
         BooleanBuilder conditions = new BooleanBuilder()
                 .and(qBoard.isDeleted.isFalse())
                 .and(qBoard.isPublic.isTrue());
 
-        userOptional.ifPresent(user -> conditions.or(qBoard.users.contains(user)));
+        if (user != null) {
+            conditions.or(qBoard.users.contains(user));
+        }
 
         return jpaQueryFactory
                 .selectFrom(qBoard)
