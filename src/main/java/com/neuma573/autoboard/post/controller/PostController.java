@@ -1,6 +1,7 @@
 package com.neuma573.autoboard.post.controller;
 
-import com.neuma573.autoboard.board.service.BoardService;
+import com.neuma573.autoboard.board.model.annotation.CheckBoardAccess;
+import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
@@ -34,8 +35,7 @@ public class PostController {
 
     private final PostService postService;
 
-    private final BoardService boardService;
-
+    @CheckBoardAccess(action = BoardAction.READ)
     @GetMapping("/list")
     public ResponseEntity<Response<List<PostResponse>>> getPostList(
             @RequestParam(name = "boardId") Long boardId,
@@ -44,8 +44,7 @@ public class PostController {
             @RequestParam(name = "order", defaultValue = "desc") String order,
             HttpServletRequest httpServletRequest) {
 
-        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
-        boardService.checkAccessibleAndThrow(boardId, userId);
+        Long userId = jwtProvider.parseUserIdSafely(httpServletRequest);
 
         Sort.Direction direction = "asc".equals(order) ? Sort.Direction.ASC : Sort.Direction.DESC;
 
@@ -58,29 +57,28 @@ public class PostController {
         return ResponseEntity.ok().body(responseUtils.success(postService.getPostList(boardId, pageable, userId)));
     }
 
+    @CheckBoardAccess(action = BoardAction.READ)
     @PostMapping("")
     public ResponseEntity<Response<PostResponse>> savePost(@Valid @RequestBody PostRequest postRequest, HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.getUserId(httpServletRequest);
-        boardService.checkAccessibleAndThrow(postRequest.getBoardId(), userId);
-
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
         return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(postService.savePost(userId, postRequest)));
     }
 
+    @CheckBoardAccess(action = BoardAction.UNAUTHORIZED_ACTION)
     @GetMapping("")
     public ResponseEntity<Response<PostResponse>> getPost(
             @RequestParam(name = "postId") Long postId,
             HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
-        postService.checkAccessibleAndThrow(postId, userId);
 
         return ResponseEntity.ok().body(responseUtils.success(postService.getPost(httpServletRequest, postId)));
     }
 
+    @CheckBoardAccess(action = BoardAction.READ)
     @PutMapping("")
     public ResponseEntity<Void> modifyPost(
             @Valid @RequestBody PostModifyRequest postModifyRequest,
             HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.getUserId(httpServletRequest);
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
         postService.checkAccessibleAndThrow(postModifyRequest.getPostId(), userId);
 
         postService.modifyPost(postModifyRequest, userId);
@@ -88,11 +86,12 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @CheckBoardAccess(action = BoardAction.READ)
     @DeleteMapping("")
     public ResponseEntity<Void> deletePost(
             @RequestParam(name = "postId") Long postId,
             HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.getUserId(httpServletRequest);
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
         postService.checkAccessibleAndThrow(postId, userId);
 
         postService.deletePost(postId, userId);
@@ -100,11 +99,12 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @CheckBoardAccess(action = BoardAction.UNAUTHORIZED_ACTION)
     @GetMapping("/permission")
     public ResponseEntity<Response<PostPermissionResponse>> checkPermission(
             @RequestParam(name = "postId") Long postId,
             HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.parseIdFrom(httpServletRequest);
+        Long userId = jwtProvider.parseUserIdSafely(httpServletRequest);
 
         return ResponseEntity.ok().body(responseUtils.success(postService.getPermissionFrom(postId, userId)));
     }
