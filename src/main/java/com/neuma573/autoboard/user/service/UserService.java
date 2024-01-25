@@ -111,6 +111,10 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
     }
 
+    public User getUserByIdSafely(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
 
     @Transactional(readOnly = true)
     public boolean isAdmin(User user) {
