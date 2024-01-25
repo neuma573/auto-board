@@ -20,6 +20,7 @@ public class Board extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     private String name;
 
     @ManyToOne
@@ -41,15 +42,4 @@ public class Board extends BaseEntity {
 
     private boolean isDeleted;
 
-    public boolean isAccessible(User user) {
-        boolean isContainedUser = getUsers().contains(user);
-
-        if (user.isAdmin()) return true;
-
-        if (isDeleted()) return false;
-
-        if (isContainedUser) return true;
-
-        return isPublic;
-    }
 }
