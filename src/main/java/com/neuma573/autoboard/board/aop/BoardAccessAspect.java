@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 @Aspect
 @RequiredArgsConstructor
@@ -33,20 +35,14 @@ public class BoardAccessAspect {
         BoardAction action = checkBoardAccess.action();
         HttpServletRequest httpServletRequest = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         Long userId = jwtProvider.parseUserIdSafely(httpServletRequest);
-        Long boardId = checkBoardAccess.boardId();
         Long postId = checkBoardAccess.postId();
-        Object[] args = joinPoint.getArgs();
 
-        for (Object arg : args) {
-            if (arg instanceof Long) {
-                boardId = (Long) arg;
-                break;
-            }
-        }
-
-        if (boardId == -1 && postId != -1) {
-            boardId = postService.findBoardIdByPostId(postId);
-        }
+        Optional<Long> boardIdOptional = Arrays.stream(joinPoint.getArgs())
+                .filter(arg -> arg instanceof Long)
+                .map(arg -> (Long) arg)
+                .findFirst();
+        Long boardId = boardIdOptional.orElseGet(() ->
+                (postId != -1 ? postService.findBoardIdByPostId(postId) : -1));
 
         switch (action) {
             case READ -> {
