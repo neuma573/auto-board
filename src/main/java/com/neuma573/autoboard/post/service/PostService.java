@@ -8,6 +8,7 @@ import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
 import com.neuma573.autoboard.post.model.dto.PostResponse;
 import com.neuma573.autoboard.post.model.entity.Post;
+import com.neuma573.autoboard.post.model.enums.PostAction;
 import com.neuma573.autoboard.post.repository.PostRepository;
 import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.user.model.entity.User;
@@ -23,8 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -66,34 +67,32 @@ public class PostService {
         return PostResponse.of(post);
     }
 
-    private List<PostResponse> subtractDeleted(List<PostResponse> postResponseList) {
-        return postResponseList.stream()
-                .filter(postResponse -> !postResponse.isDeleted())
-                .collect(Collectors.toList());
+    @Transactional
+    public boolean isCreatable(Long userId, Long boardId) {
+        return userService.isAdmin(
+                userService.getUserById(userId)
+        ) || boardService.getBoardById(boardId).isPublic()
+                || boardService.isContainedUser(
+                        userService.getUserById(userId),
+                        boardId
+        );
     }
 
     @Transactional
-    public void checkAccessibleAndThrow(Long postId, Long userId) {
-
-        if (userId != -1L && !checkAccessible(postId, userId)) {
-            throw new PostNotAccessibleException("접근할 수 없는 게시글입니다.");
-        }
-
-        if (!checkAccessible(postId, userId)) {
-            throw new PostNotAccessibleException("접근할 수 없는 게시글입니다.");
-        }
-    }
-
-    @Transactional
-    public boolean checkAccessible(Long postId, Long userId) {
+    public boolean isPostAccessible(Long userId, Long postId, PostAction action) {
         Post post = getPostById(postId);
-
-        if (userId == -1L) {
-            return post.getBoard().isDeleted() && !post.isDeleted();
-        }
-        User user = userService.getUserById(userId);
-
-        return userService.isAdmin(user)  && !post.isDeleted();
+        User user = userService.getUserByIdSafely(userId);
+        return switch (action) {
+            case READ -> {
+                if (user == null) {
+                    yield !post.isDeleted();
+                }
+                yield userService.isAdmin(user) || (!post.isDeleted());
+            }
+            case UPDATE -> !post.isDeleted() && isCreatedBy(userId, post);
+            case DELETE -> !post.isDeleted() && userService.isAdmin(user) || isCreatedBy(userId, post);
+            default -> false;
+        };
     }
 
     @Transactional
@@ -181,6 +180,11 @@ public class PostService {
                 .map(Post::getBoard)
                 .map(Board::getId)
                 .orElse(null);
+    }
+
+    @Transactional
+    public boolean isCreatedBy(Long userId, Post post) {
+        return Objects.equals(userId, post.getCreatedBy().getId());
     }
 
 }

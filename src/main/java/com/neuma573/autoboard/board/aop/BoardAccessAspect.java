@@ -71,7 +71,7 @@ public class BoardAccessAspect {
 
         switch (action) {
             case READ -> {
-                if (!boardService.isBoardAccessible(userId, boardId.get(), BoardAction.READ)) {
+                if (!boardService.isBoardAccessible(userId, boardId.get(), action)) {
                     throw new BoardNotAccessibleException("게시판 읽기 권한이 없습니다.");
                 }
             }
