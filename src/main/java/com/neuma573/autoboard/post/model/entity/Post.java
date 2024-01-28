@@ -54,7 +54,9 @@ public class Post extends BaseEntity {
     }
 
     public Long getActiveCommentCount() {
-        return comments.stream()
+        return comments == null
+                ? 0L
+                : comments.stream()
                 .filter(comment -> !comment.isDeleted())
                 .count();
     }
