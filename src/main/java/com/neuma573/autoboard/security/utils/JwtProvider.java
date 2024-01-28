@@ -19,7 +19,9 @@ import org.springframework.util.StringUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -288,5 +290,16 @@ public class JwtProvider {
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    public Map<String, String[]> getParameterMap(HttpServletRequest httpServletRequest) {
+        return httpServletRequest.getParameterMap();
+    }
+
+    public Optional<Long> extractLongFromParamMap(Map<String, String[]> paramMap, String paramName) {
+        return Optional.ofNullable(paramMap.get(paramName))
+                .flatMap(values -> Arrays.stream(values)
+                        .findFirst())
+                .map(Long::valueOf);
     }
 }

@@ -31,7 +31,6 @@ public class BoardController {
 
     private final ResponseUtils responseUtils;
 
-    @CheckBoardAccess(action = BoardAction.READ)
     @GetMapping("")
     public ResponseEntity<Response<List<BoardResponse>>> getBoardList(HttpServletRequest httpServletRequest) {
         Long userId = jwtProvider.parseUserIdSafely(httpServletRequest);
