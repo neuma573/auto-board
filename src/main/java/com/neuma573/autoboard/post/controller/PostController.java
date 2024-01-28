@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @Slf4j
 @RequestMapping("/api/v1/post")
@@ -39,7 +39,7 @@ public class PostController {
 
     @CheckBoardAccess(action = BoardAction.READ)
     @GetMapping("/list")
-    public ResponseEntity<Response<List<PostResponse>>> getPostList(
+    public ResponseEntity<Response<Page<PostResponse>>> getPostList(
             @RequestParam(name = "boardId") Long boardId,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,

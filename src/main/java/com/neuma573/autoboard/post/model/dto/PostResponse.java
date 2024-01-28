@@ -22,6 +22,8 @@ public class PostResponse {
 
     private String createdAt;
 
+    private Long commentCount;
+
     public static PostResponse of(Post post) {
        return PostResponse.builder()
                 .id(post.getId())
@@ -31,6 +33,7 @@ public class PostResponse {
                 .views(post.getViews())
                 .isDeleted(post.isDeleted())
                 .createdAt(post.getFormattedCreatedAt())
+                .commentCount(post.getActiveCommentCount())
                 .build();
     }
 }
