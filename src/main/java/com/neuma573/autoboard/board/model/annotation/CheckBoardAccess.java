@@ -11,7 +11,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CheckBoardAccess {
     BoardAction action();
-
-    long boardId() default -1;
-    long postId() default -1;
 }
