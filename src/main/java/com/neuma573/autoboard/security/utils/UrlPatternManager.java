@@ -29,6 +29,7 @@ public class UrlPatternManager {
                 "/api/v1/board",
                 "/api/v1/post/list",
                 "/api/v1/post",
+                "/api/v1/comment/list",
                 "/join",
                 "/login",
                 "/main",
