@@ -34,35 +34,35 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Response<String>> handleAccessDeniedException(AccessDeniedException ex) {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         Response<String> response = responseUtils.error(NOT_ENOUGH_ROLE, ex);
         return new ResponseEntity<>(response, NOT_ENOUGH_ROLE.getStatus());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Response<String>> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         Response<String> response = responseUtils.error(ENTITY_NOT_FOUND, ex);
         return new ResponseEntity<>(response, ENTITY_NOT_FOUND.getStatus());
     }
 
     @ExceptionHandler(InvalidLoginException.class)
     public ResponseEntity<Response<String>> handleAuthenticationException(InvalidLoginException ex) {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         Response<String> response = responseUtils.error(INVALID_LOGIN, ex);
         return new ResponseEntity<>(response, INVALID_LOGIN.getStatus());
     }
 
     @ExceptionHandler(TooManyLoginAttemptException.class)
     public ResponseEntity<Response<String>> handleTooManyAttemptException(TooManyLoginAttemptException ex) {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         Response<String> response = responseUtils.error(TOO_MANY_LOGIN_ATTEMPT, ex);
         return new ResponseEntity<>(response, TOO_MANY_LOGIN_ATTEMPT.getStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Response<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         String errorMessages = ex.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
@@ -77,21 +77,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Response<String>> handleMethodArgumentNotValidException(DataIntegrityViolationException ex) {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         Response<String> response = responseUtils.error(BAD_REQUEST, ex);
         return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
     }
 
     @ExceptionHandler(NotActivatedUserException.class)
     public ResponseEntity<Response<String>> handleNotActivatedUserException(NotActivatedUserException ex){
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         Response<String> response = responseUtils.error(NOT_ACTIVATED_USER, ex);
         return new ResponseEntity<>(response, NOT_ACTIVATED_USER.getStatus());
     }
 
     @ExceptionHandler(TokenNotFoundException.class)
     public ResponseEntity<Response<String>> handleTokenNotFoundException(TokenNotFoundException ex, HttpServletResponse httpServletResponse){
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         CookieUtils.deleteCookie(httpServletResponse, "uuid");
         Response<String> response = responseUtils.error(BAD_REQUEST, ex);
         return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({JwtException.class, ExpiredJwtException.class})
     public Object handleJwtException(JwtException ex, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
         CookieUtils.deleteCookie(httpServletResponse, "uuid");
         if (isApiRequest(httpServletRequest)) {
             Response<String> response = responseUtils.error(UNAUTHORIZED, ex);
@@ -113,6 +113,26 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler(BoardNotAccessibleException.class)
+    public ResponseEntity<Response<String>> handleBoardNotAccessibleException(BoardNotAccessibleException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(UNAUTHORIZED, ex);
+        return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
+    }
+
+    @ExceptionHandler(CommentNotAccessibleException.class)
+    public Object handleCommentNotAccessibleException(CommentNotAccessibleException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(UNAUTHORIZED, ex);
+        return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
+    }
+
+    @ExceptionHandler(PostNotAccessibleException.class)
+    public ResponseEntity<Response<String>> handlePostNotAccessibleException(PostNotAccessibleException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(UNAUTHORIZED, ex);
+        return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
+    }
 
     @ExceptionHandler(Exception.class)
     public Object handleException(Exception ex, HttpServletRequest httpServletRequest) {
