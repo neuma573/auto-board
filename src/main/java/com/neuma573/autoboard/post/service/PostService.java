@@ -23,7 +23,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -46,14 +45,14 @@ public class PostService {
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
 
     @Transactional
-    public List<PostResponse> getPostList(Long boardId, Pageable pageable, Long userId) {
+    public Page<PostResponse> getPostList(Long boardId, Pageable pageable, Long userId) {
         User user = userService.getUserByIdSafely(userId);
 
         Page<Post> posts = (user != null && userService.isAdmin(user))
                 ? postRepository.findAllByBoardId(boardId, pageable)
                 : postRepository.findAllByBoardIdAndIsDeletedFalse(boardId, pageable);
 
-        return posts.map(PostResponse::of).getContent();
+        return posts.map(PostResponse::of);
     }
 
     @Transactional
@@ -116,23 +115,14 @@ public class PostService {
     }
 
     @Transactional
-    public void modifyPost(PostModifyRequest postModifyRequest, Long userId) {
+    public void modifyPost(PostModifyRequest postModifyRequest) {
         Post post = getPostById(postModifyRequest.getPostId());
-        if (isAbleToModify(post, userService.getUserById(userId))) {
-            modify(post, postModifyRequest);
-        } else {
-            throw new PostNotAccessibleException("수정할 수 있는 권한이 없습니다");
-        }
+        modify(post, postModifyRequest);
     }
 
     @Transactional
-    public void deletePost(Long postId, Long userId) {
-        Post post = getPostById(postId);
-        if (isAbleToDelete(post, userService.getUserById(userId))) {
-            delete(post);
-        } else {
-            throw new PostNotAccessibleException("삭제할 수 있는 권한이 없습니다");
-        }
+    public void deletePost(Long postId) {
+        delete(getPostById(postId));
     }
 
     public boolean isAbleToModify(Post post, User user) {
