@@ -101,7 +101,7 @@ async function fetchPosts(boardId, page, size, order) {
             updatePostsTable(data.data); // 기존 테이블 업데이트
             updateMobilePostsList(data.data); // 모바일 화면용 리스트 업데이트
 
-            const totalRecords = localStorage.getItem(boardId); // 백엔드로부터 받은 총 페이지 수
+            const totalRecords = data.data.totalElements; // 백엔드로부터 받은 총 페이지 수
             createPaginationButtons(Math.ceil(totalRecords / size) , page);
 
             hideSpinner();
@@ -125,7 +125,7 @@ function updatePostsTable(posts) {
     const tableBody = document.querySelector('.table tbody');
     tableBody.innerHTML = ''; // Clear existing rows
 
-    if (posts.length === 0) {
+    if (posts.empty === true) {
         // 게시글이 없을 경우 표시할 행 추가
         const row = tableBody.insertRow();
         const cell = row.insertCell(0);
@@ -133,7 +133,7 @@ function updatePostsTable(posts) {
         cell.setAttribute('colspan', 5); // 모든 컬럼을 합친 하나의 셀로 표시
         cell.style.textAlign = 'center';
     } else {
-        posts.forEach((post, index) => {
+        posts.content.forEach((post, index) => {
             const row = tableBody.insertRow();
             const numberCell = row.insertCell(0);
             const titleCell = row.insertCell(1);
@@ -153,6 +153,13 @@ function updatePostsTable(posts) {
                 titleLink.textContent = post.title;
             }
 
+            if (post.commentCount !== 0) {
+                const commentCountSpan = document.createElement('span');
+                commentCountSpan.textContent = ` [${post.commentCount}]`;
+                commentCountSpan.className = 'comment-count-span';
+                titleLink.appendChild(commentCountSpan);
+            }
+
             titleLink.onclick = function() { clickPost(post.id); };
             titleCell.appendChild(titleLink);
 
@@ -169,7 +176,7 @@ function updateMobilePostsList(posts) {
     const listGroup = document.querySelector('.list-group');
     listGroup.innerHTML = '';
 
-    if (posts.length === 0) {
+    if (posts.empty === true) {
         // 게시글이 없을 경우 표시할 항목 추가
         const listItem = document.createElement('div');
         listItem.className = 'list-group-item';
@@ -177,7 +184,7 @@ function updateMobilePostsList(posts) {
         listItem.style.textAlign = 'center';
         listGroup.appendChild(listItem);
     } else {
-        posts.forEach(post => {
+        posts.content.forEach(post => {
             const listItem = document.createElement('div');
             listItem.className = 'list-group-item';
 
@@ -192,6 +199,15 @@ function updateMobilePostsList(posts) {
                 postTitleLink.style.fontStyle = 'italic'; // 이탤릭체 적용
             } else {
                 postTitleLink.textContent = `${post.title.substring(0, 30)}${post.title.length > 30 ? '...' : ''}`;
+            }
+
+            if (post.commentCount !== 0) {
+
+                const commentCountSpan = document.createElement('span');
+                commentCountSpan.textContent = ` [${post.commentCount}]`;
+                commentCountSpan.className = 'comment-count-span';
+
+                postTitleLink.appendChild(commentCountSpan);
             }
 
 

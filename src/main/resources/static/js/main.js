@@ -42,6 +42,7 @@ async function checkAndRefreshToken() {
     if ( !(await verifyToken(accessToken))) {
         const isRefreshed = await refreshAccessToken();
         if (!isRefreshed) {
+            alert('세션이 만료되어 로그아웃됩니다.');
             window.location.href = '/login'; // 로그인 페이지로 리다이렉션
         }
     }
@@ -136,7 +137,7 @@ function setToken(value) {
 }
 
 function deleteToken() {
-    localStorage.removeItem("accessToken");
+    localStorage.clear();
 }
 
 function getFormattedCreatedAt(createdAt) {
