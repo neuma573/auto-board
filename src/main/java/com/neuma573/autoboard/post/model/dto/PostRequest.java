@@ -20,7 +20,6 @@ public class PostRequest {
     @Size(min = 1, max = 1000, message = "내용은 1자 이상 1000자 이하이어야 합니다")
     private String content;
 
-    @NotNull
     private Long boardId;
 
     public Post of(Board board, User user) {

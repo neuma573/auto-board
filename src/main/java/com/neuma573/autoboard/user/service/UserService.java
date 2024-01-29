@@ -2,6 +2,7 @@ package com.neuma573.autoboard.user.service;
 
 import com.neuma573.autoboard.email.model.dto.MailRequest;
 import com.neuma573.autoboard.email.service.MailService;
+import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -59,7 +61,7 @@ public class UserService {
         );
 
 
-        return user.toResponse();
+        return UserResponse.of(user);
 
     }
 
@@ -70,7 +72,7 @@ public class UserService {
     
     public VerificationToken generateVerificationToken(User user) {
 
-        VerificationToken verificationToken = user.generateVerificationToken();
+        VerificationToken verificationToken = VerificationToken.generateVerificationToken(user);
         verificationTokenRedisTemplate.opsForValue().set(verificationToken.getToken(), verificationToken);
         return verificationToken;
 
@@ -103,6 +105,25 @@ public class UserService {
 
     public boolean isValidVerificationToken(VerificationToken verificationToken) {
         return verificationToken.getExpiryDate().isAfter(LocalDateTime.now());
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+    }
+
+    public User getUserByIdSafely(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+
+    @Transactional(readOnly = true)
+    public boolean isAdmin(User user) {
+        return getRolesById(user.getId()).stream()
+                .anyMatch(userRole -> userRole.getRole() == Role.ADMIN);
+    }
+
+    public Set<UserRole> getRolesById(Long userId) {
+        return userRoleRepository.findByUserId(userId);
     }
 
 }

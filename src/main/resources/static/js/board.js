@@ -1,20 +1,15 @@
 let currentBoard = -1;
 
-document.addEventListener('DOMContentLoaded', function() {
-    verifyToken(localStorage.getItem("accessToken")).then(() => {
-        if(localStorage.getItem("accessToken") === null) {
+document.addEventListener('DOMContentLoaded', async function () {
+    try {
+        await fetchBoards();
+        handleBoardSelectChange();
+        if (localStorage.getItem("accessToken") === null) {
             document.getElementById('writeButton').style.display = 'none';
         }
-    })
-
-
-    const savedBoardId = localStorage.getItem('currentBoardId');
-    if (savedBoardId) {
-        currentBoard = parseInt(savedBoardId, 10);
+    } catch (error) {
+        console.error('Error after fetching boards:', error);
     }
-    fetchBoards().then(() => {
-        setupWriteButtonLink();
-    });
 });
 
 async function fetchBoards() {
@@ -42,9 +37,6 @@ async function fetchBoards() {
                 currentBoard = localStorage.getItem('currentBoardId');
             }
             hideSpinner();
-            await fetchPosts(currentBoard, 1, 10, 'desc');
-
-
         }
     } catch (error) {
         hideSpinner();
@@ -61,32 +53,31 @@ function updateBoardSelect(boards) {
         localStorage.setItem(board.id, board.postCount);
         const option = document.createElement('option');
         option.value = board.id;
-        option.textContent = `${board.boardName} (${board.postCount})`;
+        option.textContent = `${board.name} (${board.postCount})`;
         select.appendChild(option);
         if (board.public && firstPublicBoardId === null) {
             firstPublicBoardId = board.id;
         }
     });
 
-    if (localStorage.getItem('currentBoardId') === null) {
+    const storedBoardId = localStorage.getItem('currentBoardId');
+    if (storedBoardId !== null) {
+        currentBoard = storedBoardId;
+        select.value = storedBoardId;
+    } else {
         select.value = firstPublicBoardId;
         currentBoard = firstPublicBoardId;
         localStorage.setItem('currentBoardId', currentBoard);
-        document.getElementById('writeButton').href = `/write?boardId=${currentBoard}`;
-    } else {
-        select.value = localStorage.getItem('currentBoardId');
-        document.getElementById('writeButton').href = `/write?boardId=${currentBoard}`;
     }
-}
 
-function setupWriteButtonLink() {
-    const select = document.getElementById('boardSelect');
-    select.removeEventListener('change', handleBoardSelectChange);
+    document.getElementById('writeButton').href = `/write?boardId=${currentBoard}`;
+
+    // 이벤트 리스너 추가
     select.addEventListener('change', handleBoardSelectChange);
 }
 
 function handleBoardSelectChange() {
-    const selectedBoardId = this.value;
+    const selectedBoardId = document.getElementById('boardSelect').value;
     currentBoard = selectedBoardId;
     localStorage.setItem('currentBoardId', selectedBoardId);
     const writeButton = document.getElementById('writeButton');
@@ -110,7 +101,7 @@ async function fetchPosts(boardId, page, size, order) {
             updatePostsTable(data.data); // 기존 테이블 업데이트
             updateMobilePostsList(data.data); // 모바일 화면용 리스트 업데이트
 
-            const totalRecords = localStorage.getItem(boardId); // 백엔드로부터 받은 총 페이지 수
+            const totalRecords = data.data.totalElements; // 백엔드로부터 받은 총 페이지 수
             createPaginationButtons(Math.ceil(totalRecords / size) , page);
 
             hideSpinner();
@@ -126,6 +117,7 @@ async function fetchPosts(boardId, page, size, order) {
         currentBoard = -1;
         hideSpinner();
         await fetchBoards();
+        await fetchPosts(document.getElementById('boardSelect').value, 1, 10, 'desc');
     }
 }
 
@@ -133,68 +125,115 @@ function updatePostsTable(posts) {
     const tableBody = document.querySelector('.table tbody');
     tableBody.innerHTML = ''; // Clear existing rows
 
-    posts.forEach((post, index) => {
+    if (posts.empty === true) {
+        // 게시글이 없을 경우 표시할 행 추가
         const row = tableBody.insertRow();
-        const numberCell = row.insertCell(0);
-        const titleCell = row.insertCell(1);
-        const authorCell = row.insertCell(2);
-        const dateCell = row.insertCell(3);
-        const viewsCell = row.insertCell(4);
+        const cell = row.insertCell(0);
+        cell.textContent = "게시글이 없습니다.";
+        cell.setAttribute('colspan', 5); // 모든 컬럼을 합친 하나의 셀로 표시
+        cell.style.textAlign = 'center';
+    } else {
+        posts.content.forEach((post, index) => {
+            const row = tableBody.insertRow();
+            const numberCell = row.insertCell(0);
+            const titleCell = row.insertCell(1);
+            const authorCell = row.insertCell(2);
+            const dateCell = row.insertCell(3);
+            const viewsCell = row.insertCell(4);
 
-        numberCell.textContent = index + 1;
+            numberCell.textContent = index + 1;
 
-        const titleLink = document.createElement('a');
-        titleLink.href = '#';
-        titleLink.textContent = post.title;
-        titleLink.onclick = function() { clickPost(post.id); };
-        titleCell.appendChild(titleLink);
+            const titleLink = document.createElement('a');
+            titleLink.href = '#';
 
-        authorCell.textContent = post.userResponse.name;
-        dateCell.textContent = getFormattedCreatedAt(post.createdAt);
-        viewsCell.textContent = post.views;
-    });
+            if (post.deleted) {
+                titleLink.textContent = `[삭제됨] ${post.title}`;
+                titleLink.style.fontStyle = 'italic'; // 이탤릭체 적용
+            } else {
+                titleLink.textContent = post.title;
+            }
+
+            if (post.commentCount !== 0) {
+                const commentCountSpan = document.createElement('span');
+                commentCountSpan.textContent = ` [${post.commentCount}]`;
+                commentCountSpan.className = 'comment-count-span';
+                titleLink.appendChild(commentCountSpan);
+            }
+
+            titleLink.onclick = function() { clickPost(post.id); };
+            titleCell.appendChild(titleLink);
+
+            authorCell.textContent = post.userResponse.name;
+            dateCell.textContent = getFormattedCreatedAt(post.createdAt);
+            viewsCell.textContent = post.views;
+        });
+    }
+
+
 }
 
 function updateMobilePostsList(posts) {
     const listGroup = document.querySelector('.list-group');
     listGroup.innerHTML = '';
-    posts.forEach(post => {
+
+    if (posts.empty === true) {
+        // 게시글이 없을 경우 표시할 항목 추가
         const listItem = document.createElement('div');
         listItem.className = 'list-group-item';
-
-        const postTitleLink = document.createElement('a');
-        postTitleLink.href = '#';
-        postTitleLink.className = 'post-title';
-
-
-
-        if(post.title.length > 30) {
-            postTitleLink.textContent = post.title.substring(0, 30) + '...';
-        } else {
-            postTitleLink.textContent = post.title;
-        }
-
-
-
-        postTitleLink.onclick = function() { clickPost(post.id); };
-        listItem.appendChild(postTitleLink);
-
-        const postDetails = document.createElement('div');
-        postDetails.className = 'post-details';
-
-        const authorSpan = document.createElement('span');
-        authorSpan.className = 'author';
-        authorSpan.textContent = post.userResponse.name;
-        postDetails.appendChild(authorSpan);
-
-        const statsSpan = document.createElement('span');
-        statsSpan.className = 'stats';
-        statsSpan.textContent = `작성일: ${getFormattedCreatedAt(post.createdAt)} | 조회수: ${post.views}`;
-        postDetails.appendChild(statsSpan);
-
-        listItem.appendChild(postDetails);
+        listItem.textContent = "게시글이 없습니다.";
+        listItem.style.textAlign = 'center';
         listGroup.appendChild(listItem);
-    });
+    } else {
+        posts.content.forEach(post => {
+            const listItem = document.createElement('div');
+            listItem.className = 'list-group-item';
+
+            const postTitleLink = document.createElement('a');
+            postTitleLink.href = '#';
+            postTitleLink.className = 'post-title';
+
+
+
+            if (post.deleted) {
+                postTitleLink.textContent = `[삭제됨] ${post.title.substring(0, 30)}${post.title.length > 30 ? '...' : ''}`;
+                postTitleLink.style.fontStyle = 'italic'; // 이탤릭체 적용
+            } else {
+                postTitleLink.textContent = `${post.title.substring(0, 30)}${post.title.length > 30 ? '...' : ''}`;
+            }
+
+            if (post.commentCount !== 0) {
+
+                const commentCountSpan = document.createElement('span');
+                commentCountSpan.textContent = ` [${post.commentCount}]`;
+                commentCountSpan.className = 'comment-count-span';
+
+                postTitleLink.appendChild(commentCountSpan);
+            }
+
+
+
+            postTitleLink.onclick = function() { clickPost(post.id); };
+            listItem.appendChild(postTitleLink);
+
+            const postDetails = document.createElement('div');
+            postDetails.className = 'post-details';
+
+            const authorSpan = document.createElement('span');
+            authorSpan.className = 'author';
+            authorSpan.textContent = post.userResponse.name;
+            postDetails.appendChild(authorSpan);
+
+            const statsSpan = document.createElement('span');
+            statsSpan.className = 'stats';
+            statsSpan.textContent = `작성일: ${getFormattedCreatedAt(post.createdAt)} | 조회수: ${post.views}`;
+            postDetails.appendChild(statsSpan);
+
+            listItem.appendChild(postDetails);
+            listGroup.appendChild(listItem);
+        });
+    }
+
+
 }
 
 function clickPost(postId) {

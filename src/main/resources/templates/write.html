@@ -3,11 +3,16 @@
 <title>글쓰기</title>
     <body>
         <div th:fragment="content" class="container mt-5">
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                let mode = [[${mode}]];
+                /*]]>*/
+            </script>
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${boardInfo.boardName}">글쓰기</h5>
+                            <h5 class="card-title" th:text="${boardInfo.name}">글쓰기</h5>
                             <form action="#" th:action="@{/submit}" th:object="${post}" method="post">
                                 <div class="form-group">
                                     <label for="title">제목:</label>

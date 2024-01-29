@@ -27,10 +27,13 @@ function checkLoginStatus() {
 function hideLoginAndJoinButtons() {
     document.getElementById('loginButton').style.display = 'none';
     document.getElementById('joinButton').style.display = 'none';
+    document.getElementById('logoutButton').style.display = '';
 }
 
 function showLoginAndJoinButtons() {
     document.getElementById('logoutButton').style.display = 'none';
+    document.getElementById('loginButton').style.display = '';
+    document.getElementById('joinButton').style.display = '';
 }
 
 async function checkAndRefreshToken() {
@@ -39,6 +42,7 @@ async function checkAndRefreshToken() {
     if ( !(await verifyToken(accessToken))) {
         const isRefreshed = await refreshAccessToken();
         if (!isRefreshed) {
+            alert('세션이 만료되어 로그아웃됩니다.');
             window.location.href = '/login'; // 로그인 페이지로 리다이렉션
         }
     }
@@ -133,7 +137,7 @@ function setToken(value) {
 }
 
 function deleteToken() {
-    localStorage.removeItem("accessToken");
+    localStorage.clear();
 }
 
 function getFormattedCreatedAt(createdAt) {
@@ -141,9 +145,8 @@ function getFormattedCreatedAt(createdAt) {
     const createdAtDate = new Date(createdAt);
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 1, 0, 0);
 
-    if (now > yesterday && createdAtDate > yesterday) {
+    if (createdAtDate > yesterday) {
         return createdAtDate.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
     } else {
         return createdAtDate.toLocaleDateString([], { year: '2-digit', month: '2-digit', day: '2-digit' });

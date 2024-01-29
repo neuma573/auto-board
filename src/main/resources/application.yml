@@ -1,3 +1,7 @@
+#logging.level:
+#  org.hibernate.orm.jdbc.bind: trace
+
+
 server:
   port: 443
   ssl:
@@ -12,6 +16,7 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     show-sql: false
@@ -54,3 +59,5 @@ app:
   mail:
     path: ${MAIL_PATH}
   domain: ${DOMAIN}
+  openai:
+    key: ${OPENAI_KEY}

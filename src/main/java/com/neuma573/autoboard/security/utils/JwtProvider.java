@@ -19,7 +19,9 @@ import org.springframework.util.StringUtils;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -254,7 +256,15 @@ public class JwtProvider {
                 .build();
     }
 
-    public Long parseIdFrom(HttpServletRequest httpServletRequest) {
+    public Long parseUserId(HttpServletRequest httpServletRequest) {
+        Optional<Long> userId = parseIdWithValidation(httpServletRequest);
+        if (userId.isEmpty()) {
+            throw new UserNotFoundException("User ID not found in JWT token");
+        }
+        return userId.get();
+    }
+
+    public Long parseUserIdSafely(HttpServletRequest httpServletRequest) {
         try {
             return parseJwtToken(httpServletRequest)
                     .map(this::getClaims)
@@ -282,11 +292,14 @@ public class JwtProvider {
         }
     }
 
-    public Long getUserId(HttpServletRequest httpServletRequest) {
-        Optional<Long> userId = parseIdWithValidation(httpServletRequest);
-        if (userId.isEmpty()) {
-            throw new UserNotFoundException("User ID not found in JWT token");
-        }
-        return userId.get();
+    public Map<String, String[]> getParameterMap(HttpServletRequest httpServletRequest) {
+        return httpServletRequest.getParameterMap();
+    }
+
+    public Optional<Long> extractLongFromParamMap(Map<String, String[]> paramMap, String paramName) {
+        return Optional.ofNullable(paramMap.get(paramName))
+                .flatMap(values -> Arrays.stream(values)
+                        .findFirst())
+                .map(Long::valueOf);
     }
 }

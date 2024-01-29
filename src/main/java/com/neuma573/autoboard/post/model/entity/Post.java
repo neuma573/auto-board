@@ -1,14 +1,13 @@
 package com.neuma573.autoboard.post.model.entity;
 
 import com.neuma573.autoboard.board.model.entity.Board;
+import com.neuma573.autoboard.comment.model.entity.Comment;
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import java.time.format.DateTimeFormatter;
+import lombok.*;
+
+import java.util.Set;
 
 @Builder
 @Entity
@@ -25,8 +24,10 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "board_id")
     private Board board;
 
+    @Setter
     private String title;
 
+    @Setter
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -38,12 +39,25 @@ public class Post extends BaseEntity {
 
     private boolean isDeleted;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Comment> comments;
+
+
     public void addViews() {
         views++;
     }
 
-    public String getFormattedCreatedAt() {
-        return getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    @Override
+    public void delete() {
+        this.isDeleted = true;
+        super.delete();
     }
 
+    public Long getActiveCommentCount() {
+        return comments == null
+                ? 0L
+                : comments.stream()
+                .filter(comment -> !comment.isDeleted())
+                .count();
+    }
 }
