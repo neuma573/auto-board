@@ -14,6 +14,8 @@ public class CommentResponse {
     private UserResponse createdBy;
     private String createdAt;
 
+    private boolean isDeleted;
+
     private CommentResponse parent;
 
 
@@ -35,6 +37,7 @@ public class CommentResponse {
                 .createdBy(userResponse)
                 .createdAt(comment.getFormattedCreatedAt())
                 .parent(parentResponse)
+                .isDeleted(comment.isDeleted())
                 .build();
 
     }
