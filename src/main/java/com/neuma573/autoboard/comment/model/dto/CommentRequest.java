@@ -14,7 +14,6 @@ public class CommentRequest {
     @NotNull(message = "잘못된 요청입니다")
     private Long postId;
 
-
     private Long parentId;
 
     @NotEmpty(message = "댓글 본문은 비어 있을 수 없습니다")
@@ -28,8 +27,5 @@ public class CommentRequest {
                 .createdBy(user)
                 .parentComment(parentComment)
                 .build();
-    }
-    public Comment toEntity(Post post, User user) {
-        return toEntity(post, user, null);
     }
 }
