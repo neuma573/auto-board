@@ -3,7 +3,6 @@ package com.neuma573.autoboard.user.model.dto;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.model.entity.UserRole;
-import com.neuma573.autoboard.user.model.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -13,7 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,6 +24,7 @@ public class UserRequest {
     @NotEmpty(message = "이메일은 비어있을 수 없습니다.")
     private String email;
 
+    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "이름에 특수문자를 사용할 수 없습니다.")
     @NotEmpty(message = "이름은 비어있을 수 없습니다.")
     private String name;
 
