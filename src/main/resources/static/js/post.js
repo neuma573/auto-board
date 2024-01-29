@@ -5,6 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const modifyButton = document.getElementById('modify');
     modifyButton.href = `/modify?postId=${postId}`;
 
+    if (!localStorage.getItem('user')) {
+        let commentForm = document.querySelector('.comment-form');
+        if (commentForm) {
+            commentForm.style.display = 'none';
+        }
+    }
+
 });
 
 async function initializePost() {
