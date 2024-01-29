@@ -52,10 +52,11 @@ public class MvcController {
         return modelAndView;
     }
 
-    @CheckBoardAccess(action = BoardAction.UNAUTHORIZED_ACTION)
     @GetMapping("/post")
     public ModelAndView showPost(@RequestParam(name = "postId") Long postId ) {
-        return new ModelAndView("post");
+        ModelAndView modelAndView = new ModelAndView("post");
+        modelAndView.addObject("postId", postId);
+        return modelAndView;
     }
 
 }
