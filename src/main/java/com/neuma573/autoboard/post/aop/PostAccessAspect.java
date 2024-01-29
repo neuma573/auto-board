@@ -1,5 +1,7 @@
 package com.neuma573.autoboard.post.aop;
 
+import com.neuma573.autoboard.comment.model.dto.CommentRequest;
+import com.neuma573.autoboard.comment.service.CommentService;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.post.model.annotation.CheckPostAccess;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
@@ -19,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Aspect
@@ -27,6 +30,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PostAccessAspect {
 
     private final PostService postService;
+
+    private final CommentService commentService;
 
     private final JwtProvider jwtProvider;
 
@@ -51,19 +56,33 @@ public class PostAccessAspect {
 
         switch (httpMethod) {
             case "GET", "DELETE" -> {
-                postId.set(jwtProvider.extractLongFromParamMap(paramMap, "postId")
-                        .orElse(-1L));
-                boardId.set(jwtProvider.extractLongFromParamMap(paramMap, "boardId")
-                        .orElse(postService.findBoardIdByPostId(postId.get())));
+                Optional<Long> commentIdOptional = jwtProvider.extractLongFromParamMap(paramMap, "commentId");
+                if (commentIdOptional.isPresent()) {
+                    Long commentId = commentIdOptional.get();
+                    Long associatedPostId = commentService.findPostIdByCommentId(commentId);
+                    if (associatedPostId != null) {
+                        postId.set(associatedPostId);
+                    }
+                }
+                else {
+                    postId.set(jwtProvider.extractLongFromParamMap(paramMap, "postId")
+                            .orElse(-1L));
+                    boardId.set(jwtProvider.extractLongFromParamMap(paramMap, "boardId")
+                            .orElse(postService.findBoardIdByPostId(postId.get())));
+                }
             }
             default -> Arrays.stream(joinPoint.getArgs())
-                    .filter(arg -> arg instanceof PostRequest)
+                    .filter(arg -> arg instanceof PostRequest || arg instanceof CommentRequest)
                     .findFirst()
                     .ifPresent(arg -> {
-                        PostRequest postRequest = (PostRequest) arg;
-                        boardId.set(postRequest.getBoardId());
-                        if (postRequest instanceof PostModifyRequest) {
-                            postId.set(((PostModifyRequest) postRequest).getPostId());
+                        if (arg instanceof PostRequest postRequest) {
+                            boardId.set(postRequest.getBoardId());
+                            if (postRequest instanceof PostModifyRequest) {
+                                postId.set(((PostModifyRequest) postRequest).getPostId());
+                                boardId.set(postService.findBoardIdByPostId(postId.get()));
+                            }
+                        } else if (arg instanceof CommentRequest commentRequest) {
+                            postId.set(commentRequest.getPostId());
                             boardId.set(postService.findBoardIdByPostId(postId.get()));
                         }
                     });

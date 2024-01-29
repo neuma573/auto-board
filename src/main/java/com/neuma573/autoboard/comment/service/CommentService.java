@@ -4,6 +4,7 @@ import com.neuma573.autoboard.comment.model.dto.CommentModifyRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentResponse;
 import com.neuma573.autoboard.comment.model.entity.Comment;
+import com.neuma573.autoboard.comment.model.enums.CommentAction;
 import com.neuma573.autoboard.comment.repository.CommentRepository;
 import com.neuma573.autoboard.global.exception.CommentNotAccessibleException;
 import com.neuma573.autoboard.post.model.entity.Post;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -76,6 +79,30 @@ public class CommentService {
 
     private void modify(Comment comment, CommentModifyRequest commentModifyRequest) {
         comment.setContent(commentModifyRequest.getContent());
+    }
+
+    @Transactional
+    public Long findPostIdByCommentId(Long commentId) {
+        return commentRepository.findById(commentId)
+                .map(Comment::getPost)
+                .map(Post::getId)
+                .orElse(null);
+    }
+
+    @Transactional
+    public boolean isCommentAccessible(Long userId, Long commentId, CommentAction action) {
+        Comment comment = getCommentById(commentId);
+        User user = userService.getUserByIdSafely(userId);
+        return switch (action) {
+            case UPDATE -> !comment.isDeleted() && isCreatedBy(userId, comment);
+            case DELETE -> !comment.isDeleted() && userService.isAdmin(user) || isCreatedBy(userId, comment);
+            default -> false;
+        };
+    }
+
+    @Transactional
+    public boolean isCreatedBy(Long userId, Comment comment) {
+        return Objects.equals(userId, comment.getCreatedBy().getId());
     }
 
 }
