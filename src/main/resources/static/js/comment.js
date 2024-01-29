@@ -75,29 +75,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 // 댓글 작성
-function saveComment() {
-    checkAndRefreshToken().then(r => {
-        const content = document.getElementById('comment-content').value;
-        const commentData = {postId, content};
+async function saveComment() {
+    await checkAndRefreshToken();
+    const content = document.getElementById('comment-content').value;
+    const commentData = {postId, content};
 
-        fetch('/api/v1/comment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
-            },
-            body: JSON.stringify(commentData)
+    fetch('/api/v1/comment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify(commentData)
+    })
+        .then(response => {
+            if (response.ok) {
+                document.getElementById('comment-content').value = ''; // 댓글 입력란 초기화
+                loadPage(1); // 첫 페이지의 댓글 목록 다시 불러오기
+            } else {
+                alert('댓글 작성에 실패했습니다.');
+            }
         })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById('comment-content').value = ''; // 댓글 입력란 초기화
-                    loadPage(1); // 첫 페이지의 댓글 목록 다시 불러오기
-                } else {
-                    alert('댓글 작성에 실패했습니다.');
-                }
-            })
-    });
-
 }
 
 function generatePagination(totalPages) {
@@ -173,7 +171,8 @@ function cancelEdit(commentId, originalContent, createdBy) {
     commentContainer.appendChild(cardBody);
 }
 
-function submitEdit(commentId) {
+async function submitEdit(commentId) {
+    await checkAndRefreshToken();
     const editedContent = document.getElementById(`edit-content-${commentId}`).value;
     const commentData = {
         commentId: commentId,
@@ -201,7 +200,8 @@ function submitEdit(commentId) {
         });
 }
 
-function deleteComment(commentId) {
+async function deleteComment(commentId) {
+    await checkAndRefreshToken();
     if (confirm("이 댓글을 삭제하시겠습니까?")) {
         fetch(`/api/v1/comment?commentId=${commentId}`, {
             method: 'DELETE',
