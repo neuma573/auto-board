@@ -2,6 +2,7 @@ package com.neuma573.autoboard.ai.task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.neuma573.autoboard.ai.service.OpenAiService;
+import com.neuma573.autoboard.global.service.OptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,15 +17,20 @@ public class OpenAiTask {
 
     private final OpenAiService openAiService;
 
+    private final OptionService optionService;
 
-    @Scheduled(fixedRate = 360000)
+
+    @Scheduled(fixedRate = 3600000)
     public void refreshTopic() {
-        openAiService.refreshTopic();
+        if(optionService.findByKey("autoPosting").equals("true")) {
+            openAiService.refreshTopic();
+        }
+
     }
 
-    @Scheduled(fixedRate = 28000)
+    @Scheduled(fixedRate = 358888)
     public void scheduledOpenAiTask() throws JsonProcessingException {
-        if(shouldExecuteTask()) {
+        if(optionService.findByKey("autoPosting").equals("true") && shouldExecuteTask()) {
             openAiService.ask();
         }
     }
