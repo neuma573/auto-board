@@ -7,7 +7,7 @@ import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Builder
 @Entity
@@ -40,7 +40,7 @@ public class Post extends BaseEntity {
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Comment> comments;
+    private List<Comment> comments;
 
 
     public void addViews() {
