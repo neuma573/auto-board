@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return commentElement.outerHTML;
 
                 }).join('');
-                document.getElementById('comment-count').textContent = `(${activeCommentsCount})`; // 활성 댓글 수 업데이트
+                document.getElementById('comment-count').textContent = `(${data.data.totalElements})`; // 활성 댓글 수 업데이트
                 document.getElementById('comments-list').innerHTML = commentsHtml;
             })
             .catch(error => {
