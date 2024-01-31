@@ -1,8 +1,10 @@
 package com.neuma573.autoboard.post.service;
 
+import com.neuma573.autoboard.ai.model.dto.OpenAiResponse;
 import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
+import com.neuma573.autoboard.global.service.OptionService;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
@@ -41,6 +43,8 @@ public class PostService {
 
     private final BoardService boardService;
 
+    private final OptionService optionService;
+
     private final static String VIEW_COUNT_KEY_PREFIX = "view:count:";
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
 
@@ -64,6 +68,24 @@ public class PostService {
                 writer)
         );
         return PostResponse.of(post);
+    }
+
+    public void saveAiPost(OpenAiResponse openAiResponse) {
+        String userId = optionService.findByKey("aiUserId");
+        String scheduledBoardId = optionService.findByKey("aiBoardId");
+
+        Board destination = boardService.getBoardById(Long.valueOf(scheduledBoardId));
+        User aiUser = userService.getUserById(Long.valueOf(userId));
+
+        postRepository.save(Post.builder()
+                .board(destination)
+                .title(openAiResponse.getTitle())
+                .content(openAiResponse.getContent())
+                .createdBy(aiUser)
+                .isDeleted(false)
+                .views(0L)
+                .build()
+        );
     }
 
     @Transactional
