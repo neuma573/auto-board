@@ -60,4 +60,9 @@ public class Post extends BaseEntity {
                 .filter(comment -> !comment.isDeleted())
                 .count();
     }
+
+    @Transient
+    @Setter
+    private User currentUser;
+
 }
