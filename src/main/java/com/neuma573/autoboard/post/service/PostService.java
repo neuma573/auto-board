@@ -5,6 +5,7 @@ import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.service.OptionService;
+import com.neuma573.autoboard.post.event.PostEvent;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
@@ -18,6 +19,7 @@ import com.neuma573.autoboard.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -44,6 +46,8 @@ public class PostService {
     private final BoardService boardService;
 
     private final OptionService optionService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final static String VIEW_COUNT_KEY_PREFIX = "view:count:";
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
@@ -137,8 +141,11 @@ public class PostService {
     }
 
     @Transactional
-    public void modifyPost(PostModifyRequest postModifyRequest) {
+    public void modifyPost(PostModifyRequest postModifyRequest, Long userId) {
+        User user = userService.getUserById(userId);
         Post post = getPostById(postModifyRequest.getPostId());
+        post.setCurrentUser(user);
+        applicationEventPublisher.publishEvent(new PostEvent(this, post));
         modify(post, postModifyRequest);
     }
 

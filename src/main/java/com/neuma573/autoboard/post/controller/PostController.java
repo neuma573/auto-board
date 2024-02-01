@@ -76,8 +76,10 @@ public class PostController {
     @CheckBoardAccess(action = BoardAction.READ)
     @PutMapping("")
     public ResponseEntity<Void> modifyPost(
-            @Valid @RequestBody PostModifyRequest postModifyRequest) {
-        postService.modifyPost(postModifyRequest);
+            @Valid @RequestBody PostModifyRequest postModifyRequest,
+            HttpServletRequest httpServletRequest) {
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
+        postService.modifyPost(postModifyRequest, userId);
         return ResponseEntity.noContent().build();
     }
 
