@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log('Success:', data);
-                alert('로그인 성공:');
                 localStorage.setItem("user", btoa(email));
                 localStorage.setItem("accessToken", data.data.accessToken);
                 window.location.href = "/";
