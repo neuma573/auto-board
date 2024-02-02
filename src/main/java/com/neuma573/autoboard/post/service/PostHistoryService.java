@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.post.service;
 
+import com.neuma573.autoboard.post.event.PostEvent;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.model.entity.PostHistory;
 import com.neuma573.autoboard.post.repository.PostHistoryRepository;
@@ -14,7 +15,10 @@ public class PostHistoryService {
     private final PostHistoryRepository postHistoryRepository;
 
     @Transactional
-    public void savePostHistory(Post post) {
+    public void savePostHistory(PostEvent event) {
+        Post post = event.getPost();
+
+
         PostHistory postHistory = PostHistory.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
@@ -24,6 +28,7 @@ public class PostHistoryService {
                 .createdBy(post.getCreatedBy())
                 .views(post.getViews())
                 .changedBy(post.getCurrentUser())
+                .historyType(event.getPostAction())
                 .build();
         postHistoryRepository.save(postHistory);
     }

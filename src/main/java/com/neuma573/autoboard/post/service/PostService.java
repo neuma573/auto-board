@@ -145,13 +145,17 @@ public class PostService {
         User user = userService.getUserById(userId);
         Post post = getPostById(postModifyRequest.getPostId());
         post.setCurrentUser(user);
-        applicationEventPublisher.publishEvent(new PostEvent(this, post));
+        applicationEventPublisher.publishEvent(new PostEvent(this, post, PostAction.UPDATE));
         modify(post, postModifyRequest);
     }
 
     @Transactional
-    public void deletePost(Long postId) {
-        delete(getPostById(postId));
+    public void deletePost(Long postId, Long userId) {
+        User user = userService.getUserById(userId);
+        Post post = getPostById(postId);
+        post.setCurrentUser(user);
+        applicationEventPublisher.publishEvent(new PostEvent(this, post, PostAction.DELETE));
+        delete(post);
     }
 
     public boolean isAbleToModify(Post post, User user) {

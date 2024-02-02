@@ -87,8 +87,10 @@ public class PostController {
     @CheckBoardAccess(action = BoardAction.READ)
     @DeleteMapping("")
     public ResponseEntity<Void> deletePost(
-            @RequestParam(name = "postId") Long postId) {
-        postService.deletePost(postId);
+            @RequestParam(name = "postId") Long postId,
+            HttpServletRequest httpServletRequest) {
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
+        postService.deletePost(postId, userId);
         return ResponseEntity.noContent().build();
     }
 

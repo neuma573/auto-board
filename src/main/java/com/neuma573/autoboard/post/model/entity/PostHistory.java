@@ -1,6 +1,7 @@
 package com.neuma573.autoboard.post.model.entity;
 
 import com.neuma573.autoboard.board.model.entity.Board;
+import com.neuma573.autoboard.post.model.enums.PostAction;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,7 +25,7 @@ public class PostHistory  {
     @Column(name = "post_id")
     private Long postId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "changed_by_user_id")
     private User changedBy;
 
@@ -32,7 +33,7 @@ public class PostHistory  {
     @Column(name = "changed_at")
     private LocalDateTime changedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
@@ -43,11 +44,15 @@ public class PostHistory  {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_user_id")
     private User createdBy;
 
     private Long views = 0L;
 
     private boolean isDeleted;
+
+    @Column(name = "history_type")
+    @Enumerated(EnumType.STRING)
+    private PostAction historyType;
 }
