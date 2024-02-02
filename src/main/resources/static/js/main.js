@@ -2,6 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
 });
 
+document.querySelector('.navbar-brand').addEventListener('click', function() {
+    // 현재 페이지 경로와 referrer를 가져옵니다.
+    const currentPath = window.location.pathname;
+    const referrer = document.referrer;
+
+    // URL 객체를 사용하여 referrer의 경로를 추출합니다.
+    const referrerPath = new URL(referrer).pathname;
+
+    // 현재 경로가 '/main' 또는 '/' 이고, 이전 페이지가 같은 경로일 때만 localStorage 값을 설정합니다.
+    if ((currentPath === '/main' || currentPath === '/') && referrerPath === currentPath) {
+        localStorage.setItem('pageNumber', '1');
+    }
+});
+
 function checkLoginStatus() {
     const accessToken = getToken();
     if (accessToken != null) {
@@ -42,6 +56,7 @@ async function checkAndRefreshToken() {
     if ( !(await verifyToken(accessToken))) {
         const isRefreshed = await refreshAccessToken();
         if (!isRefreshed) {
+            deleteToken()
             alert('세션이 만료되어 로그아웃됩니다.');
             window.location.href = '/login'; // 로그인 페이지로 리다이렉션
         }
@@ -66,9 +81,6 @@ async function verifyToken(accessToken) {
         const data = await response.json();
         return data.status === 200 && data.data; // Assuming the response includes success status and payload
     } catch (error) {
-        alert('세션이 만료되어 로그아웃됩니다.');
-        deleteToken();
-        window.location.href = '/login';
         return false;
     }
 }
@@ -85,14 +97,10 @@ async function refreshAccessToken() {
             setToken(data.data.accessToken);
             return true;
         } else {
-            alert('세션이 만료되어 로그아웃됩니다.');
-            deleteToken();
-            window.location.href = '/login';
+            return false;
         }
     } catch (error) {
-        alert('세션이 만료되어 로그아웃됩니다.');
-        deleteToken();
-        window.location.href = '/login';
+        return false;
     }
 }
 
