@@ -246,3 +246,29 @@ a:hover {
     background-color: #5F5F5F;
     opacity: 1;
 }
+
+.table thead th {
+    text-align: center; /* 테이블 헤더의 텍스트를 가운데로 정렬 */
+}
+
+.table {
+    table-layout: fixed; /* 테이블 레이아웃을 고정 */
+    width: 100%; /* 테이블의 전체 너비를 부모 요소에 맞춤 */
+}
+
+.table th, .table td {
+    overflow: hidden; /* 셀 내용이 넘쳐흐를 때 숨김 */
+    text-overflow: ellipsis; /* 넘쳐흐르는 텍스트를 말줄임표(...)로 표시 */
+    white-space: nowrap; /* 셀 내용을 한 줄로 표시 */
+}
+
+.table th:nth-child(1), .table td:nth-child(1) { width: 10%; } /* 번호 */
+.table th:nth-child(2), .table td:nth-child(2) { width: 45%; } /* 제목 */
+.table th:nth-child(3), .table td:nth-child(3) { width: 15%; } /* 작성자 */
+.table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* 작성일 */
+.table th:nth-child(5), .table td:nth-child(5) { width: 10%; } /* 조회수 */
+
+
+.td-center {
+    text-align: center;
+}
