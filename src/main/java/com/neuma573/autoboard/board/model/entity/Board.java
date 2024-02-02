@@ -24,7 +24,7 @@ public class Board extends BaseEntity {
     @Setter
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
     private User createdBy;
 
