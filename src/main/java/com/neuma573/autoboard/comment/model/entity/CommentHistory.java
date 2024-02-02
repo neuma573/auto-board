@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.comment.model.entity;
 
+import com.neuma573.autoboard.comment.model.enums.CommentAction;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
@@ -46,4 +47,8 @@ public class CommentHistory {
     private User createdBy;
 
     private boolean isDeleted;
+
+    @Column(name = "history_type")
+    @Enumerated(EnumType.STRING)
+    private CommentAction historyType;
 }
