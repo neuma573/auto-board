@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.comment.service;
 
+import com.neuma573.autoboard.comment.event.CommentEvent;
 import com.neuma573.autoboard.comment.model.dto.CommentModifyRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentResponse;
@@ -13,6 +14,7 @@ import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class CommentService {
     private final UserService userService;
 
     private final PostService postService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public Comment getCommentById(Long commentId) {
@@ -63,14 +67,19 @@ public class CommentService {
     }
 
     @Transactional
-    public void modifyComment(CommentModifyRequest commentModifyRequest) {
+    public void modifyComment(CommentModifyRequest commentModifyRequest, Long userId) {
         Comment comment = getCommentById(commentModifyRequest.getCommentId());
+        comment.setCurrentUser(userService.getUserById(userId));
+        applicationEventPublisher.publishEvent(new CommentEvent(this, comment, CommentAction.UPDATE));
         modify(comment, commentModifyRequest);
     }
 
     @Transactional
-    public void deleteComment(Long commentId) {
-       delete(getCommentById(commentId));
+    public void deleteComment(Long commentId, Long userId) {
+        Comment comment = getCommentById(commentId);
+        comment.setCurrentUser(userService.getUserById(userId));
+        applicationEventPublisher.publishEvent(new CommentEvent(this, comment, CommentAction.DELETE));
+        delete(comment);
     }
 
     private void delete(Comment comment) {

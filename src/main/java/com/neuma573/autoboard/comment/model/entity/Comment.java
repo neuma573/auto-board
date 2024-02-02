@@ -49,4 +49,8 @@ public class Comment extends BaseEntity {
         super.delete();
     }
 
+    @Transient
+    @Setter
+    private User currentUser;
+
 }
