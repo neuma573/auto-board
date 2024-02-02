@@ -77,8 +77,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Response<String>> handleMethodArgumentNotValidException(DataIntegrityViolationException ex) {
+        Response<String> response;
+        if (ex.getMessage().contains("Duplicate entry") && ex.getMessage().contains("for key 'user.name'")) {
+            response = responseUtils.error(DUPLICATED_NAME, new InvalidJoinException());
+        } else if (ex.getMessage().contains("Duplicate entry") && ex.getMessage().contains("for key 'user.email'")) {
+            response = responseUtils.error(DUPLICATED_EMAIL, new InvalidJoinException());
+        } else {
+            response = responseUtils.error(BAD_REQUEST, new Exception());
+        }
         log.error(ex.getMessage());
-        Response<String> response = responseUtils.error(BAD_REQUEST, ex);
         return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
     }
 
