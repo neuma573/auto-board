@@ -117,7 +117,6 @@ async function fetchPosts(boardId, page, size, order) {
         currentBoard = -1;
         hideSpinner();
         await fetchBoards();
-        await fetchPosts(document.getElementById('boardSelect').value, 1, 10, 'desc');
     }
 }
 
@@ -141,7 +140,12 @@ function updatePostsTable(posts) {
             const dateCell = row.insertCell(3);
             const viewsCell = row.insertCell(4);
 
-            numberCell.textContent = index + 1;
+            numberCell.classList.add("td-center");
+            authorCell.classList.add("td-center");
+            dateCell.classList.add("td-center");
+            viewsCell.classList.add("td-center");
+            const postNumber = posts.size * posts.number + index + 1;
+            numberCell.textContent = postNumber;
 
             const titleLink = document.createElement('a');
             titleLink.href = '#';
@@ -253,7 +257,9 @@ function createPaginationButtons(totalPages, currentPage) {
         pageLink.className = 'page-link';
         pageLink.href = '#';
         pageLink.textContent = i;
-        pageLink.onclick = function() { fetchPosts(currentBoard, i, 10, 'desc'); };
+        pageLink.onclick = function() {
+            fetchPosts(currentBoard, i, 10, 'desc');
+        };
 
         pageItem.appendChild(pageLink);
         paginationUl.appendChild(pageItem);
