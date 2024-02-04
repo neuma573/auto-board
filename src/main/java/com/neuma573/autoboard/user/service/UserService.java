@@ -126,4 +126,9 @@ public class UserService {
         return userRoleRepository.findByUserId(userId);
     }
 
+    @Transactional
+    public void initializeFailCount() {
+        userRepository.resetAllUserFailCounts();
+    }
+
 }

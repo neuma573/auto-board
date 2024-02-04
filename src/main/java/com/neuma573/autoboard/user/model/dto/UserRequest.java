@@ -20,15 +20,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @AllArgsConstructor
 public class UserRequest {
 
+    @Size(max = 30, message = "이메일은 30글자까지 가능합니다.")
     @Email(message = "email 양식을 맞춰주세요.")
     @NotEmpty(message = "이메일은 비어있을 수 없습니다.")
     private String email;
 
+    @Size(min = 2, max = 6, message = "이름은 최소 2글자, 최대 6글자까지 가능합니다.")
     @Pattern(regexp = "^[\\p{L} .'-]+$", message = "이름에 특수문자를 사용할 수 없습니다.")
     @NotEmpty(message = "이름은 비어있을 수 없습니다.")
     private String name;
 
-    @Size(min = 8, message = "패스워드는 최소 8자 이상이어야 합니다.")
+    @Size(min = 8, max = 20, message = "패스워드는 최소 8자 이상, 20자 미만이어야 합니다.")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*()_+])[a-zA-Z0-9!@#$%^&*()_+]{8,}$", message = "패스워드는 숫자, 문자, 특수문자를 포함해야 합니다.")
     @NotEmpty(message = "패스워드는 비어있을 수 없습니다.")
     @Setter

@@ -6,6 +6,7 @@ import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -23,12 +24,12 @@ public class Board extends BaseEntity {
     @Setter
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
     private User createdBy;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Post> posts;
+    private List<Post> posts;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

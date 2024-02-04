@@ -64,9 +64,11 @@ public class CommentController {
     @CheckCommentAccess(action = CommentAction.UPDATE)
     @PutMapping("")
     public ResponseEntity<Void> modifyComment(
-            @RequestBody @Valid CommentModifyRequest commentModifyRequest
+            @RequestBody @Valid CommentModifyRequest commentModifyRequest,
+            HttpServletRequest httpServletRequest
     ) {
-        commentService.modifyComment(commentModifyRequest);
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
+        commentService.modifyComment(commentModifyRequest, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -74,9 +76,11 @@ public class CommentController {
     @CheckCommentAccess(action = CommentAction.DELETE)
     @DeleteMapping("")
     public ResponseEntity<Void> deleteComment(
-            @RequestParam(name = "commentId") Long commentId
+            @RequestParam(name = "commentId") Long commentId,
+            HttpServletRequest httpServletRequest
     ) {
-        commentService.deleteComment(commentId);
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
+        commentService.deleteComment(commentId, userId);
         return ResponseEntity.noContent().build();
     }
 

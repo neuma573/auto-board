@@ -7,7 +7,7 @@ import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Builder
 @Entity
@@ -20,7 +20,7 @@ public class Post extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
@@ -31,7 +31,7 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_user_id")
     private User createdBy;
 
@@ -40,7 +40,7 @@ public class Post extends BaseEntity {
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Comment> comments;
+    private List<Comment> comments;
 
 
     public void addViews() {
@@ -60,4 +60,9 @@ public class Post extends BaseEntity {
                 .filter(comment -> !comment.isDeleted())
                 .count();
     }
+
+    @Transient
+    @Setter
+    private User currentUser;
+
 }

@@ -88,14 +88,17 @@ async function saveComment() {
         },
         body: JSON.stringify(commentData)
     })
-        .then(response => {
-            if (response.ok) {
+        .then(response => response.json()) // 응답을 JSON으로 변환
+        .then(data => {
+            if (data.status === 200) {
                 document.getElementById('comment-content').value = ''; // 댓글 입력란 초기화
                 loadPage(1); // 첫 페이지의 댓글 목록 다시 불러오기
             } else {
-                alert('댓글 작성에 실패했습니다.');
+                console.log(data);
+                alert(data.message); // data 객체에서 메시지를 알림으로 표시
             }
         })
+        .catch(error => console.error('Error:', error));
 }
 
 function generatePagination(totalPages) {
