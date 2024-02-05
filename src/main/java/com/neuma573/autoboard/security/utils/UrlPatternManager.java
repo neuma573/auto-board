@@ -19,6 +19,7 @@ public class UrlPatternManager {
         );
 
         ALLOWED_PATHS.addAll(Arrays.asList(
+                "/api/v1/policy/tos",
                 "/api/v1/post/permission",
                 "/api/v1/users",
                 "/api/v1/users/email-check",
