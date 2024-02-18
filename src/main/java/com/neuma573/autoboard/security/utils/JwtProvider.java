@@ -302,4 +302,12 @@ public class JwtProvider {
                         .findFirst())
                 .map(Long::valueOf);
     }
+
+    public String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+        if (xForwardedForHeader != null) {
+            return xForwardedForHeader.split(",")[0];
+        }
+        return request.getRemoteAddr();
+    }
 }
