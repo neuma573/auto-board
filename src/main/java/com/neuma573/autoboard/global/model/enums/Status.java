@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum Status {
     ACTIVE("Active"),
     INACTIVE("Inactive"),
+    BANNED("Banned"),
     DELETED("Deleted");
 
     private final String status;
