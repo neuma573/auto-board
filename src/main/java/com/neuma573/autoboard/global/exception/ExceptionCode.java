@@ -30,7 +30,9 @@ public enum ExceptionCode {
     INVALID_EMAIL_FORM(HttpStatus.BAD_REQUEST, "이메일 형식이 잘못됐습니다."),
     NOT_ACTIVATED_USER(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않은 사용자입니다."),
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "이미 사용중인 이메일입니다"),
-    DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "이미 사용중인 이름입니다");
+    DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "이미 사용중인 이름입니다"),
+    TOO_MANY_ATTEMP(HttpStatus.TOO_MANY_REQUESTS, "너무 많이 요청할 수 없습니다"),
+    BANNED_USER(HttpStatus.FORBIDDEN, "차단되었습니다");
 
 
     private final HttpStatus status;
