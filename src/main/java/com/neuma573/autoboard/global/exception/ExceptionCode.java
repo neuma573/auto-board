@@ -32,7 +32,7 @@ public enum ExceptionCode {
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "이미 사용중인 이메일입니다"),
     DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "이미 사용중인 이름입니다"),
     TOO_MANY_ATTEMP(HttpStatus.TOO_MANY_REQUESTS, "너무 많이 요청할 수 없습니다"),
-    BANNED_USER(HttpStatus.FORBIDDEN, "차단되었습니다");
+    BANNED_USER(HttpStatus.FORBIDDEN, "차단되었습니다. 관리자에게 문의하세요 : autoboardsite@gmail.com");
 
 
     private final HttpStatus status;
