@@ -48,7 +48,7 @@ public class PostHistory  {
     @JoinColumn(name = "created_user_id")
     private User createdBy;
 
-    private Long views = 0L;
+    private Long views;
 
     private boolean isDeleted;
 

@@ -38,6 +38,7 @@ async function getPostData() {
         }
     } catch (error) {
         hideSpinner();
+        alert(error);
         console.error("Error fetching post:", error);
     }
 }

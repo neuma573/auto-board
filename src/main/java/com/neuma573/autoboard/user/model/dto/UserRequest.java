@@ -3,6 +3,7 @@ package com.neuma573.autoboard.user.model.dto;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.model.entity.UserRole;
+import com.neuma573.autoboard.user.validation.annotation.ValidEmailDomain;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -20,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @AllArgsConstructor
 public class UserRequest {
 
+    @ValidEmailDomain(allowedDomains = {"gmail.com", "naver.com", "nate.com", "kakao.com"}, message = "허용되는 이메일 도메인을 사용해주세요 : \"gmail.com\", \"naver.com\", \"nate.com\", \"kakao.com\"")
     @Size(max = 30, message = "이메일은 30글자까지 가능합니다.")
     @Email(message = "email 양식을 맞춰주세요.")
     @NotEmpty(message = "이메일은 비어있을 수 없습니다.")

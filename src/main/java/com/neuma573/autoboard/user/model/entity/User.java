@@ -14,7 +14,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Entity
-@Table(name = "user")
+@Table(name = "user", indexes = {@Index(name = "idx_user_email", columnList = "email", unique = true)})
 public class User extends BaseEntity {
 
     @Id

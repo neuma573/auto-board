@@ -141,6 +141,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<Response<String>> handleRateLimitExceededException(RateLimitExceededException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(TOO_MANY_ATTEMP, ex);
+        return new ResponseEntity<>(response, TOO_MANY_ATTEMP.getStatus());
+    }
+
+    @ExceptionHandler(UserBlockedException.class)
+    public ResponseEntity<Response<String>> handleUserBlockedException(UserBlockedException ex) {
+        log.info(ex.getMessage());
+        Response<String> response = responseUtils.error(BANNED_USER, ex);
+        return new ResponseEntity<>(response, BANNED_USER.getStatus());
+    }
+
     @ExceptionHandler(Exception.class)
     public Object handleException(Exception ex, HttpServletRequest httpServletRequest) {
 

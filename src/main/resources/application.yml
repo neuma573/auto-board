@@ -23,8 +23,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-  session:
-    store-type: redis
   data:
     redis:
       host: ${REDIS_HOST}

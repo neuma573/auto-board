@@ -6,7 +6,6 @@ import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -39,7 +38,7 @@ public class Comment extends BaseEntity {
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
-    private List<Comment> replies = new ArrayList<>();
+    private List<Comment> replies;
 
     private boolean isDeleted;
 
