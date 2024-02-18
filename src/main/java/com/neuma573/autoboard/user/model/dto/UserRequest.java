@@ -24,6 +24,7 @@ public class UserRequest {
     @ValidEmailDomain(allowedDomains = {"gmail.com", "naver.com", "nate.com", "kakao.com"}, message = "허용되는 이메일 도메인을 사용해주세요 : \"gmail.com\", \"naver.com\", \"nate.com\", \"kakao.com\"")
     @Size(max = 30, message = "이메일은 30글자까지 가능합니다.")
     @Email(message = "email 양식을 맞춰주세요.")
+    @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "이메일에 특수문자를 사용할 수 없습니다.")
     @NotEmpty(message = "이메일은 비어있을 수 없습니다.")
     private String email;
 
