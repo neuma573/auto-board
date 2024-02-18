@@ -32,7 +32,7 @@ public class BlackList {
         return BlackList.builder()
                 .ipAddress(ip)
                 .reason(reason)
-                .expiryDate(LocalDateTime.now().plusHours(1))
+                .expiryDate(LocalDateTime.now().plusHours(24))
                 .build();
     }
 }
