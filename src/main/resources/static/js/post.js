@@ -28,17 +28,12 @@ async function initializePost() {
         if (response.ok) {
             updatePostContent(data.data);
         } else {
-            if(response.status === 401) {
-                alert('권한이 없습니다');
-                location.href = '/';
-            } else {
-                throw error;
-            }
+            throw new Error(data.message || "Failed to load post");
 
         }
     } catch (error) {
         hideSpinner();
-        alert('오류가 발생했습니다.');
+        alert('error');
         location.href = '/';
 
     }
