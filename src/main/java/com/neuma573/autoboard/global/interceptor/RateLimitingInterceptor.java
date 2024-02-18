@@ -16,6 +16,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.neuma573.autoboard.user.model.enums.BanReason.SUSPICIOUS_ACTIVITY;
 
@@ -33,6 +34,8 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
 
     private final Set<String> methodsToCheck = Set.of("POST", "PUT", "DELETE");
 
+    private final static long BAN_TIME = 24 * 60 * 60; // 24시간
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String apiKey = jwtProvider.getClientIpAddress(request);
@@ -42,7 +45,7 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
         }
 
         if (exceedsAbnormalRequestRate(apiKey)) {
-            blackListRedisTemplate.opsForValue().set(apiKey , BlackList.generateBlackList(apiKey, SUSPICIOUS_ACTIVITY));
+            blackListRedisTemplate.opsForValue().set(apiKey , BlackList.generateBlackList(apiKey, SUSPICIOUS_ACTIVITY), BAN_TIME, TimeUnit.SECONDS);
             throw new UserBlockedException();
         }
 
