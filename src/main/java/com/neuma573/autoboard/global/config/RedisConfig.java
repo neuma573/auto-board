@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
+import com.neuma573.autoboard.user.model.entity.BlackList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +51,21 @@ public class RedisConfig {
         template.setConnectionFactory(factory);
 
         Jackson2JsonRedisSerializer<VerificationToken> serializer = new Jackson2JsonRedisSerializer<>(VerificationToken.class);
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        template.setValueSerializer(serializer);
+        template.setKeySerializer(new StringRedisSerializer());
+
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, BlackList> blackListRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, BlackList> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        Jackson2JsonRedisSerializer<BlackList> serializer = new Jackson2JsonRedisSerializer<>(BlackList.class);
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
