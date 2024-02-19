@@ -29,7 +29,7 @@ public class UserRequest {
     private String email;
 
     @Size(min = 2, max = 6, message = "이름은 최소 2글자, 최대 6글자까지 가능합니다.")
-    @Pattern(regexp = "^[\\p{L} .'-]+$", message = "이름에 특수문자를 사용할 수 없습니다.")
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]+$", message = "이름에 특수문자를 사용할 수 없습니다.")
     @NotEmpty(message = "이름은 비어있을 수 없습니다.")
     private String name;
 
