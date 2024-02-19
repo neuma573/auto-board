@@ -51,12 +51,12 @@ public class AuthService {
     public AccessTokenResponse verifyUser(LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new InvalidLoginException("Invalid email or password"));
-        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+        if (user != null && user.getStatus().equals(Status.BANNED.getStatus())) {
             throw new UserBlockedException(loginRequest.getEmail());
         }
         checkLoginAttempts(user);
         try {
-            if (isActivatedUser(user)) {
+            if (isActivatedUser(Objects.requireNonNull(user))) {
                 validatePassword(loginRequest.getPassword(), user.getPassword());
                 recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS_STATE, null);
                 updateLoginAt(user);
@@ -77,7 +77,7 @@ public class AuthService {
     }
 
     private void checkLoginAttempts(User user) throws TooManyLoginAttemptException {
-        if (user.getFailCount() >= 5) {
+        if (user != null && user.getFailCount() >= 5) {
             throw new TooManyLoginAttemptException("Excessive login attempts");
         }
     }
@@ -136,10 +136,7 @@ public class AuthService {
         Long count = redisTemplate.opsForValue().increment(key);
         redisTemplate.expire(key, Duration.ofSeconds(1));
         if (count != null && count >= 2) {
-            User user = userRepository.findByEmail(email).orElse(null);
-            if (user != null) {
-                userService.setBan(user.getId());
-            }
+            userRepository.findByEmail(email).ifPresent(user -> userService.setBan(user.getId()));
         }
     }
 
