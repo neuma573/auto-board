@@ -8,6 +8,8 @@ import com.neuma573.autoboard.comment.model.entity.Comment;
 import com.neuma573.autoboard.comment.model.enums.CommentAction;
 import com.neuma573.autoboard.comment.repository.CommentRepository;
 import com.neuma573.autoboard.global.exception.CommentNotAccessibleException;
+import com.neuma573.autoboard.global.exception.UserBlockedException;
+import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.service.PostService;
 import com.neuma573.autoboard.user.model.entity.User;
@@ -102,6 +104,11 @@ public class CommentService {
     public boolean isCommentAccessible(Long userId, Long commentId, CommentAction action) {
         Comment comment = getCommentById(commentId);
         User user = userService.getUserByIdSafely(userId);
+
+        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+            throw new UserBlockedException(userId);
+        }
+
         return switch (action) {
             case UPDATE -> !comment.isDeleted() && isCreatedBy(userId, comment);
             case DELETE -> !comment.isDeleted() && userService.isAdmin(user) || isCreatedBy(userId, comment);

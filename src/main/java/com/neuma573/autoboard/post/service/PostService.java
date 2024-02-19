@@ -4,6 +4,8 @@ import com.neuma573.autoboard.ai.model.dto.OpenAiResponse;
 import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
+import com.neuma573.autoboard.global.exception.UserBlockedException;
+import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.global.service.OptionService;
 import com.neuma573.autoboard.post.event.PostEvent;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
@@ -94,6 +96,10 @@ public class PostService {
 
     @Transactional
     public boolean isCreatable(Long userId, Long boardId) {
+        User user = userService.getUserByIdSafely(userId);
+        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+            throw new UserBlockedException(userId);
+        }
         return userService.isAdmin(
                 userService.getUserById(userId)
         ) || boardService.getBoardById(boardId).isPublic()
@@ -107,15 +113,18 @@ public class PostService {
     public boolean isPostAccessible(Long userId, Long postId, PostAction action) {
         Post post = getPostById(postId);
         User user = userService.getUserByIdSafely(userId);
+        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+            throw new UserBlockedException(userId);
+        }
+
+        if (post.isDeleted()) {
+            return action == PostAction.READ && userService.isAdmin(user);
+        }
+
         return switch (action) {
-            case READ -> {
-                if (user == null) {
-                    yield !post.isDeleted();
-                }
-                yield userService.isAdmin(user) || (!post.isDeleted());
-            }
-            case UPDATE -> !post.isDeleted() && isCreatedBy(userId, post);
-            case DELETE -> !post.isDeleted() && userService.isAdmin(user) || isCreatedBy(userId, post);
+            case READ -> true;
+            case UPDATE -> isCreatedBy(userId, post);
+            case DELETE -> userService.isAdmin(user) || isCreatedBy(userId, post);
             default -> false;
         };
     }

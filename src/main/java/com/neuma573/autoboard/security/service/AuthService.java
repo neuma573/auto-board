@@ -3,6 +3,7 @@ package com.neuma573.autoboard.security.service;
 import com.neuma573.autoboard.global.exception.InvalidLoginException;
 import com.neuma573.autoboard.global.exception.NotActivatedUserException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
+import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
@@ -44,8 +45,11 @@ public class AuthService {
     public AccessTokenResponse verifyUser(LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new InvalidLoginException("Invalid email or password"));
+        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+            throw new UserBlockedException(loginRequest.getEmail());
+        }
+        checkLoginAttempts(user);
         try {
-            checkLoginAttempts(user);
 
             if (isActivatedUser(user)) {
                 validatePassword(loginRequest.getPassword(), user.getPassword());
@@ -58,6 +62,8 @@ public class AuthService {
             }
         } catch (InvalidLoginException ex) {
             handleInvalidLogin(user, loginRequest, httpServletRequest, ex);
+            throw ex;
+        } catch (NotActivatedUserException ex) {
             throw ex;
         } catch (Exception ex) {
             recordLoginAttempt(loginRequest, httpServletRequest, FAIL_STATE, ex);

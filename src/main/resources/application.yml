@@ -3,12 +3,7 @@
 
 
 server:
-  port: 443
-  ssl:
-    enabled: true
-    key-store: ${KEY_STORE}
-    key-store-password: ${KEY_STORE_PASSWORD}
-    key-store-type: ${KEY_TYPE}
+  port: 8080
 spring:
   datasource:
     url: jdbc:mysql://${DB_HOST}/auto-board?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
