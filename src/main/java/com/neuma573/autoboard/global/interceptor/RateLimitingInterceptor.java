@@ -48,8 +48,8 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
         }
 
         if (exceedsAbnormalRequestRate(apiKey)) {
-            userService.setBan(jwtProvider.parseUserIdSafely(request));
             blackListRedisTemplate.opsForValue().set(apiKey , BlackList.generateBlackList(apiKey, SUSPICIOUS_ACTIVITY), BAN_TIME, TimeUnit.SECONDS);
+            userService.setBan(jwtProvider.parseUserIdSafely(request));
             throw new UserBlockedException(apiKey);
         }
 
@@ -81,6 +81,8 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
             return "comment";
         } else if (path.contains("/user")) {
             return "user";
+        } else if (path.contains("/auth")) {
+            return "auth";
         }
         return "other";
     }
