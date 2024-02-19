@@ -15,12 +15,14 @@ import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.repository.UserRepository;
+import com.neuma573.autoboard.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -38,6 +40,10 @@ public class AuthService {
 
     private final RedisTemplate<String, RefreshToken> refreshTokenRedisTemplate;
 
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private final UserService userService;
+
     private final String FAIL_STATE = "FAIL";
 
     private final String SUCCESS_STATE = "SUCCESS";
@@ -50,12 +56,11 @@ public class AuthService {
         }
         checkLoginAttempts(user);
         try {
-
             if (isActivatedUser(user)) {
                 validatePassword(loginRequest.getPassword(), user.getPassword());
                 recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS_STATE, null);
                 updateLoginAt(user);
-
+                trackSuccessfulLogin(loginRequest.getEmail());
                 return jwtProvider.createJwt(httpServletResponse, user.getId());
             } else {
                 throw new NotActivatedUserException("not activated");
@@ -124,6 +129,18 @@ public class AuthService {
                 .ifPresent(refreshTokenRedisTemplate::delete);
         CookieUtils.deleteCookie(httpServletResponse, "accessToken");
         CookieUtils.deleteCookie(httpServletResponse, "uuid");
+    }
+
+    private void trackSuccessfulLogin(String email) {
+        String key = "loginSuccessCount:" + email;
+        Long count = redisTemplate.opsForValue().increment(key);
+        redisTemplate.expire(key, Duration.ofSeconds(1));
+        if (count != null && count >= 2) {
+            User user = userRepository.findByEmail(email).orElse(null);
+            if (user != null) {
+                userService.setBan(user.getId());
+            }
+        }
     }
 
 }
