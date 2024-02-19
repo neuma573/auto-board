@@ -97,7 +97,7 @@ public class PostService {
     @Transactional
     public boolean isCreatable(Long userId, Long boardId) {
         User user = userService.getUserByIdSafely(userId);
-        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+        if (user != null && user.getStatus().equals(Status.BANNED.getStatus())) {
             throw new UserBlockedException(userId);
         }
         return userService.isAdmin(
@@ -113,18 +113,18 @@ public class PostService {
     public boolean isPostAccessible(Long userId, Long postId, PostAction action) {
         Post post = getPostById(postId);
         User user = userService.getUserByIdSafely(userId);
-        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+        if (user != null && user.getStatus().equals(Status.BANNED.getStatus())) {
             throw new UserBlockedException(userId);
         }
 
         if (post.isDeleted()) {
-            return action == PostAction.READ && userService.isAdmin(user);
+            return action == PostAction.READ && (user != null && userService.isAdmin(user));
         }
 
         return switch (action) {
             case READ -> true;
             case UPDATE -> isCreatedBy(userId, post);
-            case DELETE -> userService.isAdmin(user) || isCreatedBy(userId, post);
+            case DELETE -> (user != null && userService.isAdmin(user)) || isCreatedBy(userId, post);
             default -> false;
         };
     }

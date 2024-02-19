@@ -105,13 +105,13 @@ public class CommentService {
         Comment comment = getCommentById(commentId);
         User user = userService.getUserByIdSafely(userId);
 
-        if (user.getStatus().equals(Status.BANNED.getStatus())) {
+        if (user != null && user.getStatus().equals(Status.BANNED.getStatus())) {
             throw new UserBlockedException(userId);
         }
 
         return switch (action) {
             case UPDATE -> !comment.isDeleted() && isCreatedBy(userId, comment);
-            case DELETE -> !comment.isDeleted() && userService.isAdmin(user) || isCreatedBy(userId, comment);
+            case DELETE -> !comment.isDeleted() && (user != null && userService.isAdmin(user)) || isCreatedBy(userId, comment);
             default -> false;
         };
     }
