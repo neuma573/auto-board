@@ -5,6 +5,7 @@ import com.neuma573.autoboard.global.exception.RateLimitExceededException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.user.model.entity.BlackList;
+import com.neuma573.autoboard.user.service.UserService;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,8 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final UserService userService;
+
     private final Set<String> methodsToCheck = Set.of("POST", "PUT", "DELETE");
 
     private final static long BAN_TIME = 24 * 60 * 60; // 24시간
@@ -41,12 +44,13 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
         String apiKey = jwtProvider.getClientIpAddress(request);
 
         if (shouldApplyRateLimit(request) && isBlacklisted(apiKey)) {
-            throw new UserBlockedException();
+            throw new UserBlockedException(apiKey);
         }
 
         if (exceedsAbnormalRequestRate(apiKey)) {
+            userService.setBan(jwtProvider.parseUserIdSafely(request));
             blackListRedisTemplate.opsForValue().set(apiKey , BlackList.generateBlackList(apiKey, SUSPICIOUS_ACTIVITY), BAN_TIME, TimeUnit.SECONDS);
-            throw new UserBlockedException();
+            throw new UserBlockedException(apiKey);
         }
 
         if (shouldApplyRateLimit(request)) {

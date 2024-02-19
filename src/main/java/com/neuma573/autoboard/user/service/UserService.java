@@ -37,13 +37,11 @@ public class UserService {
 
     @Transactional
     public UserResponse signUp(UserRequest userRequest) {
-
         userRequest.setPassword(
                 passwordEncoder.encode(
                         userRequest.getPassword()
                 )
         );
-
         User user = userRequest.toEntity();
         UserRole role = UserRole.builder()
                 .role(Role.USER)
@@ -59,10 +57,7 @@ public class UserService {
                         .verificationToken(generateVerificationToken(user))
                 .build()
         );
-
-
         return UserResponse.of(user);
-
     }
 
     @Transactional
@@ -129,6 +124,12 @@ public class UserService {
     @Transactional
     public void initializeFailCount() {
         userRepository.resetAllUserFailCounts();
+    }
+
+    @Transactional
+    public void setBan(Long userId) {
+        User user = getUserById(userId);
+        user.setStatus(Status.BANNED);
     }
 
 }
