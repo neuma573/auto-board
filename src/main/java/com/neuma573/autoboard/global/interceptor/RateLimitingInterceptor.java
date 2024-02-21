@@ -40,21 +40,21 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
     private final static long BAN_TIME = 24 * 60 * 60; // 24시간
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        String apiKey = jwtProvider.getClientIpAddress(request);
+    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) {
+        String apiKey = jwtProvider.getClientIpAddress(httpServletRequest);
 
-        if (shouldApplyRateLimit(request) && isBlacklisted(apiKey)) {
+        if (shouldApplyRateLimit(httpServletRequest) && isBlacklisted(apiKey)) {
             throw new UserBlockedException(apiKey);
         }
 
         if (exceedsAbnormalRequestRate(apiKey)) {
             blackListRedisTemplate.opsForValue().set(apiKey , BlackList.generateBlackList(apiKey, SUSPICIOUS_ACTIVITY), BAN_TIME, TimeUnit.SECONDS);
-            userService.setBan(jwtProvider.parseUserIdSafely(request));
+            userService.setBan(jwtProvider.parseUserIdSafely(httpServletRequest));
             throw new UserBlockedException(apiKey);
         }
 
-        if (shouldApplyRateLimit(request)) {
-            String action = determineAction(request.getRequestURI());
+        if (shouldApplyRateLimit(httpServletRequest)) {
+            String action = determineAction(httpServletRequest.getRequestURI());
             applyRateLimit(apiKey, action);
         }
         return true;
