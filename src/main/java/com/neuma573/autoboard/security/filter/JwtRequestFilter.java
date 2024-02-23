@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.security.filter;
 
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.security.utils.CookieUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.UrlPatternManager;
@@ -41,7 +42,7 @@ public class JwtRequestFilter implements Filter {
     private boolean isAuthorizedRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         Optional<String> accessTokenOpt = jwtProvider.parseJwtToken(httpServletRequest);
 
-        boolean isMvcRequest = !httpServletRequest.getRequestURI().startsWith("/api");
+        boolean isMvcRequest = !RequestUtils.getRequestUri(httpServletRequest).startsWith("/api");
 
         if (CookieUtils.getCookieValue(httpServletRequest, "uuid").isPresent() && (isMvcRequest || accessTokenOpt.map(token -> !jwtProvider.validateAccessTokenWithoutResponse(token)).orElse(true))) {
             jwtProvider.refreshAccessToken(httpServletRequest, httpServletResponse);

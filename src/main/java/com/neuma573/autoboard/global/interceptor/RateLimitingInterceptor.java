@@ -3,6 +3,7 @@ package com.neuma573.autoboard.global.interceptor;
 import com.neuma573.autoboard.global.config.RateLimiter;
 import com.neuma573.autoboard.global.exception.RateLimitExceededException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.user.model.entity.BlackList;
 import com.neuma573.autoboard.user.service.UserService;
@@ -41,7 +42,7 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) {
-        String apiKey = jwtProvider.getClientIpAddress(httpServletRequest);
+        String apiKey = RequestUtils.getClientIpAddress(httpServletRequest);
 
         if (shouldApplyRateLimit(httpServletRequest) && isBlacklisted(apiKey)) {
             throw new UserBlockedException(apiKey);
@@ -54,7 +55,7 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
         }
 
         if (shouldApplyRateLimit(httpServletRequest)) {
-            String action = determineAction(httpServletRequest.getRequestURI());
+            String action = determineAction(RequestUtils.getRequestUri(httpServletRequest));
             applyRateLimit(apiKey, action);
         }
         return true;
@@ -70,8 +71,8 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
     }
 
 
-    private boolean shouldApplyRateLimit(HttpServletRequest request) {
-        return methodsToCheck.contains(request.getMethod().toUpperCase());
+    private boolean shouldApplyRateLimit(HttpServletRequest httpServletRequest) {
+        return methodsToCheck.contains(httpServletRequest.getMethod().toUpperCase());
     }
 
     private String determineAction(String path) {

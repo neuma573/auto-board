@@ -186,7 +186,7 @@ public class GlobalExceptionHandler {
 
     }
 
-    private boolean isApiRequest(HttpServletRequest request) {
-        return request.getServletPath().startsWith("/api");
+    private boolean isApiRequest(HttpServletRequest httpServletRequest) {
+        return httpServletRequest.getServletPath().startsWith("/api");
     }
 }

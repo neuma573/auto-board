@@ -1,6 +1,7 @@
 package com.neuma573.autoboard.security.utils;
 
 import com.neuma573.autoboard.global.exception.UserNotFoundException;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
@@ -193,29 +194,29 @@ public class JwtProvider {
 
     }
 
-    public boolean validateRefreshToken(String refreshToken, HttpServletResponse response) throws IOException {
+    public boolean validateRefreshToken(String refreshToken, HttpServletResponse httpServletResponse) throws IOException {
         try {
 
             getClaims(refreshToken);
 
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException | IllegalArgumentException e) {
-            responseUtils.setResponse(response, INVALID_JWT_TOKEN, e);
+            responseUtils.setResponse(httpServletResponse, INVALID_JWT_TOKEN, e);
         } catch (ExpiredJwtException e) {
-            responseUtils.setResponse(response, EXPIRED_ACCESS_TOKEN, e);
+            responseUtils.setResponse(httpServletResponse, EXPIRED_ACCESS_TOKEN, e);
         } catch (UnsupportedJwtException e) {
-            responseUtils.setResponse(response, UNSUPPORTED_JWT_TOKEN, e);
+            responseUtils.setResponse(httpServletResponse, UNSUPPORTED_JWT_TOKEN, e);
         }
 
         return false;
     }
 
-    public Optional<String> parseJwtToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(headerString))
+    public Optional<String> parseJwtToken(HttpServletRequest httpServletRequest) {
+        return Optional.ofNullable(RequestUtils.getHeader(httpServletRequest, headerString))
                 .filter(StringUtils::hasText)
                 .filter(token -> token.startsWith(tokenPrefix))
                 .map(token -> token.replace(tokenPrefix, ""))
-                .or(() -> CookieUtils.getCookieValue(request, "accessToken"));
+                .or(() -> CookieUtils.getCookieValue(httpServletRequest, "accessToken"));
     }
 
 
@@ -293,7 +294,7 @@ public class JwtProvider {
     }
 
     public Map<String, String[]> getParameterMap(HttpServletRequest httpServletRequest) {
-        return httpServletRequest.getParameterMap();
+        return RequestUtils.getParameterMap(httpServletRequest);
     }
 
     public Optional<Long> extractLongFromParamMap(Map<String, String[]> paramMap, String paramName) {
@@ -301,13 +302,5 @@ public class JwtProvider {
                 .flatMap(values -> Arrays.stream(values)
                         .findFirst())
                 .map(Long::valueOf);
-    }
-
-    public String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
-        if (xForwardedForHeader != null) {
-            return xForwardedForHeader.split(",")[0];
-        }
-        return request.getRemoteAddr();
     }
 }

@@ -1,6 +1,7 @@
 package com.neuma573.autoboard.automate.controller;
 
 import com.neuma573.autoboard.automate.service.WhitelistService;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.security.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,11 @@ public class AutomateController {
 
     private final WhitelistService whitelistService;
 
-    private final AuthService authService;
-
     @GetMapping
     public ResponseEntity<?> auth(
             @RequestParam(name = "app-name") String appName,
             HttpServletRequest httpServletRequest) {
-        String ip = authService.getClientIpAddress(httpServletRequest);
+        String ip = RequestUtils.getClientIpAddress(httpServletRequest);
         log.info("ip : {} ; appName : {}", ip, appName);
         if (whitelistService.isValidIp(
                 ip,
