@@ -162,6 +162,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, ENTITY_NOT_FOUND.getStatus());
     }
 
+    @ExceptionHandler(RecaptchaValidationException.class)
+    public ResponseEntity<Response<String>> handleRecaptchaValidationException(RecaptchaValidationException ex) {
+        log.error("Exception : {}, Message : {}", ex.getClass().getSimpleName(), ex.getMessage());
+        Response<String> response = responseUtils.error(BAD_REQUEST, ex);
+        return new ResponseEntity<>(response, BAD_REQUEST.getStatus());
+    }
+
     @ExceptionHandler(Exception.class)
     public Object handleException(Exception ex, HttpServletRequest httpServletRequest) {
 

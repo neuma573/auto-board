@@ -4,13 +4,13 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
-        const recaptchaToken = await executeRecaptcha('LOGIN');
+        const recaptchaToken = await executeRecaptcha('login');
         fetch('/api/v1/auth/authenticate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Recaptcha-Token': recaptchaToken,
-                'Action-Name': 'LOGIN'
+                'Action-Name': 'login'
             },
             body: JSON.stringify({email: email, password: password}),
         })

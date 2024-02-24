@@ -12,13 +12,13 @@ async function handleSignupSubmit(event) {
     const password = document.getElementById('password').value;
 
     try {
-        const recaptchaToken = await executeRecaptcha('JOIN');
+        const recaptchaToken = await executeRecaptcha('signup');
         const response = await fetch('/api/v1/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Recaptcha-Token': recaptchaToken,
-                'Action-Name': 'JOIN'
+                'Action-Name': 'signup'
             },
             body: JSON.stringify({ email, name, password })
         });
@@ -48,13 +48,13 @@ async function checkEmail() {
     }
 
     try {
-        const recaptchaToken = await executeRecaptcha('EMAIL_CHECK');
+        const recaptchaToken = await executeRecaptcha('email_check');
         const response = await fetch(`/api/v1/users/email-check?email=${encodeURIComponent(email)}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Recaptcha-Token': recaptchaToken,
-                'Action-Name': 'EMAIL_CHECK'
+                'Action-Name': 'email_check'
             }
         });
 

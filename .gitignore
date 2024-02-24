@@ -39,3 +39,4 @@ out/
 
 ### certificate
 *.pfx
+*.json

@@ -56,5 +56,7 @@ app:
     key: ${OPENAI_KEY}
   recaptcha:
     secret: ${RECAPTCHA_SECRET}
-    url: https://www.google.com/recaptcha/api/siteverify
     project-id: ${RECAPTCHA_PROJECT_ID}
+  google:
+    credentials:
+      path: ${GOOGLE_APPLICATION_CREDENTIALS}
