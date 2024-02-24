@@ -37,6 +37,6 @@ public class RequestUtils {
     }
 
     public static HttpMethod getMethod(HttpServletRequest httpServletRequest) {
-        return HttpMethod.resolve(httpServletRequest.getMethod());
+        return HttpMethod.valueOf(httpServletRequest.getMethod());
     }
 }
