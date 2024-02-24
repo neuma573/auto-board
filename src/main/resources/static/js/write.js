@@ -73,11 +73,14 @@ async function handleFormSubmit(event) {
 
 async function updatePost(postData) {
     await checkAndRefreshToken(); // 토큰 체크 및 갱신
+    const recaptchaToken = await executeRecaptcha('POST_PUT');
     const response = await fetch('/api/v1/post', {
         method: 'PUT', // PUT 메서드 사용
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}` // 적절한 토큰 설정
+            'Authorization': `Bearer ${getToken()}`,
+            'Recaptcha-Token': recaptchaToken,
+            'Action-Name': 'POST_PUT'
         },
         body: JSON.stringify(postData) // 요청 본문에 postData 포함
     });
@@ -93,11 +96,14 @@ async function updatePost(postData) {
 
 async function submitPost(postData) {
     await checkAndRefreshToken();
+    const recaptchaToken = await executeRecaptcha('POST_POST')
     const response = await fetch('/api/v1/post', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
+            'Authorization': `Bearer ${getToken()}`,
+            'Recaptcha-Token': recaptchaToken,
+            'Action-Name': 'POST_POST'
         },
         body: JSON.stringify(postData)
     });

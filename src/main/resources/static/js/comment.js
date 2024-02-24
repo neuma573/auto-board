@@ -79,12 +79,15 @@ async function saveComment() {
     await checkAndRefreshToken();
     const content = document.getElementById('comment-content').value;
     const commentData = {postId, content};
+    const recaptchaToken = await executeRecaptcha('COMMENT_POST');
 
     fetch('/api/v1/comment', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
+            'Authorization': `Bearer ${getToken()}`,
+            'Recaptcha-Token': recaptchaToken,
+            'Action-Name': 'COMMENT_POST'
         },
         body: JSON.stringify(commentData)
     })
@@ -182,12 +185,14 @@ async function submitEdit(commentId) {
         postId: postId, // postId는 현재 페이지의 게시글 ID
         content: editedContent
     };
-
+    const recaptchaToken = await executeRecaptcha('COMMENT_PUT');
     fetch('/api/v1/comment', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
+            'Authorization': `Bearer ${getToken()}`,
+            'Recaptcha-Token': recaptchaToken,
+            'Action-Name': 'COMMENT_PUT'
         },
         body: JSON.stringify(commentData)
     })
@@ -205,12 +210,15 @@ async function submitEdit(commentId) {
 
 async function deleteComment(commentId) {
     await checkAndRefreshToken();
+    const recaptchaToken = await executeRecaptcha('COMMENT_DELETE');
     if (confirm("이 댓글을 삭제하시겠습니까?")) {
         fetch(`/api/v1/comment?commentId=${commentId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
+                'Authorization': `Bearer ${getToken()}`,
+                'Recaptcha-Token': recaptchaToken,
+                'Action-Name': 'COMMENT_DELETE'
             }
         })
             .then(response => {
