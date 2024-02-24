@@ -19,11 +19,11 @@ public class ResponseUtils {
 
     private final ObjectMapper objectMapper;
 
-    public void setResponse(HttpServletResponse httpServletResponse, ExceptionCode exceptionCode, Exception e) throws IOException {
-        log.error("error message : {}", exceptionCode.getMessage(), e);
+    public void setResponse(HttpServletResponse httpServletResponse, ExceptionCode exceptionCode, Exception ex) throws IOException {
+        log.error("Exception : {}, Message : {}", ex.getClass().getSimpleName(), ex.getMessage());
         httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
         httpServletResponse.setCharacterEncoding("UTF-8");
-        httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        httpServletResponse.setStatus(exceptionCode.getStatus().value());
 
         httpServletResponse.getWriter().write(objectMapper.writeValueAsString(
                 Response.builder()
