@@ -1,6 +1,8 @@
 package com.neuma573.autoboard.security.service;
 
 import com.google.recaptchaenterprise.v1.*;
+import com.neuma573.autoboard.global.exception.RecaptchaValidationException;
+import com.neuma573.autoboard.global.model.dto.RecaptchaResponse;
 import com.neuma573.autoboard.global.utils.RequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,7 @@ public class RecaptchaService {
     @Value("${app.recaptcha.project-id}")
     private String recaptchaProjectId;
 
-    public boolean createAssessment(HttpServletRequest httpServletRequest)
+    public RecaptchaResponse createAssessment(HttpServletRequest httpServletRequest)
             throws IOException {
         // reCAPTCHA 클라이언트를 만듭니다.
         // 할 일: 클라이언트 생성 코드를 캐시하거나(권장) 메서드를 종료하기 전에 client.close()를 호출합니다.
@@ -29,7 +31,7 @@ public class RecaptchaService {
         String recaptchaAction = RequestUtils.getHeader(httpServletRequest, "Action-Name");
 
         if (recaptchaToken == null || recaptchaToken.isEmpty() || recaptchaAction == null || recaptchaAction.isEmpty()) {
-            return false;
+            throw new RecaptchaValidationException("Recaptcha Token is invalid");
         }
 
         try (RecaptchaEnterpriseServiceClient client = RecaptchaEnterpriseServiceClient.create()) {
@@ -54,16 +56,12 @@ public class RecaptchaService {
 
             // 토큰의 유효성과 예상한 작업의 실행을 확인합니다.
             if (!response.getTokenProperties().getValid()) {
-                log.info("The CreateAssessment call failed because the token was: " + response.getTokenProperties().getInvalidReason().name());
-                return false;
+                throw new RecaptchaValidationException("The CreateAssessment call failed because the token was: " + response.getTokenProperties().getInvalidReason().name());
             }
 
             if (!response.getTokenProperties().getAction().equals(recaptchaAction)) {
-                log.info("The action attribute in the reCAPTCHA tag does not match the action (" + recaptchaAction + ") you are expecting to score");
-                return false;
+                throw new RecaptchaValidationException("The action attribute in the reCAPTCHA tag does not match the action (" + recaptchaAction + ") you are expecting to score");
             }
-
-
             // 위험 점수와 이유를 가져옵니다.
             // 평가 해석에 대한 자세한 내용은 다음을 참조하세요.
             // https://cloud.google.com/recaptcha-enterprise/docs/interpret-assessment
@@ -73,13 +71,18 @@ public class RecaptchaService {
 
             float recaptchaScore = response.getRiskAnalysis().getScore();
             log.info("The reCAPTCHA score is: " + recaptchaScore);
-
+            if (recaptchaScore < 0.5) { // 임계값 설정
+                throw new RecaptchaValidationException("reCAPTCHA score is too low.");
+            }
             // 평가 이름(ID)을 가져옵니다. 평가에 주석을 추가하는 데 사용합니다.
             String assessmentName = response.getName();
-            log.info(
-                    "Assessment name: " + assessmentName.substring(assessmentName.lastIndexOf("/") + 1));
+            log.info("Assessment name: " + assessmentName.substring(assessmentName.lastIndexOf("/") + 1));
 
-            return true;
+            return RecaptchaResponse
+                    .builder()
+                    .score(recaptchaScore)
+                    .success(true)
+                    .build();
         }
     }
 }

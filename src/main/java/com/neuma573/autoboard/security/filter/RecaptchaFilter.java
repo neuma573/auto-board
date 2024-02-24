@@ -29,10 +29,7 @@ public class RecaptchaFilter extends OncePerRequestFilter {
         HttpMethod method = RequestUtils.getMethod(httpServletRequest);
         if (urlPatternManager.isRecaptchaProtectedUrl(requestURI, method)) {
             log.info("Recaptcha Verification Request URI : [{}] {}", method, requestURI);
-            if (!recaptchaService.createAssessment(httpServletRequest)) {
-                httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid reCAPTCHA token");
-                return; // 리캡차 검증 실패시 요청 처리 중단
-            }
+            recaptchaService.createAssessment(httpServletRequest);
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse); // 검증 성공시 다음 필터로 요청 전달
