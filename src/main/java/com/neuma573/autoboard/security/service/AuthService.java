@@ -5,6 +5,7 @@ import com.neuma573.autoboard.global.exception.NotActivatedUserException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
@@ -93,20 +94,12 @@ public class AuthService {
         LoginLog loginLog = LoginLog.builder()
                 .email(loginRequest.getEmail())
                 .loginTime(LocalDateTime.now())
-                .ipAddress(getClientIpAddress(httpServletRequest))
+                .ipAddress(RequestUtils.getClientIpAddress(httpServletRequest))
                 .loginResult(result)
-                .deviceInfo(httpServletRequest.getHeader("User-Agent"))
+                .deviceInfo(RequestUtils.getUserAgent(httpServletRequest))
                 .errorMessage(ex != null ? ex.getClass().getSimpleName() + ": " + ex.getMessage() : null)
                 .build();
         loginLogRepository.save(loginLog);
-    }
-
-    public String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
-        if (xForwardedForHeader != null) {
-            return xForwardedForHeader.split(",")[0];
-        }
-        return request.getRemoteAddr();
     }
 
     public void handleInvalidLogin(User user, LoginRequest loginRequest, HttpServletRequest httpServletRequest, InvalidLoginException ex) {

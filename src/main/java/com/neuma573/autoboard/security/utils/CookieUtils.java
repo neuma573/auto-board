@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.security.utils;
 
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,12 +19,12 @@ public class CookieUtils {
         return cookie;
     }
 
-    public static void addCookie(HttpServletResponse response, Cookie cookie) {
-        response.addCookie(cookie);
+    public static void addCookie(HttpServletResponse httpServletResponse, Cookie cookie) {
+        httpServletResponse.addCookie(cookie);
     }
 
     public static Optional<String> getCookieValue(HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
+        Cookie[] cookies = RequestUtils.getCookies(request);
         return cookies == null ? Optional.empty() :
                 Arrays.stream(cookies)
                         .filter(cookie -> cookieName.equals(cookie.getName()))
@@ -32,10 +33,10 @@ public class CookieUtils {
     }
 
 
-    public static void deleteCookie(HttpServletResponse response, String cookieName) {
+    public static void deleteCookie(HttpServletResponse httpServletResponse, String cookieName) {
         Cookie cookie = new Cookie(cookieName, null);
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        httpServletResponse.addCookie(cookie);
     }
 }

@@ -1,16 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
         showSpinner();
         e.preventDefault();
         let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
-
+        const recaptchaToken = await executeRecaptcha('LOGIN');
         fetch('/api/v1/auth/authenticate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Recaptcha-Token': recaptchaToken,
+                'Action-Name': 'LOGIN'
             },
-            body: JSON.stringify({ email: email, password: password }),
+            body: JSON.stringify({email: email, password: password}),
         })
             .then(response => {
                 // status 코드에 따라 다른 처리를 합니다.

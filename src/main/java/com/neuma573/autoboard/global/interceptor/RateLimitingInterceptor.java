@@ -3,6 +3,7 @@ package com.neuma573.autoboard.global.interceptor;
 import com.neuma573.autoboard.global.config.RateLimiter;
 import com.neuma573.autoboard.global.exception.RateLimitExceededException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.user.model.entity.BlackList;
 import com.neuma573.autoboard.user.service.UserService;
@@ -40,21 +41,21 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
     private final static long BAN_TIME = 24 * 60 * 60; // 24시간
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        String apiKey = jwtProvider.getClientIpAddress(request);
+    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) {
+        String apiKey = RequestUtils.getClientIpAddress(httpServletRequest);
 
-        if (shouldApplyRateLimit(request) && isBlacklisted(apiKey)) {
+        if (shouldApplyRateLimit(httpServletRequest) && isBlacklisted(apiKey)) {
             throw new UserBlockedException(apiKey);
         }
 
         if (exceedsAbnormalRequestRate(apiKey)) {
             blackListRedisTemplate.opsForValue().set(apiKey , BlackList.generateBlackList(apiKey, SUSPICIOUS_ACTIVITY), BAN_TIME, TimeUnit.SECONDS);
-            userService.setBan(jwtProvider.parseUserIdSafely(request));
+            userService.setBan(jwtProvider.parseUserIdSafely(httpServletRequest));
             throw new UserBlockedException(apiKey);
         }
 
-        if (shouldApplyRateLimit(request)) {
-            String action = determineAction(request.getRequestURI());
+        if (shouldApplyRateLimit(httpServletRequest)) {
+            String action = determineAction(RequestUtils.getRequestUri(httpServletRequest));
             applyRateLimit(apiKey, action);
         }
         return true;
@@ -70,8 +71,8 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
     }
 
 
-    private boolean shouldApplyRateLimit(HttpServletRequest request) {
-        return methodsToCheck.contains(request.getMethod().toUpperCase());
+    private boolean shouldApplyRateLimit(HttpServletRequest httpServletRequest) {
+        return methodsToCheck.contains(httpServletRequest.getMethod().toUpperCase());
     }
 
     private String determineAction(String path) {

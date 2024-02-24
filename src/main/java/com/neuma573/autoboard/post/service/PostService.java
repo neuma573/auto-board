@@ -7,6 +7,7 @@ import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.global.service.OptionService;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.post.event.PostEvent;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
@@ -138,7 +139,7 @@ public class PostService {
 
     @Async
     public void increaseViewCount(HttpServletRequest httpServletRequest, Long postId) {
-        String ipAddress = authService.getClientIpAddress(httpServletRequest);
+        String ipAddress = RequestUtils.getClientIpAddress(httpServletRequest);
         String cacheKey = VIEW_COUNT_KEY_PREFIX + postId + ":" + ipAddress;
         Boolean alreadyViewed = stringRedisTemplate.opsForValue().setIfAbsent(cacheKey, "1", VIEW_COUNT_EXPIRATION, TimeUnit.SECONDS);
 

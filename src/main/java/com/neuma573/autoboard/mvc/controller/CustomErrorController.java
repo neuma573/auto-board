@@ -11,10 +11,10 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class CustomErrorController implements ErrorController {
     @RequestMapping("/error")
-    public ModelAndView handleError(HttpServletRequest request) {
+    public ModelAndView handleError(HttpServletRequest httpServletRequest) {
         ModelAndView modelAndView = new ModelAndView("error/error");
 
-        Object statusObject = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        Object statusObject = httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         if (statusObject != null) {

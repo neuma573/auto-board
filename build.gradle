@@ -51,6 +51,10 @@ dependencies {
     // Azure OpenAI
     implementation "com.azure:azure-ai-openai:1.0.0-beta.6"
 
+    // Recaptcha
+    implementation platform('com.google.cloud:libraries-bom:26.32.0')
+    implementation 'com.google.cloud:google-cloud-recaptchaenterprise'
+
     compileOnly 'com.fasterxml.jackson.core:jackson-databind'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'

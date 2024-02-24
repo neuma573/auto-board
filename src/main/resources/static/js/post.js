@@ -79,13 +79,18 @@ function toggleButton(buttonId, isVisible) {
     }
 }
 
-function deletePost() {
+async function deletePost() {
 
     if (confirm("이 게시글을 삭제하시겠습니까?")) { // 사용자에게 삭제 확인 요청
+
+        const recaptchaToken = await executeRecaptcha('POST_DELETE');
+
         fetch('/api/v1/post?postId=' + postId, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${getToken()}` // 적절한 토큰을 포함하여 인증
+                'Authorization': `Bearer ${getToken()}`,
+                'Recaptcha-Token': recaptchaToken,
+                'Action-Name': 'POST_DELETE'
             }
         })
             .then(response => {
