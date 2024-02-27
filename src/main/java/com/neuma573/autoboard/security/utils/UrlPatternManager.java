@@ -15,7 +15,9 @@ public class UrlPatternManager {
     private static final Set<String> ALLOWED_PATHS = new HashSet<>();
     private static final Set<Pattern> ALLOWED_PATTERNS = new HashSet<>();
 
-    private static final Set<UrlPattern> RECAPTCHA_VALIDATION_PATTERNS = new HashSet<>();
+    private static final Set<UrlPattern> RECAPTCHA_V2_VALIDATION_PATTERNS = new HashSet<>();
+
+    private static final Set<UrlPattern> RECAPTCHA_V3_VALIDATION_PATTERNS = new HashSet<>();
 
     static {
         Arrays.asList("/static/.*", "/images/.*", "/js/.*", "/css/.*", "/favicon.ico", "/ads.txt").forEach(
@@ -42,11 +44,16 @@ public class UrlPatternManager {
                 "/"
         ));
 
-        RECAPTCHA_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/post", Set.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)));
-        RECAPTCHA_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/users", Set.of(HttpMethod.POST)));
-        RECAPTCHA_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/users/email-check", Set.of(HttpMethod.GET)));
-        RECAPTCHA_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/auth/authenticate", Set.of(HttpMethod.POST)));
-        RECAPTCHA_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/comment", Set.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)));
+        RECAPTCHA_V2_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/post", Set.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)));
+        RECAPTCHA_V2_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/users", Set.of(HttpMethod.POST)));
+        RECAPTCHA_V2_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/auth/authenticate", Set.of(HttpMethod.POST)));
+
+
+        RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/users/email-check", Set.of(HttpMethod.GET)));
+        RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/post", Set.of(HttpMethod.DELETE)));
+        RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/comment", Set.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)));
+
+
     }
 
     public boolean isProtectedUrl(String url) {
@@ -54,8 +61,13 @@ public class UrlPatternManager {
                 ALLOWED_PATTERNS.stream().noneMatch(pattern -> pattern.matcher(url).matches());
     }
 
-    public boolean isRecaptchaProtectedUrl(String url, HttpMethod method) {
-        return RECAPTCHA_VALIDATION_PATTERNS.stream()
+    public boolean isRecaptchaV2ProtectedUrl(String url, HttpMethod method) {
+        return RECAPTCHA_V2_VALIDATION_PATTERNS.stream()
+                .anyMatch(pattern -> pattern.matchesUrl(url) && pattern.matchesMethod(method));
+    }
+
+    public boolean isRecaptchaV3ProtectedUrl(String url, HttpMethod method) {
+        return RECAPTCHA_V3_VALIDATION_PATTERNS.stream()
                 .anyMatch(pattern -> pattern.matchesUrl(url) && pattern.matchesMethod(method));
     }
 }
