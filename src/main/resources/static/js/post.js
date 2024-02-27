@@ -83,14 +83,15 @@ async function deletePost() {
 
     if (confirm("이 게시글을 삭제하시겠습니까?")) { // 사용자에게 삭제 확인 요청
 
-        const recaptchaToken = await executeRecaptcha('post_delete');
+        const recaptchaToken = await executeRecaptchaV3('post_delete');
 
         fetch('/api/v1/post?postId=' + postId, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${getToken()}`,
                 'Recaptcha-Token': recaptchaToken,
-                'Action-Name': 'post_delete'
+                'Action-Name': 'post_delete',
+                'Recaptcha-version': 'v3'
             }
         })
             .then(response => {

@@ -55,7 +55,10 @@ app:
   openai:
     key: ${OPENAI_KEY}
   recaptcha:
-    secret: ${RECAPTCHA_SECRET}
+    v2:
+      site-key: ${RECAPTCHA_V2_SITE_KEY}
+    v3:
+      site-key: ${RECAPTCHA_V3_SITE_KEY}
     project-id: ${RECAPTCHA_PROJECT_ID}
   google:
     credentials:

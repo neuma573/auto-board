@@ -3,6 +3,7 @@ package com.neuma573.autoboard.security.filter;
 import com.neuma573.autoboard.global.exception.ExceptionCode;
 import com.neuma573.autoboard.global.exception.RecaptchaValidationException;
 
+import com.neuma573.autoboard.global.model.dto.RecaptchaResponse;
 import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.service.RecaptchaService;
@@ -33,9 +34,12 @@ public class RecaptchaFilter extends OncePerRequestFilter {
         String requestURI = RequestUtils.getRequestUri(httpServletRequest);
         HttpMethod method = RequestUtils.getMethod(httpServletRequest);
         try {
-            if (urlPatternManager.isRecaptchaProtectedUrl(requestURI, method)) {
+            if (urlPatternManager.isRecaptchaV3ProtectedUrl(requestURI, method) || urlPatternManager.isRecaptchaV2ProtectedUrl(requestURI, method)) {
                 log.info("Recaptcha Verification Request URI : [{}] {}", method, requestURI);
-                recaptchaService.createAssessment(httpServletRequest);
+                RecaptchaResponse recaptchaResponse = recaptchaService.createAssessment(httpServletRequest);
+                if (!recaptchaResponse.isSuccess()) {
+                    throw new RecaptchaValidationException("Recaptcha Validation Failed");
+                }
             }
         } catch (RecaptchaValidationException ex) {
             responseUtils.setResponse(httpServletResponse, ExceptionCode.ILLEGAL_RECAPTCHA_REQUEST, ex);

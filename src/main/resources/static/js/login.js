@@ -4,13 +4,19 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
-        const recaptchaToken = await executeRecaptcha('login');
+        const recaptchaResponse = document.getElementById('g-recaptcha-response').value;
+        if(recaptchaResponse === null || recaptchaResponse === '') {
+            alert('reCaptcha 챌린지를 수행해주세요');
+            hideSpinner();
+            return ;
+        }
         fetch('/api/v1/auth/authenticate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Recaptcha-Token': recaptchaToken,
-                'Action-Name': 'login'
+                'Recaptcha-Token': recaptchaResponse,
+                'Action-Name': 'login',
+                'Recaptcha-version': 'v2'
             },
             body: JSON.stringify({email: email, password: password}),
         })
@@ -32,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 error.json().then(errMessage => {
                     console.error('Error:', errMessage);
                     alert(errMessage.message); // 에러 메시지 표시
+                    grecaptcha.reset();
                 });
             });
         hideSpinner();

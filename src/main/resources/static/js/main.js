@@ -16,11 +16,12 @@ document.querySelector('.navbar-brand').addEventListener('click', function() {
     }
 });
 
-async function executeRecaptcha(action) {
+
+async function executeRecaptchaV3(action) {
     return new Promise((resolve, reject) => {
-        grecaptcha.enterprise.ready(async () => {
+        grecaptcha.ready(async () => {
             try {
-                const token = await grecaptcha.enterprise.execute('6LeZG34pAAAAAGhUyxO3RmnFcwbw9xVIVXg-1GAF', {action: action});
+                const token = await grecaptcha.execute('6LeZG34pAAAAAGhUyxO3RmnFcwbw9xVIVXg-1GAF', {action: action});
                 resolve(token);
             } catch (error) {
                 reject(error);
@@ -28,6 +29,7 @@ async function executeRecaptcha(action) {
         });
     });
 }
+
 
 function checkLoginStatus() {
     const accessToken = getToken();

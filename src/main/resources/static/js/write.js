@@ -63,8 +63,6 @@ async function handleFormSubmit(event) {
         } else {
             await submitPost({ title, content, boardId }); // 글 작성 로직
         }
-        // 성공적으로 처리 후 리다이렉션
-        window.location.href = '/main';
     } catch (error) {
         hideSpinner();
         console.error('Error:', error);
@@ -73,14 +71,20 @@ async function handleFormSubmit(event) {
 
 async function updatePost(postData) {
     await checkAndRefreshToken(); // 토큰 체크 및 갱신
-    const recaptchaToken = await executeRecaptcha('post_put');
+    const recaptchaToken = document.getElementById('g-recaptcha-response').value;
+    if(recaptchaToken === null || recaptchaToken === '') {
+        alert('reCaptcha 챌린지를 수행해주세요');
+        hideSpinner();
+        return ;
+    }
     const response = await fetch('/api/v1/post', {
         method: 'PUT', // PUT 메서드 사용
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${getToken()}`,
             'Recaptcha-Token': recaptchaToken,
-            'Action-Name': 'post_put'
+            'Action-Name': 'post_put',
+            'Recaptcha-version': 'v2'
         },
         body: JSON.stringify(postData) // 요청 본문에 postData 포함
     });
@@ -88,22 +92,30 @@ async function updatePost(postData) {
     if (!response.ok) {
         const errorData = await response.json();
         alert(errorData.message);
+        grecaptcha.reset();
         throw new Error('Failed to update post');
     }
     hideSpinner();
+    window.location.href = '/';
     return true;
 }
 
 async function submitPost(postData) {
     await checkAndRefreshToken();
-    const recaptchaToken = await executeRecaptcha('post_post')
+    const recaptchaToken = document.getElementById('g-recaptcha-response').value;
+    if(recaptchaToken === null || recaptchaToken === '') {
+        alert('reCaptcha 챌린지를 수행해주세요');
+        hideSpinner();
+        return ;
+    }
     const response = await fetch('/api/v1/post', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${getToken()}`,
             'Recaptcha-Token': recaptchaToken,
-            'Action-Name': 'post_post'
+            'Action-Name': 'post_post',
+            'Recaptcha-version': 'v2'
         },
         body: JSON.stringify(postData)
     });
@@ -111,8 +123,10 @@ async function submitPost(postData) {
     if (!response.ok) {
         const errorData = await response.json();
         alert(errorData.message);
+        grecaptcha.reset();
         throw new Error('Failed to submit post');
     }
     hideSpinner();
+    window.location.href = '/';
     return response.json();
 }
