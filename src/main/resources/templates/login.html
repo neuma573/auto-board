@@ -8,7 +8,7 @@
                     <div class="card text-white">
                         <div class="card-body">
                             <h5 class="card-title">Login</h5>
-                            <form id="loginForm">
+                            <form id="loginForm" method="POST">
                                 <div class="mb-3">
                                     <div th:if="${message} != null">
                                         <p><span th:text="${message}"></span></p>
@@ -20,7 +20,10 @@
                                     <label for="password" class="form-label">Password:</label>
                                     <input type="password" class="form-control" id="password" name="password" required>
                                 </div>
-                                <button type="submit" class="btn btn-dark">Login</button>
+                                <div class="mb-3">
+                                    <button type="submit" class="btn btn-dark">Login</button>
+                                </div>
+                                <div class="g-recaptcha" data-sitekey="6LeOTIEpAAAAAEEJ5-SuYX3k8LhJF7uyMrNOv2yP" data-theme="dark"></div>
                             </form>
                         </div>
                     </div>

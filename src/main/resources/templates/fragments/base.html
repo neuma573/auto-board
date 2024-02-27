@@ -8,23 +8,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7028995738414689"
           crossorigin="anonymous"></script>
-  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LeZG34pAAAAAGhUyxO3RmnFcwbw9xVIVXg-1GAF"></script>
+  <script src="https://www.google.com/recaptcha/api.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6LeZG34pAAAAAGhUyxO3RmnFcwbw9xVIVXg-1GAF"></script>
 </head>
 <body>
-<div th:insert="~{fragments/header :: header}"></div>
+  <div th:insert="~{fragments/header :: header}"></div>
 
-<div th:replace="${content}"></div>
+  <div th:replace="${content}"></div>
 
-<div th:insert="~{fragments/footer :: footer}"></div>
-
-<div class="text-center" id="spinner-container" style="display: none;">
-  <div class="spinner-border" role="status">
-    <span class="sr-only">Loading...</span>
+  <div th:insert="~{fragments/footer :: footer}"></div>
+  <br/>
+  <div class="text-center" id="spinner-container" style="display: none;">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
   </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="js/main.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

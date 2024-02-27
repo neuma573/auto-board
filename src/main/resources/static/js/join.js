@@ -10,21 +10,28 @@ async function handleSignupSubmit(event) {
     const email = document.getElementById('email').value;
     const name = document.getElementById('name').value;
     const password = document.getElementById('password').value;
+    const recaptchaResponse = document.getElementById('g-recaptcha-response').value;
 
     try {
-        const recaptchaToken = await executeRecaptcha('signup');
+        if(recaptchaResponse === null || recaptchaResponse === '') {
+            alert('reCaptcha 챌린지를 수행해주세요');
+            hideSpinner();
+            return ;
+        }
         const response = await fetch('/api/v1/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Recaptcha-Token': recaptchaToken,
-                'Action-Name': 'signup'
+                'Recaptcha-Token': recaptchaResponse,
+                'Action-Name': 'signup',
+                'Recaptcha-version': 'v2'
             },
             body: JSON.stringify({ email, name, password })
         });
         const result = await response.json();
         if (!response.ok) {
             alert(result.message);
+            grecaptcha.reset();
             throw new Error('Signup failed');
         }
 
@@ -48,13 +55,14 @@ async function checkEmail() {
     }
 
     try {
-        const recaptchaToken = await executeRecaptcha('email_check');
+        const recaptchaToken = await executeRecaptchaV3('email_check');
         const response = await fetch(`/api/v1/users/email-check?email=${encodeURIComponent(email)}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Recaptcha-Token': recaptchaToken,
-                'Action-Name': 'email_check'
+                'Action-Name': 'email_check',
+                'Recaptcha-version': 'v3'
             }
         });
 
