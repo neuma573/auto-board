@@ -127,6 +127,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
     }
 
+    @ExceptionHandler(BoardNotFoundException.class)
+    public ResponseEntity<Response<String>> handleBoardNotFoundException(BoardNotFoundException ex) {
+        log.error("Exception : {}, Message : {}", ex.getClass().getSimpleName(), ex.getMessage());
+        Response<String> response = responseUtils.error(UNAUTHORIZED, ex);
+        return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
+    }
+
     @ExceptionHandler(CommentNotAccessibleException.class)
     public Object handleCommentNotAccessibleException(CommentNotAccessibleException ex) {
         log.error("Exception : {}, Message : {}", ex.getClass().getSimpleName(), ex.getMessage());
