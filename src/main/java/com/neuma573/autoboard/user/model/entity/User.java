@@ -9,6 +9,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -44,6 +45,8 @@ public class User extends BaseEntity {
     @NotAudited
     private LocalDateTime lastLoginAt;
 
+    private LocalDateTime lastPasswordChangedAt;
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private Set<UserRole> roles;
 
@@ -63,4 +66,7 @@ public class User extends BaseEntity {
         return status.getStatus();
     }
 
+    public boolean shouldChangePassword() {
+        return ChronoUnit.DAYS.between(lastPasswordChangedAt, LocalDateTime.now()) > 180;
+    }
 }
