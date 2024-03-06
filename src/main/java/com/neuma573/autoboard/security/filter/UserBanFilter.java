@@ -2,6 +2,7 @@ package com.neuma573.autoboard.security.filter;
 
 import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.user.model.entity.BlackList;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -14,14 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@RequiredArgsConstructor
 @Component
 public class UserBanFilter extends GenericFilterBean {
 
     private final RedisTemplate<String, BlackList> blackListRedisTemplate;
-
-    public UserBanFilter(RedisTemplate<String, BlackList> blackListRedisTemplate) {
-        this.blackListRedisTemplate = blackListRedisTemplate;
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
