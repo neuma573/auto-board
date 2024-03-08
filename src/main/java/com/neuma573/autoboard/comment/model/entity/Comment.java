@@ -5,6 +5,8 @@ import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Audited
 @Table(name = "comment")
 public class Comment extends BaseEntity {
 
@@ -25,6 +28,7 @@ public class Comment extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @NotAudited
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
@@ -33,10 +37,12 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "created_user_id")
     private User createdBy;
 
+    @NotAudited
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parentComment;
 
+    @NotAudited
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
     private List<Comment> replies;
 
