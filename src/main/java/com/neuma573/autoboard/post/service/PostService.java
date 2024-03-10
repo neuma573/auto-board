@@ -8,7 +8,6 @@ import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.global.service.OptionService;
 import com.neuma573.autoboard.global.utils.RequestUtils;
-import com.neuma573.autoboard.post.event.PostEvent;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
@@ -49,8 +48,6 @@ public class PostService {
     private final BoardService boardService;
 
     private final OptionService optionService;
-
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final static String VIEW_COUNT_KEY_PREFIX = "view:count:";
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
@@ -155,7 +152,6 @@ public class PostService {
         User user = userService.getUserById(userId);
         Post post = getPostById(postModifyRequest.getPostId());
         post.setCurrentUser(user);
-        applicationEventPublisher.publishEvent(new PostEvent(this, post, PostAction.UPDATE));
         modify(post, postModifyRequest);
     }
 
@@ -164,7 +160,6 @@ public class PostService {
         User user = userService.getUserById(userId);
         Post post = getPostById(postId);
         post.setCurrentUser(user);
-        applicationEventPublisher.publishEvent(new PostEvent(this, post, PostAction.DELETE));
         delete(post);
     }
 
