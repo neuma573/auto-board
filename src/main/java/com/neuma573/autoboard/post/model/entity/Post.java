@@ -6,6 +6,8 @@ import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Audited
 @Table(name = "post")
 public class Post extends BaseEntity {
     @Id
@@ -35,10 +38,12 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "created_user_id")
     private User createdBy;
 
+    @NotAudited
     private Long views;
 
     private boolean isDeleted;
 
+    @NotAudited
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
 

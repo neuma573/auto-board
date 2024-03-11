@@ -1,6 +1,5 @@
 package com.neuma573.autoboard.comment.service;
 
-import com.neuma573.autoboard.comment.event.CommentEvent;
 import com.neuma573.autoboard.comment.model.dto.CommentModifyRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentResponse;
@@ -34,8 +33,6 @@ public class CommentService {
     private final UserService userService;
 
     private final PostService postService;
-
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public Comment getCommentById(Long commentId) {
@@ -72,7 +69,6 @@ public class CommentService {
     public void modifyComment(CommentModifyRequest commentModifyRequest, Long userId) {
         Comment comment = getCommentById(commentModifyRequest.getCommentId());
         comment.setCurrentUser(userService.getUserById(userId));
-        applicationEventPublisher.publishEvent(new CommentEvent(this, comment, CommentAction.UPDATE));
         modify(comment, commentModifyRequest);
     }
 
@@ -80,7 +76,6 @@ public class CommentService {
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = getCommentById(commentId);
         comment.setCurrentUser(userService.getUserById(userId));
-        applicationEventPublisher.publishEvent(new CommentEvent(this, comment, CommentAction.DELETE));
         delete(comment);
     }
 

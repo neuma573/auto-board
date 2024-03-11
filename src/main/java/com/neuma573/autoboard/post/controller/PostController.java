@@ -3,6 +3,7 @@ package com.neuma573.autoboard.post.controller;
 import com.neuma573.autoboard.board.model.annotation.CheckBoardAccess;
 import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.global.model.dto.Response;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.post.model.annotation.CheckPostAccess;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
@@ -69,7 +70,8 @@ public class PostController {
     public ResponseEntity<Response<PostResponse>> getPost(
             @RequestParam(name = "postId") Long postId,
             HttpServletRequest httpServletRequest) {
-        return ResponseEntity.ok().body(responseUtils.success(postService.getPost(httpServletRequest, postId)));
+        String ipAddress = RequestUtils.getClientIpAddress(httpServletRequest);
+        return ResponseEntity.ok().body(responseUtils.success(postService.getPost(ipAddress, postId)));
     }
 
     @CheckPostAccess(action = PostAction.UPDATE)
