@@ -128,15 +128,14 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse getPost(HttpServletRequest httpServletRequest, Long postId) {
+    public PostResponse getPost(String ipAddress, Long postId) {
         Post post = getPostById(postId);
-        increaseViewCount(httpServletRequest, postId);
+        increaseViewCount(ipAddress, postId);
         return PostResponse.of(post);
     }
 
     @Async
-    public void increaseViewCount(HttpServletRequest httpServletRequest, Long postId) {
-        String ipAddress = RequestUtils.getClientIpAddress(httpServletRequest);
+    public void increaseViewCount(String ipAddress, Long postId) {
         String cacheKey = VIEW_COUNT_KEY_PREFIX + postId + ":" + ipAddress;
         Boolean alreadyViewed = stringRedisTemplate.opsForValue().setIfAbsent(cacheKey, "1", VIEW_COUNT_EXPIRATION, TimeUnit.SECONDS);
 
