@@ -48,4 +48,8 @@ jobs:
         scp -o "StrictHostKeyChecking=no" -P ${{ secrets.SERVER_PORT }} ./build/libs/auto-board-0.0.1-SNAPSHOT.jar ${{ secrets.SSH_USER }}@${{ secrets.SERVER_URL }}:${{ secrets.DEPLOY_PATH }}/auto-board-0.0.1-SNAPSHOT.jar
     - name: Execute Deployment Script
       run: |
-        echo "${{ secrets.DEPLOY_SCRIPT }}" | bash
+          ssh -o "StrictHostKeyChecking=no" -P ${{ secrets.SERVER_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_URL }} << EOF
+          sudo systemctl stop ${{ secrets.SERVICE_NAME }}
+          sudo systemctl daemon-reload
+          sudo systemctl start ${{ secrets.SERVICE_NAME }}
+          EOF
