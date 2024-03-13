@@ -45,7 +45,7 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Copy JAR file to server
       run: | 
-        scp -o "StrictHostKeyChecking=no" ./build/libs/auto-board-0.0.1-SNAPSHOT.jar ${{ secrets.SSH_USER }}@${{ secrets.SERVER_URL }}:${{ secrets.DEPLOY_PATH }}/auto-board-0.0.1-SNAPSHOT.jar
+        scp -o "StrictHostKeyChecking=no" -P ${{ secrets.SERVER_PORT }} ./build/libs/auto-board-0.0.1-SNAPSHOT.jar ${{ secrets.SSH_USER }}@${{ secrets.SERVER_URL }}:${{ secrets.DEPLOY_PATH }}/auto-board-0.0.1-SNAPSHOT.jar
     - name: Execute Deployment Script
       run: |
         echo "${{ secrets.DEPLOY_SCRIPT }}" | bash
