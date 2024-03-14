@@ -36,9 +36,7 @@ jobs:
     - name: Execute Deployment Script
       env:
         SSH_USER: ${{ secrets.SSH_USER }}
-        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         SERVER_PORT: ${{ secrets.SERVER_PORT }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
-        SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
       run: |
         ssh -o "StrictHostKeyChecking=no" -p ${SERVER_PORT} ${SSH_USER}@${SERVER_URL} 'bash deploy.sh'
