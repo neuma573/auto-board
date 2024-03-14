@@ -36,12 +36,13 @@ jobs:
     - name: Execute Deployment Script
       run: |
         ssh -o "StrictHostKeyChecking=no" -p ${{ secrets.SERVER_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_URL }} << EOF
+        rm -rf /home/${{ secrets.SSH_USER }}/auto-board
+        rm -rf ${{ secrets.DEPLOY_PATH }}/auto-board-0.0.1-SNAPSHOT.jar
         git clone https://github.com/neuma573/auto-board
         cd auto-board/
         chmod +x ./gradlew
         ./gradlew clean build
         cp /home/${{ secrets.SSH_USER }}/auto-board/build/libs/auto-board-0.0.1-SNAPSHOT.jar ${{ secrets.DEPLOY_PATH }}/auto-board-0.0.1-SNAPSHOT.jar
-        rm -rf /home/${{ secrets.SSH_USER }}/auto-board
         sudo systemctl stop ${{ secrets.SERVICE_NAME }}
         sudo systemctl daemon-reload
         sudo systemctl start ${{ secrets.SERVICE_NAME }}
