@@ -34,16 +34,22 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Execute Deployment Script
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        SERVER_URL: ${{ secrets.SERVER_URL }}
+        SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
       run: |
-        ssh -o "StrictHostKeyChecking=no" -p ${{ secrets.SERVER_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SERVER_URL }} << EOF
-        rm -rf /home/${{ secrets.SSH_USER }}/auto-board
-        rm -rf ${{ secrets.DEPLOY_PATH }}/auto-board-0.0.1-SNAPSHOT.jar
+        ssh -o "StrictHostKeyChecking=no" -p ${SERVER_PORT} ${SSH_USER}@${SERVER_URL} << EOF
+        rm -rf /home/${SSH_USER}/auto-board
+        rm -rf ${DEPLOY_PATH}/auto-board-0.0.1-SNAPSHOT.jar
         git clone https://github.com/neuma573/auto-board
         cd auto-board/
         chmod +x ./gradlew
         ./gradlew clean build
-        cp /home/${{ secrets.SSH_USER }}/auto-board/build/libs/auto-board-0.0.1-SNAPSHOT.jar ${{ secrets.DEPLOY_PATH }}/auto-board-0.0.1-SNAPSHOT.jar
-        sudo systemctl stop ${{ secrets.SERVICE_NAME }}
+        cp /home/${SSH_USER}/auto-board/build/libs/auto-board-0.0.1-SNAPSHOT.jar ${DEPLOY_PATH}/auto-board-0.0.1-SNAPSHOT.jar
+        sudo systemctl stop ${SERVICE_NAME}
         sudo systemctl daemon-reload
-        sudo systemctl start ${{ secrets.SERVICE_NAME }}
+        sudo systemctl start ${SERVICE_NAME}
         EOF
