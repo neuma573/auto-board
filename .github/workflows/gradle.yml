@@ -41,15 +41,4 @@ jobs:
         SERVER_URL: ${{ secrets.SERVER_URL }}
         SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
       run: |
-        ssh -o "StrictHostKeyChecking=no" -p ${SERVER_PORT} ${SSH_USER}@${SERVER_URL} << EOF
-        rm -rf /home/${SSH_USER}/auto-board
-        rm -rf ${DEPLOY_PATH}/auto-board-0.0.1-SNAPSHOT.jar
-        git clone https://github.com/neuma573/auto-board
-        cd auto-board/
-        chmod +x ./gradlew
-        ./gradlew clean build
-        cp /home/${SSH_USER}/auto-board/build/libs/auto-board-0.0.1-SNAPSHOT.jar ${DEPLOY_PATH}/auto-board-0.0.1-SNAPSHOT.jar
-        sudo systemctl stop ${SERVICE_NAME}
-        sudo systemctl daemon-reload
-        sudo systemctl start ${SERVICE_NAME}
-        EOF
+        ssh -o "StrictHostKeyChecking=no" -p ${SERVER_PORT} ${SSH_USER}@${SERVER_URL} 'bash deploy.sh'
