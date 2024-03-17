@@ -132,4 +132,8 @@ public class UserService {
         user.setStatus(Status.BANNED);
     }
 
+    public UserResponse getUser(Long userId) {
+        return UserResponse.of(getUserById(userId));
+    }
+
 }
