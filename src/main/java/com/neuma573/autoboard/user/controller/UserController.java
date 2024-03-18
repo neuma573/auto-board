@@ -30,12 +30,6 @@ public class UserController {
 
     private final JwtProvider jwtProvider;
 
-    @GetMapping(value = "/test")
-    public ResponseEntity<String> test() {
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @GetMapping(value = "")
     public ResponseEntity<Response<UserResponse>> getUserInfo(HttpServletRequest httpServletRequest) {
         Long userId = jwtProvider.parseUserId(httpServletRequest);
@@ -51,7 +45,5 @@ public class UserController {
     public ResponseEntity<Response<?>> checkEmailAvailability(@Valid @ModelAttribute EmailRequest emailRequest) {
         return ResponseEntity.ok().body(responseUtils.success(userService.isEmailAvailable(emailRequest.getEmail())));
     }
-
-
 
 }
