@@ -3,10 +3,12 @@ package com.neuma573.autoboard.user.controller;
 
 import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
+import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.user.model.dto.EmailRequest;
 import com.neuma573.autoboard.user.model.dto.UserRequest;
 import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +28,18 @@ public class UserController {
 
     private final ResponseUtils responseUtils;
 
+    private final JwtProvider jwtProvider;
 
     @GetMapping(value = "/test")
     public ResponseEntity<String> test() {
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "")
+    public ResponseEntity<Response<UserResponse>> getUserInfo(HttpServletRequest httpServletRequest) {
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
+        return ResponseEntity.ok().body(responseUtils.success(userService.getUser(userId)));
     }
 
     @PostMapping(value = "")
