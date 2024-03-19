@@ -63,3 +63,10 @@ app:
   google:
     credentials:
       path: ${GOOGLE_APPLICATION_CREDENTIALS}
+  oauth2:
+    naver:
+      client-id: ${NAVER_CLIENT_ID}
+      client-secret: ${NAVER_CLIENT_SECRET}
+    google:
+      client-id: ${GOOGLE_CLIENT_ID}
+      client-secret: ${GOOGLE_CLIENT_SECRET}
