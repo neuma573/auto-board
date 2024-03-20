@@ -10,6 +10,7 @@ import org.hibernate.envers.NotAudited;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -49,6 +50,12 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private Set<UserRole> roles;
+
+    private String picture;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @NotAudited
+    private List<AuthenticationProvider> authenticationProviders;
 
     public void addRole(UserRole userRole){
         roles.add(userRole);
