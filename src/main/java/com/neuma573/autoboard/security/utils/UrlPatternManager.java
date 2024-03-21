@@ -25,6 +25,8 @@ public class UrlPatternManager {
         );
 
         ALLOWED_PATHS.addAll(Arrays.asList(
+                "/api/v1/oauth2/naver/callback",
+                "/api/v1/oauth2/google/callback",
                 "/api/v1/policy/tos",
                 "/api/v1/post/permission",
                 "/api/v1/users",
@@ -52,7 +54,6 @@ public class UrlPatternManager {
         RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/users/email-check", Set.of(HttpMethod.GET)));
         RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/post", Set.of(HttpMethod.DELETE)));
         RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/comment", Set.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)));
-
 
     }
 
