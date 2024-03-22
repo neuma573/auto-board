@@ -6,10 +6,15 @@ import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,9 +23,24 @@ public class MvcController {
 
     private final BoardService boardService;
 
+    @Value("${app.oauth2.naver.client-id}")
+    private String naverOAuthClientId;
+
+    @Value("${app.oauth2.google.client-id}")
+    private String googleOAuthClientId;
+
+    @Value("${app.domain}")
+    private String domain;
+
     @GetMapping("/login")
     public ModelAndView showLoginForm() {
-        return new ModelAndView("login");
+        ModelAndView modelAndView = new ModelAndView("login");
+        modelAndView.addObject("naverClientId", naverOAuthClientId);
+        modelAndView.addObject("googleClientId", googleOAuthClientId);
+        modelAndView.addObject("domain", domain);
+        modelAndView.addObject("state", URLEncoder.encode(UUID.randomUUID().toString(), StandardCharsets.UTF_8));
+
+        return modelAndView;
     }
 
     @GetMapping(value = {"/main", "/"})
