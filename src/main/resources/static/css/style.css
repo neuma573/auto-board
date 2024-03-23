@@ -272,3 +272,35 @@ a:hover {
 .td-center {
     text-align: center;
 }
+
+.login-btn {
+    width: 100%;
+}
+
+.divider {
+    margin: 30px 0;
+    display: flex;
+    align-items: center;
+}
+
+.divider .line {
+    width: 100%;
+    height: 1px;
+    background-color: #444;
+}
+
+.divider > p {
+    padding: 0 10px;
+    color: #888;
+    font-size: 14px;
+    flex: none;
+    margin-top: initial;
+    margin-bottom: initial;
+}
+
+.oauth-btn {
+    max-width: 10%;
+    height: auto;
+    margin: 20px auto;
+    width: 40px;
+}
