@@ -43,8 +43,8 @@ public class OAuthService {
         return getNaverUserResponse(tokenResponse);
     }
 
-    public GoogleUserResponse getAuthenticate(String code, String state, String scope) {
-        GoogleTokenResponse tokenResponse = getToken(code, state, domain + "/api/v1/oauth2/google/callback");
+    public GoogleUserResponse getAuthenticate(String code) {
+        GoogleTokenResponse tokenResponse = getToken(code);
         return getGoogleUserResponse(tokenResponse);
     }
 
@@ -58,12 +58,12 @@ public class OAuthService {
         );
     }
 
-    private GoogleTokenResponse getToken(String code, String state, String redirectUri) {
+    private GoogleTokenResponse getToken(String code) {
         return googleAuthClient.getToken(
                 code,
                 googleClientId,
                 googleClientSecret,
-                redirectUri,
+                domain + "/api/v1/oauth2/google/callback",
                 "authorization_code"
         );
     }

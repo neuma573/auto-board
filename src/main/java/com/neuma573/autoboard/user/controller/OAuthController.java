@@ -30,11 +30,10 @@ public class OAuthController {
 
     @GetMapping("/google/callback")
     public ResponseEntity<Response<GoogleUserResponse>> getGoogleOAuthCallback(
-            @RequestParam(value = "code") String code,
-            @RequestParam(value = "state") String state,
-            @RequestParam(value = "scope") String scope)
+            @RequestParam(value = "code") String code
+    )
     {
-        return ResponseEntity.ok().body(responseUtils.created(oAuthService.getAuthenticate(code, state, scope)));
+        return ResponseEntity.ok().body(responseUtils.created(oAuthService.getAuthenticate(code)));
     }
 
 }
