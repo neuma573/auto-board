@@ -28,21 +28,28 @@
                                 <div class="mb-3">
                                     <button type="submit" class="btn btn-dark login-btn">Login</button>
                                 </div>
-                                <div class="g-recaptcha" data-sitekey="6LeOTIEpAAAAAEEJ5-SuYX3k8LhJF7uyMrNOv2yP" data-theme="dark"></div>
+                                <div class="mb-3 recaptcha-container">
+                                    <div class="g-recaptcha" data-sitekey="6LeOTIEpAAAAAEEJ5-SuYX3k8LhJF7uyMrNOv2yP" data-theme="dark">
+
+                                    </div>
+                                </div>
                             </form>
                             <div class="divider">
                                 <div class="line"></div>
                                 <p>SNS 로그인</p>
                                 <div class="line"></div>
                             </div>
-                            <a th:href="@{https://nid.naver.com/oauth2.0/authorize(response_type='code', client_id=${naverClientId}, redirect_uri=${domain} + '/api/v1/oauth2/naver/callback', state=${state})}">
-                                <img class="oauth-btn" src="/images/naver_oauth.png" alt="Naver OAuth Login"/>
-                            </a>
-                            <a th:href="@{https://accounts.google.com/o/oauth2/v2/auth(scope='https://www.googleapis.com/auth/userinfo.email',access_type='offline', include_granted_scopes='true',  response_type='code', state=${state},  redirect_uri=${domain} + '/api/v1/oauth2/google/callback', client_id=${googleClientId})}">
-                                <img class="oauth-btn" src="/images/google_oauth.png" alt="Google OAuth Login"/>
-                            </a>
-                            <div id="appleid-signin" class="oauth-btn"></div>
-                            <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+                            <div class="oauth-container">
+                                <a th:href="@{https://nid.naver.com/oauth2.0/authorize(response_type='code', client_id=${naverClientId}, redirect_uri=${domain} + '/api/v1/oauth2/naver/callback', state=${state})}">
+                                    <img class="oauth-btn" src="/images/naver_oauth.png" alt="Naver OAuth Login"/>
+                                </a>
+                                <a th:href="@{https://accounts.google.com/o/oauth2/v2/auth(scope='https://www.googleapis.com/auth/userinfo.email',access_type='offline', include_granted_scopes='true',  response_type='code', state=${state},  redirect_uri=${domain} + '/api/v1/oauth2/google/callback', client_id=${googleClientId})}">
+                                    <img class="oauth-btn" src="/images/google_oauth.png" alt="Google OAuth Login"/>
+                                </a>
+                                <a th:href="@{https://accounts.google.com/o/oauth2/v2/auth(scope='https://www.googleapis.com/auth/userinfo.email',access_type='offline', include_granted_scopes='true',  response_type='code', state=${state},  redirect_uri=${domain} + '/api/v1/oauth2/google/callback', client_id=${googleClientId})}">
+                                    <img class="oauth-btn" src="/images/kakao_oauth.png" alt="Kakao OAuth Login"/>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
