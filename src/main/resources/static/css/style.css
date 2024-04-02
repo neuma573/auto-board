@@ -299,8 +299,17 @@ a:hover {
 }
 
 .oauth-btn {
-    max-width: 10%;
-    height: auto;
-    margin: 20px auto;
-    width: 40px;
+    width: 60px;
+    margin-right: 10px;
+}
+
+.oauth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.recaptcha-container {
+    display: flex;
+    justify-content: center
 }
