@@ -80,7 +80,7 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
     implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.1'
-    implementation 'commo한ns-io:commons-io:2.15.1'
+    implementation 'commons-io:commons-io:2.15.1'
 
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
