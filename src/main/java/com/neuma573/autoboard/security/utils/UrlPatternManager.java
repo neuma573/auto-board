@@ -20,7 +20,7 @@ public class UrlPatternManager {
     private static final Set<UrlPattern> RECAPTCHA_V3_VALIDATION_PATTERNS = new HashSet<>();
 
     static {
-        Arrays.asList("/static/.*", "/images/.*", "/js/.*", "/css/.*", "/favicon.ico", "/ads.txt").forEach(
+        Arrays.asList("/static/.*", "/images/.*", "/js/.*", "/css/.*", "/favicon.ico", "/ads.txt", "/api/v1/file/.*").forEach(
                 pattern -> ALLOWED_PATTERNS.add(Pattern.compile(pattern))
         );
 
