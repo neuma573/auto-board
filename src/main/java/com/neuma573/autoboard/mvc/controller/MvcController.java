@@ -59,16 +59,17 @@ public class MvcController {
         ModelAndView modelAndView = new ModelAndView("write");
         modelAndView.addObject("boardInfo", boardService.getBoardInfo(boardId));
         modelAndView.addObject("mode", "write");
+        modelAndView.addObject("tempId", UUID.randomUUID());
         return modelAndView;
-
     }
 
     @CheckBoardAccess(action = BoardAction.READ)
     @GetMapping("/modify")
-    public ModelAndView showModifyForm(@RequestParam(name = "postId") Long postId) {
+    public ModelAndView showModifyForm() {
         ModelAndView modelAndView = new ModelAndView("write");
         modelAndView.addObject("boardInfo", BoardResponse.builder().name("글 수정하기").build());
         modelAndView.addObject("mode", "modify");
+        modelAndView.addObject("tempId", UUID.randomUUID());
         return modelAndView;
     }
 
