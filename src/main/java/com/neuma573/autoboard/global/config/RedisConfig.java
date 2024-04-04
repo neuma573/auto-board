@@ -3,6 +3,7 @@ package com.neuma573.autoboard.global.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.neuma573.autoboard.file.model.dto.UploadFileRequest;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
 import com.neuma573.autoboard.user.model.entity.BlackList;
@@ -15,8 +16,11 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -82,6 +86,18 @@ public class RedisConfig {
 
         Jackson2JsonRedisSerializer<RefreshToken> serializer = new Jackson2JsonRedisSerializer<>(RefreshToken.class);
         template.setValueSerializer(serializer);
+        template.setKeySerializer(new StringRedisSerializer());
+
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, List<UploadFileRequest>> tempFileRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, List<UploadFileRequest>> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
+        template.setValueSerializer(valueSerializer);
         template.setKeySerializer(new StringRedisSerializer());
 
         return template;
