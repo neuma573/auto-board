@@ -6,6 +6,7 @@
             <script th:inline="javascript">
                 /*<![CDATA[*/
                 let mode = [[${mode}]];
+                const tempId = [[${tempId}]];
                 /*]]>*/
             </script>
             <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
@@ -16,6 +17,7 @@
                         <div class="card-body">
                             <h5 class="card-title" th:text="${boardInfo.name}">글쓰기</h5>
                             <form action="#" th:action="@{/submit}" th:object="${post}" method="post">
+                                <input type="hidden" id="tempId" name="tempId" th:value="${tempId}" />
                                 <div class="form-group">
                                     <input type="text" class="form-control" id="title" name="title" placeholder="제목">
                                 </div>
@@ -48,7 +50,7 @@
                                 ]
                             },
                             ckfinder: {
-                                uploadUrl : `/api/v1/file?postId=${postId}`
+                                uploadUrl : `/api/v1/file?tempId=${tempId}`
                             }
                         })
                         .then(editor => {
