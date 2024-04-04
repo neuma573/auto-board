@@ -3,11 +3,12 @@ package com.neuma573.autoboard.post.service;
 import com.neuma573.autoboard.ai.model.dto.OpenAiResponse;
 import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.board.service.BoardService;
+import com.neuma573.autoboard.file.model.dto.UploadFileRequest;
+import com.neuma573.autoboard.file.service.FileService;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.global.service.OptionService;
-import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
@@ -15,20 +16,20 @@ import com.neuma573.autoboard.post.model.dto.PostResponse;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.model.enums.PostAction;
 import com.neuma573.autoboard.post.repository.PostRepository;
-import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -41,13 +42,15 @@ public class PostService {
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    private final AuthService authService;
-
     private final UserService userService;
 
     private final BoardService boardService;
 
     private final OptionService optionService;
+
+    private final FileService fileService;
+
+    private final RedisTemplate<String, List<UploadFileRequest>> tempFileRedisTemplate;
 
     private final static String VIEW_COUNT_KEY_PREFIX = "view:count:";
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
@@ -71,6 +74,7 @@ public class PostService {
                 destination,
                 writer)
         );
+        handlingTempFileToEntity(postRequest, post);
         return PostResponse.of(post);
     }
 
@@ -150,15 +154,14 @@ public class PostService {
     public void modifyPost(PostModifyRequest postModifyRequest, Long userId) {
         User user = userService.getUserById(userId);
         Post post = getPostById(postModifyRequest.getPostId());
-        post.setCurrentUser(user);
         modify(post, postModifyRequest);
+        handlingTempFileToEntity(postModifyRequest, post);
     }
 
     @Transactional
     public void deletePost(Long postId, Long userId) {
         User user = userService.getUserById(userId);
         Post post = getPostById(postId);
-        post.setCurrentUser(user);
         delete(post);
     }
 
@@ -214,4 +217,18 @@ public class PostService {
         return Objects.equals(userId, post.getCreatedBy().getId());
     }
 
+    private void handlingTempFileToEntity(PostRequest postRequest, Post post) {
+        List<UploadFileRequest> fileList = tempFileRedisTemplate.opsForValue().get(postRequest.getTempId());
+
+        if (fileList != null) {
+            fileList.forEach(file -> {
+                try {
+                    fileService.saveFile(file, post);
+                } catch (IOException e) {
+                    throw new RuntimeException("파일 저장에 실패했습니다.", e);
+                }
+            });
+        }
+        tempFileRedisTemplate.delete(postRequest.getTempId());
+    }
 }
