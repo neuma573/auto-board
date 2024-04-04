@@ -17,7 +17,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -96,19 +95,19 @@ public class FileService {
         return !"png".equalsIgnoreCase(extension) && !"jpg".equalsIgnoreCase(extension) && !"jpeg".equalsIgnoreCase(extension) && !"gif".equalsIgnoreCase(extension);
     }
 
-    public UploadedFile saveFile(UploadFileRequest uploadFileRequest, Post post) throws IOException {
+    public void saveFile(UploadFileRequest uploadFileRequest, Post post) throws IOException {
 
         Path sourceLocation = Paths.get(uploadFileRequest.getFilePath());
         Path targetLocation = Paths.get(uploadPath).resolve(uploadFileRequest.getFileName());
         Files.move(sourceLocation, targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-        return saveFileAsEntity(uploadFileRequest, targetLocation, post);
+        saveFileAsEntity(uploadFileRequest, targetLocation, post);
     }
 
-    public UploadedFile saveFileAsEntity(UploadFileRequest uploadFileRequest,
+    public void saveFileAsEntity(UploadFileRequest uploadFileRequest,
                                  Path targetLocation,
                                  Post post) {
-        return uploadedFileRepository.save(
+        uploadedFileRepository.save(
                 UploadedFile.builder()
                         .fileName(uploadFileRequest.getFileName())
                         .originalFileName(uploadFileRequest.getOriginalFileName())
