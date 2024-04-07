@@ -57,9 +57,11 @@ function hideLoginAndJoinButtons() {
     document.getElementById('loginButton').style.display = 'none';
     document.getElementById('joinButton').style.display = 'none';
     document.getElementById('logoutButton').style.display = '';
+    document.getElementById('myPage').style.display = '';
 }
 
 function showLoginAndJoinButtons() {
+    document.getElementById('myPage').style.display = 'none';
     document.getElementById('logoutButton').style.display = 'none';
     document.getElementById('loginButton').style.display = '';
     document.getElementById('joinButton').style.display = '';
