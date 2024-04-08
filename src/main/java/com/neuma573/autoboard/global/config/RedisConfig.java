@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.neuma573.autoboard.file.model.dto.UploadFileRequest;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
+import com.neuma573.autoboard.user.model.dto.ProviderUserResponse;
 import com.neuma573.autoboard.user.model.entity.BlackList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -104,9 +105,24 @@ public class RedisConfig {
     }
 
     @Bean
+    public RedisTemplate<String, ProviderUserResponse> providerUserResponseRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, ProviderUserResponse> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        Jackson2JsonRedisSerializer<ProviderUserResponse> serializer = new Jackson2JsonRedisSerializer<>(ProviderUserResponse.class);
+        template.setValueSerializer(serializer);
+        template.setKeySerializer(new StringRedisSerializer());
+
+        return template;
+    }
+
+
+    @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate template = new StringRedisTemplate();
         template.setConnectionFactory(factory);
         return template;
     }
+
+
 }
