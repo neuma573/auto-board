@@ -17,4 +17,13 @@ public class NaverUserResponse {
         private String email;
 
     }
+
+    public String getId() {
+        return getResponse().getId();
+    }
+
+    public String getEmail() {
+        return getResponse().getEmail();
+    }
+
 }
