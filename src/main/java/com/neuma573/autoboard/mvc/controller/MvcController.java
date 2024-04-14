@@ -4,6 +4,8 @@ import com.neuma573.autoboard.board.model.annotation.CheckBoardAccess;
 import com.neuma573.autoboard.board.model.dto.BoardResponse;
 import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.board.service.BoardService;
+import com.neuma573.autoboard.user.model.dto.ProviderUserResponse;
+import com.neuma573.autoboard.user.service.OAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,8 @@ import java.util.UUID;
 public class MvcController {
 
     private final BoardService boardService;
+
+    private final OAuthService oAuthService;
 
     @Value("${app.oauth2.naver.client-id}")
     private String naverOAuthClientId;
@@ -51,6 +55,17 @@ public class MvcController {
     @GetMapping("/join")
     public ModelAndView showJoin() {
         return new ModelAndView("join");
+    }
+
+    @GetMapping("/oauth/join")
+    public ModelAndView showOAuthJoin( @RequestParam(value = "code") String uuid) {
+        ModelAndView modelAndView = new ModelAndView("/oauth_join");
+        ProviderUserResponse providerUserResponse = oAuthService.getUserByUuid(uuid);
+        modelAndView.addObject("email", providerUserResponse.getEmail());
+        modelAndView.addObject("uuid", uuid);
+
+
+        return modelAndView;
     }
 
     @CheckBoardAccess(action = BoardAction.READ)
