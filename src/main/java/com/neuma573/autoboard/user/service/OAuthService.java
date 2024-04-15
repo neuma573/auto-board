@@ -5,10 +5,18 @@ import com.neuma573.autoboard.global.client.GoogleUserClient;
 import com.neuma573.autoboard.global.client.NaverAuthClient;
 import com.neuma573.autoboard.global.client.NaverUserClient;
 import com.neuma573.autoboard.user.model.dto.*;
+import com.neuma573.autoboard.user.model.entity.AuthenticationProvider;
+import com.neuma573.autoboard.user.model.enums.AuthenticationProviderType;
+import com.neuma573.autoboard.user.repository.AuthenticationProviderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,6 +30,12 @@ public class OAuthService {
     private final GoogleAuthClient googleAuthClient;
 
     private final GoogleUserClient googleUserClient;
+
+    private final AuthenticationProviderRepository authenticationProviderRepository;
+
+    private final UserService userService;
+
+    private final RedisTemplate<String, ProviderUserResponse> providerUserResponseRedisTemplate;
 
     @Value("${app.oauth2.naver.client-id}")
     private String naverClientId;
@@ -79,4 +93,43 @@ public class OAuthService {
     private String getAuthorizationHeader(TokenResponse tokenResponse) {
         return tokenResponse.getTokenType() + " " + tokenResponse.getAccessToken();
     }
+
+    public String handleOAuthLogin(String providerId, String email, AuthenticationProviderType authenticationProviderType) {
+        Optional<AuthenticationProvider> authenticationProvider = getAuthenticationProviderById(providerId);
+
+        if (authenticationProvider.isPresent()) {
+            return "";
+            // 로그인 처리
+        } else {
+            boolean isEmailAvailable = userService.isEmailAvailable(email);
+            if (isEmailAvailable) {
+                return saveUser(providerId, email, authenticationProviderType);
+            }
+
+            throw new RuntimeException("이메일이 중복입니다.");
+        }
+    }
+
+    private Optional<AuthenticationProvider> getAuthenticationProviderById(String providerId) {
+        return authenticationProviderRepository.findByProviderId(providerId);
+    }
+
+    private String saveUser(String providerId, String email, AuthenticationProviderType authenticationProvider) {
+        String uuid = UUID.randomUUID().toString();
+        ProviderUserResponse userResponse = ProviderUserResponse
+                .builder()
+                .providerId(providerId)
+                .email(email)
+                .authenticationProviderType(authenticationProvider)
+                .build();
+        providerUserResponseRedisTemplate.opsForValue().set(uuid, userResponse, 1, TimeUnit.HOURS);
+
+        return uuid;
+    }
+
+    public ProviderUserResponse getUserByUuid(String uuid) {
+        return providerUserResponseRedisTemplate.opsForValue().get(uuid);
+    }
+
+
 }
