@@ -39,6 +39,7 @@ public class UrlPatternManager {
                 "/api/v1/post/list",
                 "/api/v1/post",
                 "/api/v1/comment/list",
+                "/oauth/join",
                 "/join",
                 "/login",
                 "/main",
