@@ -48,8 +48,8 @@ public class UserService {
                 .user(user)
                 .build();
         user.addRole(role);
-        userRepository.save(user);
-        userRoleRepository.save(role);
+        saveUser(user);
+        saveUserRole(role);
         mailService.sendVerifyEmail(
                 MailRequest.builder()
                         .to(user.getEmail())
@@ -88,7 +88,7 @@ public class UserService {
             return false;
         }
         user.setStatus(Status.ACTIVE);
-        userRepository.save(user);
+        saveUser(user);
         verificationTokenRedisTemplate.delete(verificationToken.getToken());
         return true;
     }
@@ -134,6 +134,14 @@ public class UserService {
 
     public UserResponse getUser(Long userId) {
         return UserResponse.of(getUserById(userId));
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public void saveUserRole(UserRole userRole) {
+        userRoleRepository.save(userRole);
     }
 
 }
