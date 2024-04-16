@@ -33,6 +33,7 @@ public class UrlPatternManager {
                 "/api/v1/users/email-check",
                 "/api/v1/auth/authenticate",
                 "/api/v1/auth/verify",
+                "/api/v1/auth/oauth",
                 "/api/v1/auth/verify-token",
                 "/api/v1/auth/refresh/token",
                 "/api/v1/board",
