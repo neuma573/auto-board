@@ -41,7 +41,7 @@ public class AuthMvcController {
             modelAndView.setViewName("redirect:/login");
             redirectAttributes.addFlashAttribute("message", "유효하지 않은 소셜 가입정보입니다. 다시 가입을 시도해주세요.");
         } else {
-            modelAndView.setViewName("/oauth_join");
+            modelAndView.setViewName("oauth_join");
             modelAndView.addObject("email", providerUserResponse.getEmail());
             modelAndView.addObject("uuid", uuid);
         }
