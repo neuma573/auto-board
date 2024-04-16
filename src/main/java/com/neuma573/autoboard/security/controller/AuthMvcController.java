@@ -34,7 +34,7 @@ public class AuthMvcController {
 
     @GetMapping("/oauth")
     public ModelAndView showOAuthJoin(@RequestParam(value = "code") String uuid, RedirectAttributes redirectAttributes) {
-        ModelAndView modelAndView = new ModelAndView("/oauth_join");
+        ModelAndView modelAndView = new ModelAndView("oauth_join");
         ProviderUserResponse providerUserResponse = oAuthService.getUserByUuid(uuid);
 
         if (providerUserResponse == null) {
