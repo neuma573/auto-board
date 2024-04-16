@@ -249,8 +249,24 @@ function createPaginationButtons(totalPages, currentPage) {
     const paginationUl = document.querySelector('.pagination');
     paginationUl.innerHTML = ''; // 기존 페이징 버튼 삭제
 
-    // 페이지 버튼 생성
-    for (let i = 1; i <= totalPages; i++) {
+    // 첫 페이지로 이동하는 버튼
+    const firstPageItem = document.createElement('li');
+    firstPageItem.className = 'page-item';
+    const firstPageLink = document.createElement('a');
+    firstPageLink.className = 'page-link';
+    firstPageLink.href = '#';
+    firstPageLink.textContent = '<<';
+    firstPageLink.onclick = function() {
+        fetchPosts(currentBoard, 1, 10, 'desc');
+    };
+    firstPageItem.appendChild(firstPageLink);
+    paginationUl.appendChild(firstPageItem);
+
+    // 최대 10개의 페이지 버튼만 표시
+    let startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+    let endPage = Math.min(startPage + 9, totalPages);
+
+    for (let i = startPage; i <= endPage; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
         const pageLink = document.createElement('a');
@@ -264,4 +280,32 @@ function createPaginationButtons(totalPages, currentPage) {
         pageItem.appendChild(pageLink);
         paginationUl.appendChild(pageItem);
     }
+
+    // 다음 페이지 세트로 이동하는 버튼
+    if (endPage < totalPages) {
+        const nextPageItem = document.createElement('li');
+        nextPageItem.className = 'page-item';
+        const nextPageLink = document.createElement('a');
+        nextPageLink.className = 'page-link';
+        nextPageLink.href = '#';
+        nextPageLink.textContent = '>';
+        nextPageLink.onclick = function() {
+            fetchPosts(currentBoard, endPage + 1, 10, 'desc');
+        };
+        nextPageItem.appendChild(nextPageLink);
+        paginationUl.appendChild(nextPageItem);
+    }
+
+    // 마지막 페이지로 이동하는 버튼
+    const lastPageItem = document.createElement('li');
+    lastPageItem.className = 'page-item';
+    const lastPageLink = document.createElement('a');
+    lastPageLink.className = 'page-link';
+    lastPageLink.href = '#';
+    lastPageLink.textContent = '>>';
+    lastPageLink.onclick = function() {
+        fetchPosts(currentBoard, totalPages, 10, 'desc');
+    };
+    lastPageItem.appendChild(lastPageLink);
+    paginationUl.appendChild(lastPageItem);
 }

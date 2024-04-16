@@ -3,8 +3,10 @@ package com.neuma573.autoboard.global.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.neuma573.autoboard.file.model.dto.UploadFileRequest;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
+import com.neuma573.autoboard.user.model.dto.ProviderUserResponse;
 import com.neuma573.autoboard.user.model.entity.BlackList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,8 +17,11 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -88,9 +93,36 @@ public class RedisConfig {
     }
 
     @Bean
+    public RedisTemplate<String, List<UploadFileRequest>> tempFileRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, List<UploadFileRequest>> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
+        template.setValueSerializer(valueSerializer);
+        template.setKeySerializer(new StringRedisSerializer());
+
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, ProviderUserResponse> providerUserResponseRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, ProviderUserResponse> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        Jackson2JsonRedisSerializer<ProviderUserResponse> serializer = new Jackson2JsonRedisSerializer<>(ProviderUserResponse.class);
+        template.setValueSerializer(serializer);
+        template.setKeySerializer(new StringRedisSerializer());
+
+        return template;
+    }
+
+
+    @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate template = new StringRedisTemplate();
         template.setConnectionFactory(factory);
         return template;
     }
+
+
 }

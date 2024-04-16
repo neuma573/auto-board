@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,12 +29,6 @@ public class UserController {
 
     private final JwtProvider jwtProvider;
 
-    @GetMapping(value = "/test")
-    public ResponseEntity<String> test() {
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @GetMapping(value = "")
     public ResponseEntity<Response<UserResponse>> getUserInfo(HttpServletRequest httpServletRequest) {
         Long userId = jwtProvider.parseUserId(httpServletRequest);
@@ -51,7 +44,5 @@ public class UserController {
     public ResponseEntity<Response<?>> checkEmailAvailability(@Valid @ModelAttribute EmailRequest emailRequest) {
         return ResponseEntity.ok().body(responseUtils.success(userService.isEmailAvailable(emailRequest.getEmail())));
     }
-
-
 
 }

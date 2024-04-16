@@ -5,23 +5,18 @@ import com.neuma573.autoboard.global.exception.NotActivatedUserException;
 import com.neuma573.autoboard.global.exception.TooManyLoginAttemptException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
-import com.neuma573.autoboard.global.utils.RequestUtils;
-import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
+import com.neuma573.autoboard.security.model.dto.ClientInfo;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
-import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.repository.LoginLogRepository;
-import com.neuma573.autoboard.security.utils.CookieUtils;
-import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.repository.UserRepository;
 import com.neuma573.autoboard.user.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,11 +30,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
 
-    private final JwtProvider jwtProvider;
-
     private final LoginLogRepository loginLogRepository;
-
-    private final RedisTemplate<String, RefreshToken> refreshTokenRedisTemplate;
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -49,7 +40,8 @@ public class AuthService {
 
     private final String SUCCESS_STATE = "SUCCESS";
 
-    public AccessTokenResponse verifyUser(LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    @Transactional
+    public User verifyUser(LoginRequest loginRequest, ClientInfo clientInfo) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new InvalidLoginException("Invalid email or password"));
         if (user != null && user.getStatus().equals(Status.BANNED.getStatus())) {
@@ -59,20 +51,17 @@ public class AuthService {
         try {
             if (isActivatedUser(Objects.requireNonNull(user))) {
                 validatePassword(loginRequest.getPassword(), user.getPassword());
-                recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS_STATE, null);
-                updateLoginAt(user);
-                trackSuccessfulLogin(loginRequest.getEmail());
-                return jwtProvider.createJwt(httpServletResponse, user.getId());
+                return handleLogin(loginRequest.getEmail(), clientInfo, user);
             } else {
                 throw new NotActivatedUserException("not activated");
             }
         } catch (InvalidLoginException ex) {
-            handleInvalidLogin(user, loginRequest, httpServletRequest, ex);
+            handleInvalidLogin(user, loginRequest.getEmail(), clientInfo, ex);
             throw ex;
         } catch (NotActivatedUserException ex) {
             throw ex;
         } catch (Exception ex) {
-            recordLoginAttempt(loginRequest, httpServletRequest, FAIL_STATE, ex);
+            recordLoginAttempt(loginRequest.getEmail(), clientInfo, FAIL_STATE, ex);
             throw ex;
         }
     }
@@ -89,23 +78,35 @@ public class AuthService {
         }
     }
 
-    public void recordLoginAttempt(LoginRequest loginRequest, HttpServletRequest httpServletRequest, String result, Exception ex) {
+    public void recordLoginAttempt(String email, ClientInfo clientInfo, String result, Exception ex) {
 
         LoginLog loginLog = LoginLog.builder()
-                .email(loginRequest.getEmail())
+                .email(email)
                 .loginTime(LocalDateTime.now())
-                .ipAddress(RequestUtils.getClientIpAddress(httpServletRequest))
+                .ipAddress(clientInfo.getClientIpAddress())
                 .loginResult(result)
-                .deviceInfo(RequestUtils.getUserAgent(httpServletRequest))
+                .deviceInfo(clientInfo.getUserAgent())
                 .errorMessage(ex != null ? ex.getClass().getSimpleName() + ": " + ex.getMessage() : null)
                 .build();
         loginLogRepository.save(loginLog);
     }
 
-    public void handleInvalidLogin(User user, LoginRequest loginRequest, HttpServletRequest httpServletRequest, InvalidLoginException ex) {
-        recordLoginAttempt(loginRequest, httpServletRequest, FAIL_STATE, ex);
+    public void handleInvalidLogin(User user, String email, ClientInfo clientInfo, InvalidLoginException ex) {
+        recordLoginAttempt(email, clientInfo, FAIL_STATE, ex);
         user.addFailCount();
         userRepository.save(user);
+    }
+
+    @Transactional
+    public User handleLogin(
+            String email,
+            ClientInfo clientInfo,
+            User user
+    ) {
+        recordLoginAttempt(email, clientInfo, SUCCESS_STATE, null);
+        updateLoginAt(user);
+        trackSuccessfulLogin(email);
+        return user;
     }
 
     public void updateLoginAt(User user) {
@@ -115,13 +116,6 @@ public class AuthService {
 
     public boolean isActivatedUser(User user) {
         return Objects.equals(user.getStatus(), Status.ACTIVE.getStatus());
-    }
-
-    public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        CookieUtils.getCookieValue(httpServletRequest, "uuid")
-                .ifPresent(refreshTokenRedisTemplate::delete);
-        CookieUtils.deleteCookie(httpServletResponse, "accessToken");
-        CookieUtils.deleteCookie(httpServletResponse, "uuid");
     }
 
     private void trackSuccessfulLogin(String email) {

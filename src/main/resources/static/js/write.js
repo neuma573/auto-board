@@ -45,7 +45,9 @@ async function getPostData() {
 
 function appendPostContent(postData) {
     document.getElementById("title").value = postData.title;
-    document.getElementById("content").textContent = postData.content;
+    if (editorInstance) {
+        editorInstance.setData(postData.content);
+    }
     hideSpinner();
 }
 
@@ -54,14 +56,14 @@ async function handleFormSubmit(event) {
     showSpinner();
     event.preventDefault();
     const title = document.getElementById('title').value;
-    const content = document.getElementById('content').value;
+    const content = editorInstance.getData();
     const boardId = getBoardIdFromUrl();
-
+    const tempId = document.getElementById('tempId').value;
     try {
         if (mode === 'modify') {
-            await updatePost({ title, content, postId }); // 글 수정 로직
+            await updatePost({ title, content, postId, tempId }); // 글 수정 로직
         } else {
-            await submitPost({ title, content, boardId }); // 글 작성 로직
+            await submitPost({ title, content, boardId, tempId }); // 글 작성 로직
         }
     } catch (error) {
         hideSpinner();

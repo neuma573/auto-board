@@ -57,9 +57,11 @@ function hideLoginAndJoinButtons() {
     document.getElementById('loginButton').style.display = 'none';
     document.getElementById('joinButton').style.display = 'none';
     document.getElementById('logoutButton').style.display = '';
+    document.getElementById('myPage').style.display = '';
 }
 
 function showLoginAndJoinButtons() {
+    document.getElementById('myPage').style.display = 'none';
     document.getElementById('logoutButton').style.display = 'none';
     document.getElementById('loginButton').style.display = '';
     document.getElementById('joinButton').style.display = '';
@@ -174,4 +176,17 @@ function getFormattedCreatedAt(createdAt) {
     } else {
         return createdAtDate.toLocaleDateString([], { year: '2-digit', month: '2-digit', day: '2-digit' });
     }
+}
+
+async function oauthLogin(token) {
+    const response = await fetch('/api/v1/auth/verify-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({token})
+    });
+    const data = await response.json();
+    return data.status === 200 && data.data;
 }

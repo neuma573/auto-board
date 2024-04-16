@@ -20,6 +20,8 @@ public class PostRequest {
 
     private Long boardId;
 
+    private String tempId;
+
     public Post of(Board board, User user) {
         return Post.builder()
                 .board(board)

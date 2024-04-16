@@ -2,6 +2,7 @@ package com.neuma573.autoboard.post.model.entity;
 
 import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.comment.model.entity.Comment;
+import com.neuma573.autoboard.file.model.entity.UploadedFile;
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.*;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -47,6 +49,10 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
+    @NotAudited
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UploadedFile> uploadedFiles = new ArrayList<>();
+
 
     public void addViews() {
         views++;
@@ -65,9 +71,5 @@ public class Post extends BaseEntity {
                 .filter(comment -> !comment.isDeleted())
                 .count();
     }
-
-    @Transient
-    @Setter
-    private User currentUser;
 
 }

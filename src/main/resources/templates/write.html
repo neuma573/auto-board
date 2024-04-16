@@ -6,32 +6,81 @@
             <script th:inline="javascript">
                 /*<![CDATA[*/
                 let mode = [[${mode}]];
+                const tempId = [[${tempId}]];
                 /*]]>*/
             </script>
+            <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+            <script src="https://ckeditor.com/apps/ckfinder/3.5.0/ckfinder.js"></script>
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title" th:text="${boardInfo.name}">글쓰기</h5>
                             <form action="#" th:action="@{/submit}" th:object="${post}" method="post">
+                                <input type="hidden" id="tempId" name="tempId" th:value="${tempId}" />
                                 <div class="form-group">
-                                    <label for="title">제목:</label>
-                                    <input type="text" class="form-control" id="title" name="title">
+                                    <input type="text" class="form-control" id="title" name="title" placeholder="제목">
                                 </div>
                                 <div class="form-group">
-                                    <label for="content">내용:</label>
-                                    <textarea class="form-control" id="content" name="content" rows="10"></textarea>
+                                    <textarea id="content"></textarea>
                                 </div>
-                                <div class="mb-1">
-                                    <button type="submit" class="btn btn-dark">제출</button>
+                                <div class="form-group">
+                                    <div class="mb-1">
+                                        <button type="submit" class="btn btn-dark">제출</button>
+                                    </div>
+                                    <div class="g-recaptcha" data-sitekey="6LeOTIEpAAAAAEEJ5-SuYX3k8LhJF7uyMrNOv2yP" data-theme="dark"></div>
                                 </div>
-                                <div class="g-recaptcha" data-sitekey="6LeOTIEpAAAAAEEJ5-SuYX3k8LhJF7uyMrNOv2yP" data-theme="dark"></div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
             <script src="/js/write.js"></script>
+            <script>
+                let editorInstance;
+                document.addEventListener('DOMContentLoaded', function() {
+                    ClassicEditor
+                        .create(document.querySelector('#content'), {
+                            toolbar: {
+                                items: [
+                                    '|', 'heading',
+                                    '|', 'bold', 'italic',
+                                    '|', 'link', 'insertImage', 'insertTable', 'mediaEmbed',
+                                    '|', 'bulletedList', 'numberedList', 'outdent', 'indent'
+                                ]
+                            },
+                            ckfinder: {
+                                uploadUrl : `/api/v1/file?tempId=${tempId}`
+                            }
+                        })
+                        .then(editor => {
+                            console.log('CKEditor initialized successfully');
+                            editorInstance = editor;
+
+                            const style = document.createElement('style');
+                            document.head.appendChild(style);
+                            style.innerHTML =
+                                `
+                                    .ck.ck-content.ck-editor__editable, .ck.ck-content.ck-editor__editable_inline {
+                                        background-color: #495057;
+                                        border-radius: 0.25rem;
+                                        border-style: solid;
+                                        border-width: 1px;
+                                    }
+                                    .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused) {
+                                        border-color: #6c757d;
+                                    }
+                                    .ck-rounded-corners .ck.ck-editor__top .ck-sticky-panel .ck-toolbar, .ck.ck-editor__top .ck-sticky-panel .ck-toolbar.ck-rounded-corners {
+                                        background-color: #7b8187;
+                                    }
+                                `;
+                        })
+                        .catch(error => {
+                            console.error('Error initializing CKEditor:', error);
+                        });
+
+                });
+            </script>
         </div>
     </body>
 </html>

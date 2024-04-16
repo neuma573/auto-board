@@ -37,6 +37,8 @@ public class CookieUtils {
         Cookie cookie = new Cookie(cookieName, null);
         cookie.setPath("/");
         cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         httpServletResponse.addCookie(cookie);
     }
 }

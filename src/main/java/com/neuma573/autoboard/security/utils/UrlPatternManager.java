@@ -20,23 +20,28 @@ public class UrlPatternManager {
     private static final Set<UrlPattern> RECAPTCHA_V3_VALIDATION_PATTERNS = new HashSet<>();
 
     static {
-        Arrays.asList("/static/.*", "/images/.*", "/js/.*", "/css/.*", "/favicon.ico", "/ads.txt").forEach(
+        Arrays.asList("/static/.*", "/images/.*", "/js/.*", "/css/.*", "/favicon.ico", "/ads.txt", "/api/v1/file/.*").forEach(
                 pattern -> ALLOWED_PATTERNS.add(Pattern.compile(pattern))
         );
 
         ALLOWED_PATHS.addAll(Arrays.asList(
+                "/api/v1/oauth2/naver/callback",
+                "/api/v1/oauth2/google/callback",
+                "/api/v1/oauth2/user",
                 "/api/v1/policy/tos",
                 "/api/v1/post/permission",
                 "/api/v1/users",
                 "/api/v1/users/email-check",
                 "/api/v1/auth/authenticate",
                 "/api/v1/auth/verify",
+                "/api/v1/auth/oauth",
                 "/api/v1/auth/verify-token",
                 "/api/v1/auth/refresh/token",
                 "/api/v1/board",
                 "/api/v1/post/list",
                 "/api/v1/post",
                 "/api/v1/comment/list",
+                "/oauth/join",
                 "/join",
                 "/login",
                 "/main",
@@ -52,7 +57,6 @@ public class UrlPatternManager {
         RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/users/email-check", Set.of(HttpMethod.GET)));
         RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/post", Set.of(HttpMethod.DELETE)));
         RECAPTCHA_V3_VALIDATION_PATTERNS.add(UrlPattern.of("/api/v1/comment", Set.of(HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE)));
-
 
     }
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
+  <title>회원가입</title>
+  <body>
+    <div th:fragment="content">
+      <div class="container mt-5">
+        <div class="row">
+          <div class="col-md-6 offset-md-3">
+            <div class="card text-white">
+              <div class="card-body">
+                <h5 class="card-title">소셜 회원가입</h5>
+                <form id="signupForm">
+                  <div class="mb-3">
+                    <label for="email" class="form-label">이메일:</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" id="email" name="email" th:value="${email}" readonly>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="name" class="form-label">이름:</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                  </div>
+                  <input type="hidden" name="uuid" id="uuid" th:value="${uuid}">
+                  <div class="mb-3">
+                    <button type="submit" class="btn btn-dark">회원가입</button>
+                  </div>
+                  <div class="g-recaptcha" data-sitekey="6LeOTIEpAAAAAEEJ5-SuYX3k8LhJF7uyMrNOv2yP" data-theme="dark"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script src="/js/oauth_join.js"></script>
+    </div>
+  </body>
+</html>
