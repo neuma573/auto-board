@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<title>OAUTH 2.0</title>
+<body>
+
+<div th:fragment="content" class="container mt-3">
+
+  <h3>Login in progress .. </h3>
+  <script src="/js/main.js"></script>
+  <script>
+    // 서버에서 전달된 토큰을 로컬 스토리지에 저장
+    let token = `'[[${token}]]'`;
+    let email = `'[[${email}]]'`;
+
+    if (oauthLogin(token)) {
+      localStorage.setItem("user", btoa(email));
+      localStorage.setItem("accessToken", token);
+      window.location.href = "/";
+    } else {
+      alert('로그인 중 오류가 발생했습니다.')
+      window.location.href = "/";
+    }
+
+
+  </script>
+</div>
+</body>
+</html>
