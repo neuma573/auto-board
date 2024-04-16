@@ -1,14 +1,18 @@
 package com.neuma573.autoboard.security.controller;
 
 import com.neuma573.autoboard.global.model.dto.Response;
+import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.model.dto.AccessTokenRequest;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
+import com.neuma573.autoboard.security.model.dto.ClientInfo;
 import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.security.service.TokenService;
 import com.neuma573.autoboard.security.utils.CookieUtils;
+import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
+import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,8 @@ public class AuthController {
 
     private final ResponseUtils responseUtils;
 
+    private final JwtProvider jwtProvider;
+
     private final RedisTemplate<String, RefreshToken> refreshTokenRedisTemplate;
 
     @PutMapping("/refresh/token")
@@ -41,10 +47,17 @@ public class AuthController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<Response<?>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return ResponseEntity.ok(responseUtils.success(
-                authService.verifyUser(loginRequest, httpServletRequest, httpServletResponse)
-        ));
+    public ResponseEntity<Response<AccessTokenResponse>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        ClientInfo clientInfo = ClientInfo.builder()
+                .clientIpAddress(RequestUtils.getClientIpAddress(httpServletRequest))
+                .userAgent(RequestUtils.getUserAgent(httpServletRequest))
+                .build();
+
+        User user = authService.verifyUser(loginRequest, clientInfo);
+
+        AccessTokenResponse accessTokenResponse = jwtProvider.createJwt(httpServletResponse, user.getId());
+
+        return ResponseEntity.ok(responseUtils.success(accessTokenResponse));
     }
 
     @PostMapping("/logout")
