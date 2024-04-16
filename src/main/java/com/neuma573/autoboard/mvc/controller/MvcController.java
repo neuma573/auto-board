@@ -80,4 +80,15 @@ public class MvcController {
         return modelAndView;
     }
 
+    @GetMapping("/oauth-redirect")
+    public ModelAndView oauthRedirect(
+            @RequestParam(name = "token") String token,
+            @RequestParam(name = "email") String email
+    ) {
+        ModelAndView modelAndView = new ModelAndView("oauth_redirect");
+        modelAndView.addObject("token", token);
+        modelAndView.addObject("email", email);
+        return modelAndView;
+    }
+
 }
