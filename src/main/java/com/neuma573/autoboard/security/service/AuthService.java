@@ -8,9 +8,7 @@ import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;
 import com.neuma573.autoboard.security.model.entity.LoginLog;
-import com.neuma573.autoboard.security.model.entity.RefreshToken;
 import com.neuma573.autoboard.security.repository.LoginLogRepository;
-import com.neuma573.autoboard.security.utils.CookieUtils;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.LoginRequest;
@@ -39,8 +37,6 @@ public class AuthService {
 
     private final LoginLogRepository loginLogRepository;
 
-    private final RedisTemplate<String, RefreshToken> refreshTokenRedisTemplate;
-
     private final RedisTemplate<String, String> redisTemplate;
 
     private final UserService userService;
@@ -59,10 +55,7 @@ public class AuthService {
         try {
             if (isActivatedUser(Objects.requireNonNull(user))) {
                 validatePassword(loginRequest.getPassword(), user.getPassword());
-                recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS_STATE, null);
-                updateLoginAt(user);
-                trackSuccessfulLogin(loginRequest.getEmail());
-                return jwtProvider.createJwt(httpServletResponse, user.getId());
+                return handleLogin(loginRequest, httpServletRequest, user, httpServletResponse);
             } else {
                 throw new NotActivatedUserException("not activated");
             }
@@ -108,6 +101,18 @@ public class AuthService {
         userRepository.save(user);
     }
 
+    public AccessTokenResponse handleLogin(
+            LoginRequest loginRequest,
+            HttpServletRequest httpServletRequest,
+            User user,
+            HttpServletResponse httpServletResponse
+                                           ) {
+        recordLoginAttempt(loginRequest, httpServletRequest, SUCCESS_STATE, null);
+        updateLoginAt(user);
+        trackSuccessfulLogin(loginRequest.getEmail());
+        return jwtProvider.createJwt(httpServletResponse, user.getId());
+    }
+
     public void updateLoginAt(User user) {
         user.setLoginAt();
         userRepository.save(user);
@@ -115,13 +120,6 @@ public class AuthService {
 
     public boolean isActivatedUser(User user) {
         return Objects.equals(user.getStatus(), Status.ACTIVE.getStatus());
-    }
-
-    public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        CookieUtils.getCookieValue(httpServletRequest, "uuid")
-                .ifPresent(refreshTokenRedisTemplate::delete);
-        CookieUtils.deleteCookie(httpServletResponse, "accessToken");
-        CookieUtils.deleteCookie(httpServletResponse, "uuid");
     }
 
     private void trackSuccessfulLogin(String email) {
