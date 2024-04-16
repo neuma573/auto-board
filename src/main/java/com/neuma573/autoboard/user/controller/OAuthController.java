@@ -1,9 +1,14 @@
 package com.neuma573.autoboard.user.controller;
 
+import com.neuma573.autoboard.global.model.dto.Response;
+import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.user.model.dto.GoogleUserResponse;
 import com.neuma573.autoboard.user.model.dto.NaverUserResponse;
+import com.neuma573.autoboard.user.model.dto.OAuthUserRequest;
+import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.model.enums.AuthenticationProviderType;
 import com.neuma573.autoboard.user.service.OAuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 public class OAuthController {
 
     private final OAuthService oAuthService;
+
+    private final ResponseUtils responseUtils;
 
     @GetMapping("/naver/callback")
     public ResponseEntity<Void> getNaverOAuthCallback(
@@ -47,6 +54,11 @@ public class OAuthController {
                 googleUserResponse.getEmail(),
                 AuthenticationProviderType.GOOGLE
         );
+    }
+
+    @PostMapping(value = "/user")
+    public ResponseEntity<Response<UserResponse>> oauthJoin(@Valid @RequestBody OAuthUserRequest oAuthUserRequest) {
+        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(oAuthService.signUp(oAuthUserRequest)));
     }
 
     private ResponseEntity<Void> handleLoginAndRedirect(

@@ -1,18 +1,23 @@
 package com.neuma573.autoboard.user.service;
 
+import com.neuma573.autoboard.email.service.MailService;
 import com.neuma573.autoboard.global.client.GoogleAuthClient;
 import com.neuma573.autoboard.global.client.GoogleUserClient;
 import com.neuma573.autoboard.global.client.NaverAuthClient;
 import com.neuma573.autoboard.global.client.NaverUserClient;
 import com.neuma573.autoboard.user.model.dto.*;
 import com.neuma573.autoboard.user.model.entity.AuthenticationProvider;
+import com.neuma573.autoboard.user.model.entity.User;
+import com.neuma573.autoboard.user.model.entity.UserRole;
 import com.neuma573.autoboard.user.model.enums.AuthenticationProviderType;
+import com.neuma573.autoboard.user.model.enums.Role;
 import com.neuma573.autoboard.user.repository.AuthenticationProviderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -131,5 +136,24 @@ public class OAuthService {
         return providerUserResponseRedisTemplate.opsForValue().get(uuid);
     }
 
+    @Transactional
+    public UserResponse signUp(OAuthUserRequest oAuthUserRequest) {
+        ProviderUserResponse providerUserResponse = getUserByUuid(oAuthUserRequest.getUuid());
+        AuthenticationProvider authenticationProvider = AuthenticationProvider.builder()
+                .providerId(providerUserResponse.getProviderId())
+                .provider(providerUserResponse.getAuthenticationProviderType())
+                .build();
 
+        User user = oAuthUserRequest.toEntity(providerUserResponse);
+        UserRole role = UserRole.builder()
+                .role(Role.USER)
+                .user(user)
+                .build();
+        user.addRole(role);
+        user = userService.saveUser(user);
+        userService.saveUserRole(role);
+        authenticationProvider.setUser(user);
+        authenticationProviderRepository.save(authenticationProvider);
+        return UserResponse.of(user);
+    }
 }
