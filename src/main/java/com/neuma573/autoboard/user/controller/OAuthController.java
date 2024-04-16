@@ -58,7 +58,7 @@ public class OAuthController {
         String joinUuid = oAuthService.handleOAuthLogin(providerId, email, authenticationProviderType);
         if (!joinUuid.isEmpty()) {
             String encodedUuid = URLEncoder.encode(joinUuid, StandardCharsets.UTF_8);
-            URI joinUri = URI.create("/oauth/join?code=" + encodedUuid);
+            URI joinUri = URI.create("/api/v1/auth/oauth?code=" + encodedUuid);
             return ResponseEntity.status(HttpStatus.SEE_OTHER).location(joinUri).build();
         } else {
             return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create("/main")).build();
