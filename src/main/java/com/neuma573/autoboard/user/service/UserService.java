@@ -144,4 +144,8 @@ public class UserService {
         userRoleRepository.save(userRole);
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+    }
+
 }
