@@ -3,15 +3,14 @@ package com.neuma573.autoboard.security.service;
 import com.google.recaptchaenterprise.v1.*;
 import com.neuma573.autoboard.global.exception.RecaptchaValidationException;
 import com.neuma573.autoboard.global.model.dto.RecaptchaResponse;
-import com.neuma573.autoboard.global.utils.RequestUtils;
-import jakarta.servlet.http.HttpServletRequest;
+import com.neuma573.autoboard.security.model.dto.ClientInfo;
+import com.neuma573.autoboard.security.model.dto.RecaptchaRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.google.cloud.recaptchaenterprise.v1.RecaptchaEnterpriseServiceClient;
 import com.google.recaptchaenterprise.v1.RiskAnalysis.ClassificationReason;
-import java.io.IOException;
 
 @Slf4j
 @Service
@@ -27,14 +26,13 @@ public class RecaptchaService {
     private String recaptchaProjectId;
 
 
-    public RecaptchaResponse createAssessment(HttpServletRequest httpServletRequest)
-            throws IOException {
+    public RecaptchaResponse createAssessment(ClientInfo clientInfo, RecaptchaRequest recaptchaRequest) {
         // reCAPTCHA 클라이언트를 만듭니다.
         // 할 일: 클라이언트 생성 코드를 캐시하거나(권장) 메서드를 종료하기 전에 client.close()를 호출합니다.
-        String recaptchaToken = RequestUtils.getHeader(httpServletRequest, "Recaptcha-Token");
-        String recaptchaAction = RequestUtils.getHeader(httpServletRequest, "Action-Name");
-        String recaptchaVersion = RequestUtils.getHeader(httpServletRequest, "Recaptcha-Version");
-        if (recaptchaVersion == null || recaptchaVersion.isEmpty() || recaptchaToken == null || recaptchaToken.isEmpty() || recaptchaAction == null || recaptchaAction.isEmpty()) {
+        String recaptchaToken = recaptchaRequest.getRecaptchaToken();
+        String recaptchaAction = recaptchaRequest.getRecaptchaAction();
+        String recaptchaVersion = recaptchaRequest.getRecaptchaAction();
+        if (recaptchaVersion == null || recaptchaVersion.isEmpty() || recaptchaToken == null || recaptchaToken.isEmpty()) {
             throw new RecaptchaValidationException("Recaptcha Token is invalid");
         }
 
@@ -44,9 +42,9 @@ public class RecaptchaService {
             Event event = Event.newBuilder()
                     .setSiteKey(recaptchaVersion.equals("v3") ? recaptchaV3SiteKey : recaptchaV2SiteKey)
                     .setToken(recaptchaToken)
-                    .setUserAgent(RequestUtils.getUserAgent(httpServletRequest))
-                    .setRequestedUri(RequestUtils.getRequestUri(httpServletRequest))
-                    .setUserIpAddress(RequestUtils.getClientIpAddress(httpServletRequest))
+                    .setUserAgent(clientInfo.getUserAgent())
+                    .setRequestedUri(clientInfo.getRequestUri())
+                    .setUserIpAddress(clientInfo.getClientIpAddress())
                     .build();
 
             // 평가 요청을 작성합니다.

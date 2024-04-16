@@ -6,6 +6,8 @@ import com.neuma573.autoboard.global.exception.RecaptchaValidationException;
 import com.neuma573.autoboard.global.model.dto.RecaptchaResponse;
 import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
+import com.neuma573.autoboard.security.model.dto.ClientInfo;
+import com.neuma573.autoboard.security.model.dto.RecaptchaRequest;
 import com.neuma573.autoboard.security.service.RecaptchaService;
 import com.neuma573.autoboard.security.utils.UrlPatternManager;
 import jakarta.servlet.FilterChain;
@@ -36,7 +38,14 @@ public class RecaptchaFilter extends OncePerRequestFilter {
         try {
             if (urlPatternManager.isRecaptchaV3ProtectedUrl(requestURI, method) || urlPatternManager.isRecaptchaV2ProtectedUrl(requestURI, method)) {
                 log.info("Recaptcha Verification Request URI : [{}] {}", method, requestURI);
-                RecaptchaResponse recaptchaResponse = recaptchaService.createAssessment(httpServletRequest);
+                RecaptchaRequest recaptchaRequest = RecaptchaRequest.builder()
+                        .recaptchaAction(RequestUtils.getHeader(httpServletRequest, "Action-Name"))
+                        .recaptchaVersion(RequestUtils.getHeader(httpServletRequest, "Recaptcha-Version"))
+                        .recaptchaToken(RequestUtils.getHeader(httpServletRequest, "Recaptcha-Token"))
+                        .build();
+                ClientInfo clientInfo = ClientInfo.of(httpServletRequest);
+
+                RecaptchaResponse recaptchaResponse = recaptchaService.createAssessment(clientInfo, recaptchaRequest);
                 if (!recaptchaResponse.isSuccess()) {
                     throw new RecaptchaValidationException("Recaptcha Validation Failed");
                 }
