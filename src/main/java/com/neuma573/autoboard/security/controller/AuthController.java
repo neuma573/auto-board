@@ -42,17 +42,13 @@ public class AuthController {
     @PutMapping("/refresh/token")
     public ResponseEntity<Response<AccessTokenResponse>> tokenRefresh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         return ResponseEntity.ok(responseUtils.success(
-                tokenService.refreshAccessToken(httpServletRequest, httpServletResponse)
+                jwtProvider.refreshAccessToken(httpServletRequest, httpServletResponse)
         ));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<Response<AccessTokenResponse>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        ClientInfo clientInfo = ClientInfo.builder()
-                .clientIpAddress(RequestUtils.getClientIpAddress(httpServletRequest))
-                .userAgent(RequestUtils.getUserAgent(httpServletRequest))
-                .build();
-
+        ClientInfo clientInfo = ClientInfo.of(httpServletRequest);
         User user = authService.verifyUser(loginRequest, clientInfo);
 
         AccessTokenResponse accessTokenResponse = jwtProvider.createJwt(httpServletResponse, user.getId());
