@@ -1,7 +1,6 @@
 package com.neuma573.autoboard.security.controller;
 
 import com.neuma573.autoboard.global.model.dto.Response;
-import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.security.model.dto.AccessTokenRequest;
 import com.neuma573.autoboard.security.model.dto.AccessTokenResponse;

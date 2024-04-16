@@ -31,7 +31,7 @@ public class RecaptchaService {
         // 할 일: 클라이언트 생성 코드를 캐시하거나(권장) 메서드를 종료하기 전에 client.close()를 호출합니다.
         String recaptchaToken = recaptchaRequest.getRecaptchaToken();
         String recaptchaAction = recaptchaRequest.getRecaptchaAction();
-        String recaptchaVersion = recaptchaRequest.getRecaptchaAction();
+        String recaptchaVersion = recaptchaRequest.getRecaptchaVersion();
         if (recaptchaVersion == null || recaptchaVersion.isEmpty() || recaptchaToken == null || recaptchaToken.isEmpty()) {
             throw new RecaptchaValidationException("Recaptcha Token is invalid");
         }
@@ -70,7 +70,7 @@ public class RecaptchaService {
 
 
             if (!response.getTokenProperties().getAction().equals(recaptchaAction)) {
-                throw new RecaptchaValidationException("The action attribute in the reCAPTCHA tag does not match the action (" + recaptchaAction + ") you are expecting to score");
+                throw new RecaptchaValidationException("EXPECTED :" + response.getTokenProperties().getAction() + " ::The action attribute in the reCAPTCHA tag does not match the action (" + recaptchaAction + ") you are expecting to score");
             }
             // 위험 점수와 이유를 가져옵니다.
             // 평가 해석에 대한 자세한 내용은 다음을 참조하세요.

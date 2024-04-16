@@ -49,17 +49,17 @@ public class AuthService {
         try {
             if (isActivatedUser(Objects.requireNonNull(user))) {
                 validatePassword(loginRequest.getPassword(), user.getPassword());
-                return handleLogin(loginRequest, clientInfo, user);
+                return handleLogin(loginRequest.getEmail(), clientInfo, user);
             } else {
                 throw new NotActivatedUserException("not activated");
             }
         } catch (InvalidLoginException ex) {
-            handleInvalidLogin(user, loginRequest, clientInfo, ex);
+            handleInvalidLogin(user, loginRequest.getEmail(), clientInfo, ex);
             throw ex;
         } catch (NotActivatedUserException ex) {
             throw ex;
         } catch (Exception ex) {
-            recordLoginAttempt(loginRequest, clientInfo, FAIL_STATE, ex);
+            recordLoginAttempt(loginRequest.getEmail(), clientInfo, FAIL_STATE, ex);
             throw ex;
         }
     }
@@ -76,10 +76,10 @@ public class AuthService {
         }
     }
 
-    public void recordLoginAttempt(LoginRequest loginRequest, ClientInfo clientInfo, String result, Exception ex) {
+    public void recordLoginAttempt(String email, ClientInfo clientInfo, String result, Exception ex) {
 
         LoginLog loginLog = LoginLog.builder()
-                .email(loginRequest.getEmail())
+                .email(email)
                 .loginTime(LocalDateTime.now())
                 .ipAddress(clientInfo.getClientIpAddress())
                 .loginResult(result)
@@ -89,20 +89,20 @@ public class AuthService {
         loginLogRepository.save(loginLog);
     }
 
-    public void handleInvalidLogin(User user, LoginRequest loginRequest, ClientInfo clientInfo, InvalidLoginException ex) {
-        recordLoginAttempt(loginRequest, clientInfo, FAIL_STATE, ex);
+    public void handleInvalidLogin(User user, String email, ClientInfo clientInfo, InvalidLoginException ex) {
+        recordLoginAttempt(email, clientInfo, FAIL_STATE, ex);
         user.addFailCount();
         userRepository.save(user);
     }
 
     public User handleLogin(
-            LoginRequest loginRequest,
+            String email,
             ClientInfo clientInfo,
             User user
                                            ) {
-        recordLoginAttempt(loginRequest, clientInfo, SUCCESS_STATE, null);
+        recordLoginAttempt(email, clientInfo, SUCCESS_STATE, null);
         updateLoginAt(user);
-        trackSuccessfulLogin(loginRequest.getEmail());
+        trackSuccessfulLogin(email);
         return user;
     }
 
