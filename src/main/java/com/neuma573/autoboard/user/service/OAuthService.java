@@ -4,6 +4,8 @@ import com.neuma573.autoboard.global.client.GoogleAuthClient;
 import com.neuma573.autoboard.global.client.GoogleUserClient;
 import com.neuma573.autoboard.global.client.NaverAuthClient;
 import com.neuma573.autoboard.global.client.NaverUserClient;
+import com.neuma573.autoboard.global.exception.InvalidJoinException;
+import com.neuma573.autoboard.security.service.AuthService;
 import com.neuma573.autoboard.user.model.dto.*;
 import com.neuma573.autoboard.user.model.entity.AuthenticationProvider;
 import com.neuma573.autoboard.user.model.entity.User;
@@ -38,6 +40,8 @@ public class OAuthService {
     private final AuthenticationProviderRepository authenticationProviderRepository;
 
     private final UserService userService;
+
+    private final AuthService authService;
 
     private final RedisTemplate<String, ProviderUserResponse> providerUserResponseRedisTemplate;
 
@@ -102,15 +106,15 @@ public class OAuthService {
         Optional<AuthenticationProvider> authenticationProvider = getAuthenticationProviderById(providerId);
 
         if (authenticationProvider.isPresent()) {
+
             return "";
-            // 로그인 처리
         } else {
             boolean isEmailAvailable = userService.isEmailAvailable(email);
             if (isEmailAvailable) {
                 return saveUser(providerId, email, authenticationProviderType);
             }
 
-            throw new RuntimeException("이메일이 중복입니다.");
+            throw new InvalidJoinException("기존에 이메일로 가입된 유저입니다. 이메일 회원으로 로그인해주세요.");
         }
     }
 
