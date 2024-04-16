@@ -1,6 +1,5 @@
 package com.neuma573.autoboard.user.service;
 
-import com.neuma573.autoboard.email.service.MailService;
 import com.neuma573.autoboard.global.client.GoogleAuthClient;
 import com.neuma573.autoboard.global.client.GoogleUserClient;
 import com.neuma573.autoboard.global.client.NaverAuthClient;
