@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const signupForm = document.getElementById('signupForm');
+
     signupForm.addEventListener('submit', handleSignupSubmit);
 });
 
@@ -13,10 +14,9 @@ async function handleSignupSubmit(event) {
     const recaptchaResponse = document.getElementById('g-recaptcha-response').value;
 
     try {
-        if(recaptchaResponse === null || recaptchaResponse === '') {
-            alert('reCaptcha 챌린지를 수행해주세요');
+        if (!validateRecaptcha(recaptchaResponse)) {
             hideSpinner();
-            return ;
+            return;
         }
         const response = await fetch('/api/v1/users', {
             method: 'POST',
