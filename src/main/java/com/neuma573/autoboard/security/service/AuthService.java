@@ -16,6 +16,7 @@ import com.neuma573.autoboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ public class AuthService {
 
     private final String SUCCESS_STATE = "SUCCESS";
 
+    @Transactional
     public User verifyUser(LoginRequest loginRequest, ClientInfo clientInfo) {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new InvalidLoginException("Invalid email or password"));
@@ -95,11 +97,12 @@ public class AuthService {
         userRepository.save(user);
     }
 
+    @Transactional
     public User handleLogin(
             String email,
             ClientInfo clientInfo,
             User user
-                                           ) {
+    ) {
         recordLoginAttempt(email, clientInfo, SUCCESS_STATE, null);
         updateLoginAt(user);
         trackSuccessfulLogin(email);
