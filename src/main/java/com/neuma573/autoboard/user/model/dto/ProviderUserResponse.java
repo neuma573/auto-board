@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ProviderUserResponse {
 
-    String providerId;
+    private String providerId;
 
-    String email;
+    private String email;
 
-    AuthenticationProviderType authenticationProviderType;
+    private AuthenticationProviderType authenticationProviderType;
 
 }
