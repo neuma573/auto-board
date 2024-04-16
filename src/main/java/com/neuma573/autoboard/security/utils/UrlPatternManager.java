@@ -27,6 +27,7 @@ public class UrlPatternManager {
         ALLOWED_PATHS.addAll(Arrays.asList(
                 "/api/v1/oauth2/naver/callback",
                 "/api/v1/oauth2/google/callback",
+                "/api/v1/oauth2/user",
                 "/api/v1/policy/tos",
                 "/api/v1/post/permission",
                 "/api/v1/users",
