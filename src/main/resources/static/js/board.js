@@ -3,7 +3,11 @@ let currentBoard = -1;
 document.addEventListener('DOMContentLoaded', async function () {
     try {
         await fetchBoards();
-        handleBoardSelectChange();
+
+        let boardId = localStorage.getItem('currentBoardId');
+        let page = restorePage();
+
+        await fetchPosts(boardId, page, 10, 'desc');
         if (localStorage.getItem("accessToken") === null) {
             document.getElementById('writeButton').style.display = 'none';
         }
@@ -87,10 +91,12 @@ function handleBoardSelectChange() {
     localStorage.setItem('currentBoardId', selectedBoardId);
     const writeButton = document.getElementById('writeButton');
     writeButton.href = `/write?boardId=${selectedBoardId}`;
+    storeCurrentPage(1);
     fetchPosts(selectedBoardId, 1, 10, 'desc');
 }
 
 async function fetchPosts(boardId, page, size, order) {
+    storeCurrentPage(page)
     showSpinner();
     await checkAndRefreshToken();
 
@@ -263,7 +269,8 @@ function createPaginationButtons(totalPages, currentPage) {
     firstPageLink.href = '#';
     firstPageLink.textContent = '<<';
     firstPageLink.onclick = function() {
-        fetchPosts(currentBoard, 1, 10, 'desc');
+        const page = restorePage();
+        fetchPosts(currentBoard, page, 10, 'desc');
     };
     firstPageItem.appendChild(firstPageLink);
     paginationUl.appendChild(firstPageItem);
@@ -319,3 +326,11 @@ function createPaginationButtons(totalPages, currentPage) {
     paginationUl.appendChild(lastPageItem);
 }
 
+function storeCurrentPage(page) {
+    localStorage.setItem('currentPage', page);
+}
+
+function restorePage() {
+    const savedPage = localStorage.getItem('currentPage');
+    return savedPage ? parseInt(savedPage, 10) : 1; // 기본값으로 1 반환
+}
