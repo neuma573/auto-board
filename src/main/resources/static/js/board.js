@@ -269,13 +269,11 @@ function createPaginationButtons(totalPages, currentPage) {
     firstPageLink.href = '#';
     firstPageLink.textContent = '<<';
     firstPageLink.onclick = function() {
-        const page = restorePage();
-        fetchPosts(currentBoard, page, 10, 'desc');
+        fetchPosts(currentBoard, 1, 10, 'desc');
     };
     firstPageItem.appendChild(firstPageLink);
     paginationUl.appendChild(firstPageItem);
 
-    // 시작 페이지 계산
     let startPage = Math.floor((currentPage - 1) / 5) * 5 + 1;
     let endPage = Math.min(startPage + 4, totalPages);
     if (endPage - startPage < 4) {
