@@ -33,7 +33,7 @@ async function initializePost() {
         }
     } catch (error) {
         hideSpinner();
-        alert('error');
+        alert('접근할 수 없는 게시글입니다.');
         location.href = '/';
 
     }
