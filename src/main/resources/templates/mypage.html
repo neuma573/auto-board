@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/base :: layout (~{::title}, ~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>마이 페이지</title>
+</head>
+<body>
+<div th:fragment="content" class="container mt-3">
+    <h3>마이 페이지</h3>
+    <div th:if="${userResponse != null}">
+        <div class="d-none d-md-block table-responsive">
+            <table class="table table-borderless">
+                <tbody>
+                <tr>
+                    <th scope="row">이름</th>
+                    <td th:text="${userResponse.name}">[사용자 이름]</td>
+                </tr>
+                <tr>
+                    <th scope="row">이메일</th>
+                    <td th:text="${userResponse.email}">user@example.com</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-block d-md-none">
+            <p><strong>이름:</strong> <span th:text="${userResponse.name}">[사용자 이름]</span></p>
+            <p><strong>이메일:</strong> <span th:text="${userResponse.email}">user@example.com</span></p>
+        </div>
+    </div>
+    <div th:unless="${userResponse != null}" class="alert alert-warning">
+        사용자 정보를 찾을 수 없습니다.
+    </div>
+</div>
+</body>
+</html>
