@@ -3,7 +3,11 @@ let currentBoard = -1;
 document.addEventListener('DOMContentLoaded', async function () {
     try {
         await fetchBoards();
-        handleBoardSelectChange();
+
+        let boardId = localStorage.getItem('currentBoardId');
+        let page = restorePage();
+
+        await fetchPosts(boardId, page, 10, 'desc');
         if (localStorage.getItem("accessToken") === null) {
             document.getElementById('writeButton').style.display = 'none';
         }
@@ -15,6 +19,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 async function fetchBoards() {
     showSpinner();
     await checkAndRefreshToken();
+    let boardId = localStorage.getItem('currentBoardId');
+    if (typeof boardId !== 'object' || boardId === null || Object.keys(boardId).length === 0) {
+        boardId = 1;
+        localStorage.setItem('currentBoardId', String(boardId));
+    }
     try {
         const response = await fetch('/api/v1/board', {
             method: 'GET',
@@ -82,12 +91,15 @@ function handleBoardSelectChange() {
     localStorage.setItem('currentBoardId', selectedBoardId);
     const writeButton = document.getElementById('writeButton');
     writeButton.href = `/write?boardId=${selectedBoardId}`;
+    storeCurrentPage(1);
     fetchPosts(selectedBoardId, 1, 10, 'desc');
 }
 
 async function fetchPosts(boardId, page, size, order) {
+    storeCurrentPage(page)
     showSpinner();
     await checkAndRefreshToken();
+
     try {
         const response = await fetch(`/api/v1/post/list?boardId=${boardId}&page=${page}&size=${size}&order=${order}`, {
             method: 'GET',
@@ -257,14 +269,18 @@ function createPaginationButtons(totalPages, currentPage) {
     firstPageLink.href = '#';
     firstPageLink.textContent = '<<';
     firstPageLink.onclick = function() {
-        fetchPosts(currentBoard, 1, 10, 'desc');
+        const page = restorePage();
+        fetchPosts(currentBoard, page, 10, 'desc');
     };
     firstPageItem.appendChild(firstPageLink);
     paginationUl.appendChild(firstPageItem);
 
-    // 최대 10개의 페이지 버튼만 표시
-    let startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
-    let endPage = Math.min(startPage + 9, totalPages);
+    // 시작 페이지 계산
+    let startPage = Math.floor((currentPage - 1) / 5) * 5 + 1;
+    let endPage = Math.min(startPage + 4, totalPages);
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
 
     for (let i = startPage; i <= endPage; i++) {
         const pageItem = document.createElement('li');
@@ -308,4 +324,13 @@ function createPaginationButtons(totalPages, currentPage) {
     };
     lastPageItem.appendChild(lastPageLink);
     paginationUl.appendChild(lastPageItem);
+}
+
+function storeCurrentPage(page) {
+    localStorage.setItem('currentPage', page);
+}
+
+function restorePage() {
+    const savedPage = localStorage.getItem('currentPage');
+    return savedPage ? parseInt(savedPage, 10) : 1; // 기본값으로 1 반환
 }

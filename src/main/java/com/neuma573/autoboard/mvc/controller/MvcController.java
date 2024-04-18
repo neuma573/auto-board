@@ -4,6 +4,10 @@ import com.neuma573.autoboard.board.model.annotation.CheckBoardAccess;
 import com.neuma573.autoboard.board.model.dto.BoardResponse;
 import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.board.service.BoardService;
+import com.neuma573.autoboard.security.utils.JwtProvider;
+import com.neuma573.autoboard.user.model.dto.UserResponse;
+import com.neuma573.autoboard.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +26,10 @@ import java.util.UUID;
 public class MvcController {
 
     private final BoardService boardService;
+
+    private final UserService userService;
+
+    private final JwtProvider jwtProvider;
 
     @Value("${app.oauth2.naver.client-id}")
     private String naverOAuthClientId;
@@ -77,6 +85,15 @@ public class MvcController {
     public ModelAndView showPost(@RequestParam(name = "postId") Long postId ) {
         ModelAndView modelAndView = new ModelAndView("post");
         modelAndView.addObject("postId", postId);
+        return modelAndView;
+    }
+
+    @GetMapping("/mypage")
+    public ModelAndView showMypage(HttpServletRequest httpServletRequest) {
+        Long userId = jwtProvider.parseUserId(httpServletRequest);
+        ModelAndView modelAndView = new ModelAndView("mypage");
+        UserResponse userResponse = UserResponse.of(userService.getUserById(userId));
+        modelAndView.addObject("userResponse", userResponse);
         return modelAndView;
     }
 
