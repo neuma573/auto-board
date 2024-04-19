@@ -29,7 +29,7 @@ public class JwtRequestFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
         String requestURI = httpRequest.getRequestURI();
-        log.info("Request URI : [{}] {}", httpRequest.getMethod(), requestURI);
+        log.info("[{}] : [{}] {}", RequestUtils.getClientIpAddress(httpRequest) , httpRequest.getMethod(), requestURI);
 
         if (urlPatternManager.isProtectedUrl(requestURI) && !isAuthorizedRequest(httpRequest, httpResponse)) {
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or Missing JWT Token");
