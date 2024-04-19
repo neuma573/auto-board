@@ -144,6 +144,7 @@ function updatePostsTable(posts) {
         cell.setAttribute('colspan', 5); // 모든 컬럼을 합친 하나의 셀로 표시
         cell.style.textAlign = 'center';
     } else {
+        const startIndex = posts.totalElements - posts.pageable.offset;
         posts.content.forEach((post, index) => {
             const row = tableBody.insertRow();
             const numberCell = row.insertCell(0);
@@ -156,7 +157,7 @@ function updatePostsTable(posts) {
             authorCell.classList.add("td-center");
             dateCell.classList.add("td-center");
             viewsCell.classList.add("td-center");
-            const postNumber = posts.size * posts.number + index + 1;
+            const postNumber = startIndex - index;
             numberCell.textContent = postNumber;
 
             const titleLink = document.createElement('a');
