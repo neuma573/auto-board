@@ -262,25 +262,41 @@ function createPaginationButtons(totalPages, currentPage) {
     const paginationUl = document.querySelector('.pagination');
     paginationUl.innerHTML = ''; // 기존 페이징 버튼 삭제
 
-    // 첫 페이지로 이동하는 버튼
-    const firstPageItem = document.createElement('li');
-    firstPageItem.className = 'page-item';
-    const firstPageLink = document.createElement('a');
-    firstPageLink.className = 'page-link';
-    firstPageLink.href = '#';
-    firstPageLink.textContent = '<<';
-    firstPageLink.onclick = function() {
-        fetchPosts(currentBoard, 1, 10, 'desc');
-    };
-    firstPageItem.appendChild(firstPageLink);
-    paginationUl.appendChild(firstPageItem);
+    const pageGroupSize = 5; // 한 페이지 그룹에 표시할 페이지 수
+    let startPage = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+    let endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
-    let startPage = Math.floor((currentPage - 1) / 5) * 5 + 1;
-    let endPage = Math.min(startPage + 4, totalPages);
-    if (endPage - startPage < 4) {
-        startPage = Math.max(1, endPage - 4);
+    // 첫 페이지로 이동하는 버튼 (첫 페이지 그룹이 아닐 때만 표시)
+    if (startPage > pageGroupSize) {
+        const firstPageItem = document.createElement('li');
+        firstPageItem.className = 'page-item';
+        const firstPageLink = document.createElement('a');
+        firstPageLink.className = 'page-link';
+        firstPageLink.href = '#';
+        firstPageLink.textContent = '<<';
+        firstPageLink.onclick = function() {
+            fetchPosts(currentBoard, 1, 10, 'desc');
+        };
+        firstPageItem.appendChild(firstPageLink);
+        paginationUl.appendChild(firstPageItem);
     }
 
+    // 이전 페이지 그룹으로 이동하는 버튼 (현재 그룹이 첫 번째 그룹이 아닐 때)
+    if (startPage > 1) {
+        const previousGroupItem = document.createElement('li');
+        previousGroupItem.className = 'page-item';
+        const previousGroupLink = document.createElement('a');
+        previousGroupLink.className = 'page-link';
+        previousGroupLink.href = '#';
+        previousGroupLink.textContent = '<';
+        previousGroupLink.onclick = function() {
+            fetchPosts(currentBoard, startPage - 1, 10, 'desc');
+        };
+        previousGroupItem.appendChild(previousGroupLink);
+        paginationUl.appendChild(previousGroupItem);
+    }
+
+    // 페이지 번호 버튼
     for (let i = startPage; i <= endPage; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
@@ -296,7 +312,6 @@ function createPaginationButtons(totalPages, currentPage) {
         paginationUl.appendChild(pageItem);
     }
 
-    // 다음 페이지 세트로 이동하는 버튼
     if (endPage < totalPages) {
         const nextPageItem = document.createElement('li');
         nextPageItem.className = 'page-item';
@@ -311,18 +326,19 @@ function createPaginationButtons(totalPages, currentPage) {
         paginationUl.appendChild(nextPageItem);
     }
 
-    // 마지막 페이지로 이동하는 버튼
-    const lastPageItem = document.createElement('li');
-    lastPageItem.className = 'page-item';
-    const lastPageLink = document.createElement('a');
-    lastPageLink.className = 'page-link';
-    lastPageLink.href = '#';
-    lastPageLink.textContent = '>>';
-    lastPageLink.onclick = function() {
-        fetchPosts(currentBoard, totalPages, 10, 'desc');
-    };
-    lastPageItem.appendChild(lastPageLink);
-    paginationUl.appendChild(lastPageItem);
+    if (endPage < totalPages) {
+        const lastPageItem = document.createElement('li');
+        lastPageItem.className = 'page-item';
+        const lastPageLink = document.createElement('a');
+        lastPageLink.className = 'page-link';
+        lastPageLink.href = '#';
+        lastPageLink.textContent = '>>';
+        lastPageLink.onclick = function() {
+            fetchPosts(currentBoard, totalPages, 10, 'desc');
+        };
+        lastPageItem.appendChild(lastPageLink);
+        paginationUl.appendChild(lastPageItem);
+    }
 }
 
 function storeCurrentPage(page) {

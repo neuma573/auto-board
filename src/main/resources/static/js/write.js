@@ -1,6 +1,7 @@
 
 const postId = localStorage.getItem("dest");
 document.addEventListener('DOMContentLoaded', () => {
+    localStorage.setItem('currentPage', '1');
     setupFormSubmit();
 });
 
