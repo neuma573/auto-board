@@ -4,6 +4,7 @@ import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.comment.model.entity.Comment;
 import com.neuma573.autoboard.file.model.entity.UploadedFile;
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
+import com.neuma573.autoboard.like.model.entity.Likeable;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +21,7 @@ import java.util.List;
 @Getter
 @Audited
 @Table(name = "post")
-public class Post extends BaseEntity {
+public class Post extends BaseEntity implements Likeable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,7 +38,7 @@ public class Post extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_user_id")
+    @JoinColumn(name = "created_user_id", nullable = false)
     private User createdBy;
 
     @NotAudited
