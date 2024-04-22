@@ -44,7 +44,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.session:spring-session-data-redis'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2'
     implementation 'org.mindrot:jbcrypt:0.4'
 
     implementation 'org.springframework.data:spring-data-envers'
