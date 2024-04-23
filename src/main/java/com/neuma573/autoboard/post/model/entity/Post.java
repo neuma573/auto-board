@@ -37,7 +37,7 @@ public class Post extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_user_id")
+    @JoinColumn(name = "created_user_id", nullable = false)
     private User createdBy;
 
     @NotAudited
