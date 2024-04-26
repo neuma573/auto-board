@@ -14,6 +14,7 @@ public class PostResponse {
 
     private String title;
 
+    @Setter
     private String content;
 
     private Long views;
