@@ -21,4 +21,11 @@ public class XSSUtils {
 
         return Jsoup.clean(source, safelist);
     }
+
+    public static String removeHtmlTags(String source) {
+        Safelist safelist = Safelist.none();
+
+
+        return Jsoup.clean(source, safelist);
+    }
 }
