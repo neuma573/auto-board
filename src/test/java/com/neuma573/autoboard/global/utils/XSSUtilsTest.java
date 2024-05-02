@@ -15,4 +15,15 @@ public class XSSUtilsTest {
 
         assertEquals(expected, actual, "Filtered HTML should not contain any script tags or styles.");
     }
+
+    @Test
+    public void testFilterHtmlSourceWithBlank() {
+        String htmlSource = "<p></p>";
+
+        String expected = "";
+
+        String actual = XSSUtils.removeHtmlTags(htmlSource);
+
+        assertEquals(expected, actual, "Filtered HTML is not blank");
+    }
 }
