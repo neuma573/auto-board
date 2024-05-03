@@ -9,7 +9,7 @@ import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.global.service.OptionService;
-import com.neuma573.autoboard.global.utils.XSSUtils;
+import com.neuma573.autoboard.global.utils.ContentSanitizer;
 import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
 import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
 import com.neuma573.autoboard.post.model.dto.PostRequest;
@@ -142,7 +142,7 @@ public class PostService {
     }
 
     private PostResponse filterXSSCodes(PostResponse postResponse) {
-        postResponse.setContent(XSSUtils.filterHtmlSource(postResponse.getContent()));
+        postResponse.setContent(ContentSanitizer.filterHtmlSource(postResponse.getContent()));
 
         return postResponse;
     }
