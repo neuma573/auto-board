@@ -143,7 +143,6 @@ public class PostService {
 
     private PostResponse filterXSSCodes(PostResponse postResponse) {
         postResponse.setContent(ContentSanitizer.filterHtmlSource(postResponse.getContent()));
-
         return postResponse;
     }
 
