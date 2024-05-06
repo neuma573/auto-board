@@ -6,10 +6,16 @@ import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "likes")
 public class Like extends BaseEntity {
 
@@ -19,9 +25,6 @@ public class Like extends BaseEntity {
 
     @ManyToOne
     private Post post;
-
-    @ManyToOne
-    private Comment comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_user_id", nullable = false)
