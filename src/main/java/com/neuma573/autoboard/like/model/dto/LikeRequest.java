@@ -9,7 +9,7 @@ import lombok.Getter;
 public class LikeRequest {
     private Long postId;
 
-    public static Like of(User user, Post post) {
+    public static Like toEntity(User user, Post post) {
         return Like.builder()
                 .post(post)
                 .createdBy(user)

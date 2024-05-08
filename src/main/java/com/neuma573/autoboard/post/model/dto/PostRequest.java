@@ -22,7 +22,7 @@ public class PostRequest {
 
     private String tempId;
 
-    public Post of(Board board, User user) {
+    public Post toEntity(Board board, User user) {
         return Post.builder()
                 .board(board)
                 .title(title)

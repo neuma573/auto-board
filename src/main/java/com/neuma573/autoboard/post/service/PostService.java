@@ -71,7 +71,7 @@ public class PostService {
     public PostResponse savePost(Long userId, PostRequest postRequest) {
         Board destination = boardService.getBoardById(postRequest.getBoardId());
         User writer = userService.getUserById(userId);
-        Post post = postRepository.save(postRequest.of(
+        Post post = postRepository.save(postRequest.toEntity(
                 destination,
                 writer)
         );

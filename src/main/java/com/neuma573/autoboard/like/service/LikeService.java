@@ -25,7 +25,7 @@ public class LikeService {
         User user = userService.getUserById(userId);
         Post post = postService.getPostById(likeRequest.getPostId());
         Like like = likeRepository.save(
-                LikeRequest.of(user, post)
+                LikeRequest.toEntity(user, post)
         );
         return LikeResponse.of(like);
     }
