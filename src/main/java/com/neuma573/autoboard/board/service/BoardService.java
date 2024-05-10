@@ -60,13 +60,18 @@ public class BoardService {
 
 
     @Transactional
-    public BoardResponse saveBoard(Long userId, BoardRequest boardRequest) {
+    public BoardResponse generateBoard(Long userId, BoardRequest boardRequest) {
         User user = userService.getUserById(userId);
-        return BoardResponse.of(boardRepository.save(
-                boardRequest.toEntity(
-                user)
-        ));
+        return BoardResponse.of(
+                saveBoard(boardRequest, user)
+        );
     }
+
+    public Board saveBoard(BoardRequest boardRequest, User user) {
+        return boardRepository.save(boardRequest.toEntity(user));
+    }
+
+
 
     @Transactional
     public BoardResponse getBoardInfo(Long boardId) {
