@@ -61,7 +61,7 @@ public class PostController {
             @Valid @RequestBody PostRequest postRequest,
             HttpServletRequest httpServletRequest) {
         Long userId = jwtProvider.parseUserId(httpServletRequest);
-        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(postService.savePost(userId, postRequest)));
+        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(postService.generatePost(userId, postRequest)));
     }
 
     @CheckPostAccess(action = PostAction.READ)

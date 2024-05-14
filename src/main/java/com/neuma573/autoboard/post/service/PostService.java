@@ -68,15 +68,23 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse savePost(Long userId, PostRequest postRequest) {
+    public PostResponse generatePost(Long userId, PostRequest postRequest) {
         Board destination = boardService.getBoardById(postRequest.getBoardId());
         User writer = userService.getUserById(userId);
-        Post post = postRepository.save(postRequest.toEntity(
+        Post post = savePost(
+                postRequest,
                 destination,
-                writer)
+                writer
         );
         handlingTempFileToEntity(postRequest, post);
         return PostResponse.of(post);
+    }
+
+    public Post savePost(PostRequest postRequest, Board destination, User writer) {
+        return postRepository.save(postRequest.toEntity(
+                destination,
+                writer)
+        );
     }
 
     public void saveAiPost(OpenAiResponse openAiResponse) {
