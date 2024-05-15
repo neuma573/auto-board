@@ -4,4 +4,5 @@ import com.neuma573.autoboard.like.model.entity.Like;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikeRepository extends JpaRepository<Like, Long> {
+    Long countByPostId(Long id);
 }
