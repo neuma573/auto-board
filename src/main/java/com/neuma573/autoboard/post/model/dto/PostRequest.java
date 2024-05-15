@@ -5,8 +5,14 @@ import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.validation.annotation.ValidContent;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class PostRequest {
 
