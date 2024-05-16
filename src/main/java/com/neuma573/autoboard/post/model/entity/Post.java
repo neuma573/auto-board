@@ -43,6 +43,8 @@ public class Post extends BaseEntity {
     @NotAudited
     private Long views;
 
+    private Long likeCount = 0L;
+
     private boolean isDeleted;
 
     @NotAudited
@@ -62,6 +64,14 @@ public class Post extends BaseEntity {
     public void delete() {
         this.isDeleted = true;
         super.delete();
+    }
+
+    public void increaseLikes() {
+        likeCount++;
+    }
+
+    public void decreaseLikes() {
+        likeCount--;
     }
 
     public Long getActiveCommentCount() {
