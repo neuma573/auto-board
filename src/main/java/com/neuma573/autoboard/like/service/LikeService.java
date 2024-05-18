@@ -6,10 +6,15 @@ import com.neuma573.autoboard.like.model.entity.Like;
 import com.neuma573.autoboard.like.repository.LikeRepository;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.service.PostService;
+import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -21,21 +26,26 @@ public class LikeService {
 
     private final PostService postService;
 
-    public LikeResponse createLike(LikeRequest likeRequest, Long userId) {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public LikeResponse toggleLike(Long postId, Long userId) {
         User user = userService.getUserById(userId);
-        Post post = postService.getPostById(likeRequest.getPostId());
-        Like like = likeRepository.save(
-                LikeRequest.toEntity(user, post)
-        );
-        return LikeResponse.of(like);
+        Post post = postService.getPostById(postId);
+
+        Optional<Like> existingLike = likeRepository.findByUserAndPost(user, post);
+
+        if (existingLike.isPresent()) {
+            likeRepository.delete(existingLike.get());
+            return LikeResponse.ofRemovedLike(postId, UserResponse.of(user));
+        } else {
+            Like like = likeRepository.save(
+                    Like.of(post, user)
+            );
+            return LikeResponse.of(like);
+        }
     }
 
-    public void deleteLike(LikeRequest likeRequest) {
-
-    }
-
-    public Long getLikeCount(LikeRequest likeRequest) {
-        return 0L;
+    public Long getLikeCount(Long postId) {
+        return likeRepository.countByPostId(postId);
     }
 
 }
