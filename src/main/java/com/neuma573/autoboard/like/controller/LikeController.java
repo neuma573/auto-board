@@ -30,7 +30,7 @@ public class LikeController {
     @PostMapping("/{postId}")
     public ResponseEntity<Response<LikeResponse>> toogleLike(@PathVariable Long postId, HttpServletRequest httpServletRequest) {
         Long userId = jwtProvider.parseUserId(httpServletRequest);
-        return ResponseEntity.ok().body(responseUtils.success(likeService.toogleLike(postId, userId)));
+        return ResponseEntity.ok().body(responseUtils.success(likeService.toggleLike(postId, userId)));
     }
 
 }
