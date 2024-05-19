@@ -15,7 +15,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "likes")
+@Table(name = "likes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"post_id", "created_user_id"})
+})
 public class Like extends BaseEntity {
 
     @Id
@@ -29,4 +31,10 @@ public class Like extends BaseEntity {
     @JoinColumn(name = "created_user_id", nullable = false)
     private User createdBy;
 
+    public static Like of(Post post, User user) {
+        return Like.builder()
+                .post(post)
+                .createdBy(user)
+                .build();
+    }
 }
