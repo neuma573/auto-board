@@ -1,6 +1,5 @@
 package com.neuma573.autoboard.like.service;
 
-import com.neuma573.autoboard.like.model.dto.LikeRequest;
 import com.neuma573.autoboard.like.model.dto.LikeResponse;
 import com.neuma573.autoboard.like.model.entity.Like;
 import com.neuma573.autoboard.like.repository.LikeRepository;
