@@ -30,7 +30,7 @@ public class LikeService {
         User user = userService.getUserById(userId);
         Post post = postService.getPostById(postId);
 
-        Optional<Like> existingLike = likeRepository.findByUserAndPost(user, post);
+        Optional<Like> existingLike = likeRepository.findByCreatedByAndPost(user, post);
 
         if (existingLike.isPresent()) {
             likeRepository.delete(existingLike.get());
