@@ -318,3 +318,37 @@ a:hover {
     max-width: 100%;
     height: auto;
 }
+
+
+.post-card .vote-area {
+    margin: 1rem 0 2rem;
+    text-align: center;
+    clear: both;
+}
+.post-card .vote-area .itemForm:first-child {
+    margin-right: 5px;
+}
+.post-card .vote-area .itemForm {
+    display: inline-block;
+}
+.post-card .vote-area .item:last-of-type {
+    margin-right: 0;
+}
+.post-card .vote-area .item {
+    display: inline-block;
+    text-align: center;
+    border: 1px solid;
+    position: relative;
+    border-color: var(--color-bd-outer);
+    background-color: var(--color-bg-main);
+    color: var(--color-text);
+    border-radius: 5px;
+    min-width: 4rem;
+    padding: .5rem 1.3rem;
+    position: relative;
+}
+small, .small {
+    font-size: 80%;
+    font-weight: 400;
+}
+
