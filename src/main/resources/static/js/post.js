@@ -105,3 +105,31 @@ async function deletePost() {
             .catch(error => console.error('Error:', error));
     }
 }
+
+async function toggleLike(event) {
+    showSpinner();
+    event.preventDefault();
+    const recaptchaToken = await executeRecaptchaV3('post_like');
+
+    fetch('/api/v1/like/' + postId, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${getToken()}`,
+            'Recaptcha-Token': recaptchaToken,
+            'Action-Name': 'post_like',
+            'Recaptcha-version': 'v3'
+        }
+    })
+        .then(async response => {
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('ratingUp').innerText = data.data.likeCount;
+                hideSpinner();
+            } else {
+                alert("추천할 수 없습니다");
+                hideSpinner();
+            }
+        })
+        .catch(error => hideSpinner());
+
+}
