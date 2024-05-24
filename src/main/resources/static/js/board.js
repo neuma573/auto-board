@@ -180,7 +180,7 @@ function updatePostsTable(posts) {
             titleLink.onclick = function() { clickPost(post.id); };
             titleCell.appendChild(titleLink);
 
-            authorCell.textContent = post.userResponse.name;
+            authorCell.textContent = post.userName;
             dateCell.textContent = getFormattedCreatedAt(post.createdAt);
             viewsCell.textContent = post.views;
         });
@@ -237,7 +237,7 @@ function updateMobilePostsList(posts) {
 
             const authorSpan = document.createElement('span');
             authorSpan.className = 'author';
-            authorSpan.textContent = post.userResponse.name;
+            authorSpan.textContent = post.userName;
             postDetails.appendChild(authorSpan);
 
             const statsSpan = document.createElement('span');
