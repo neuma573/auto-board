@@ -36,6 +36,7 @@ public class PostRequest {
                 .createdBy(user)
                 .isDeleted(false)
                 .views(0L)
+                .likeCount(0L)
                 .build();
     }
 }
