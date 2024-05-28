@@ -82,4 +82,8 @@ public class Post extends BaseEntity {
                 .count();
     }
 
+    public boolean hasImage() {
+        return content != null && content.contains("<img");
+    }
+
 }
