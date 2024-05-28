@@ -25,6 +25,8 @@ public class PostResponse {
 
     private Long commentCount;
 
+    private Long likeCount;
+
     public static PostResponse of(Post post) {
        return PostResponse.builder()
                 .id(post.getId())
@@ -35,6 +37,7 @@ public class PostResponse {
                 .isDeleted(post.isDeleted())
                 .createdAt(post.getFormattedCreatedAt())
                 .commentCount(post.getActiveCommentCount())
+                .likeCount(post.getLikeCount())
                 .build();
     }
 }

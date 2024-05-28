@@ -20,6 +20,10 @@ public class PostListResponse {
 
     private Long commentCount;
 
+    private Long likeCount;
+
+    private boolean hasImages;
+
     public static PostListResponse of(Post post) {
         return PostListResponse.builder()
                 .id(post.getId())
@@ -28,6 +32,8 @@ public class PostListResponse {
                 .views(post.getViews())
                 .createdAt(post.getFormattedCreatedAt())
                 .commentCount(post.getActiveCommentCount())
+                .likeCount(post.getLikeCount())
+                .hasImages(post.hasImage())
                 .build();
     }
 }
