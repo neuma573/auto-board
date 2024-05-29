@@ -43,7 +43,9 @@ function updatePostContent(postData) {
     document.getElementById("title").textContent = postData.title;
     document.getElementById("user").textContent = postData.userResponse.name;
     document.getElementById("views").textContent = `조회 ${postData.views}`;
+    document.getElementById('ratingUp').innerText = postData.likeCount;
     document.getElementById("content").innerHTML = postData.content;
+
 
     const postDateElement = document.querySelector(".post-info time");
     postDateElement.textContent = `작성일 ${postData.createdAt}`;

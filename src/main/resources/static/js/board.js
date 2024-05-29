@@ -182,6 +182,14 @@ function updatePostsTable(posts) {
             titleLink.onclick = function() { clickPost(post.id); };
             titleCell.appendChild(titleLink);
 
+            if (post.hasImages) {
+                const imageIcon = document.createElement('img');
+                imageIcon.src = '/images/image.svg';
+                imageIcon.alt = 'Image';
+                imageIcon.className = 'image-icon';
+                titleCell.appendChild(imageIcon);
+            }
+
             authorCell.textContent = post.userName;
             dateCell.textContent = getFormattedCreatedAt(post.createdAt);
             viewsCell.textContent = post.views;
@@ -219,6 +227,13 @@ function updateMobilePostsList(posts) {
                 postTitleLink.style.fontStyle = 'italic'; // 이탤릭체 적용
             } else {
                 postTitleLink.textContent = `${post.title.substring(0, 30)}${post.title.length > 30 ? '...' : ''}`;
+                if (post.hasImages) {
+                    const imageIcon = document.createElement('img');
+                    imageIcon.src = '/images/image.svg';
+                    imageIcon.alt = 'Image';
+                    imageIcon.className = 'image-icon';
+                    postTitleLink.appendChild(imageIcon);
+                }
             }
 
             if (post.commentCount !== 0) {
