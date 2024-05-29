@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "likes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"post_id", "created_user_id"})
+        @UniqueConstraint(columnNames = {"created_user_id", "post_id", "is_deleted"})
 })
 public class Like extends BaseEntity {
 
@@ -24,17 +24,22 @@ public class Like extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_user_id", nullable = false)
     private User createdBy;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
+
     public static Like of(Post post, User user) {
         return Like.builder()
                 .post(post)
                 .createdBy(user)
+                .isDeleted(false)
                 .build();
     }
 }
