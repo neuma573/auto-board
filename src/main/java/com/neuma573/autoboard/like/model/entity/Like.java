@@ -9,14 +9,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
 
 @Getter
 @Entity
 @Builder
+@Audited
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "likes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"created_user_id", "post_id", "is_deleted"})
+        @UniqueConstraint(columnNames = {"created_user_id", "post_id"})
 })
 public class Like extends BaseEntity {
 
@@ -32,14 +34,10 @@ public class Like extends BaseEntity {
     @JoinColumn(name = "created_user_id", nullable = false)
     private User createdBy;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
-
     public static Like of(Post post, User user) {
         return Like.builder()
                 .post(post)
                 .createdBy(user)
-                .isDeleted(false)
                 .build();
     }
 }
