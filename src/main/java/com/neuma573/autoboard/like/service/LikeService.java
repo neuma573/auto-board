@@ -5,7 +5,6 @@ import com.neuma573.autoboard.like.model.entity.Like;
 import com.neuma573.autoboard.like.repository.LikeRepository;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.service.PostService;
-import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +33,14 @@ public class LikeService {
 
         if (existingLike.isPresent()) {
             likeRepository.delete(existingLike.get());
-            return LikeResponse.ofRemovedLike(postId, UserResponse.of(user));
+            post.decreaseLikes();
         } else {
-            Like like = likeRepository.save(
+            likeRepository.save(
                     Like.of(post, user)
             );
-            return LikeResponse.of(like);
+            post.increaseLikes();
         }
+        return LikeResponse.of(postId, getLikeCount(postId));
     }
 
     public Long getLikeCount(Long postId) {
