@@ -43,6 +43,7 @@ public class Post extends BaseEntity {
     @NotAudited
     private Long views;
 
+    @NotAudited
     private Long likeCount = 0L;
 
     private boolean isDeleted;
