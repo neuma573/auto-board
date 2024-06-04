@@ -152,11 +152,13 @@ function updatePostsTable(posts) {
             const authorCell = row.insertCell(2);
             const dateCell = row.insertCell(3);
             const viewsCell = row.insertCell(4);
+            const likesCell = row.insertCell(5);
 
             numberCell.classList.add("td-center");
             authorCell.classList.add("td-center");
             dateCell.classList.add("td-center");
             viewsCell.classList.add("td-center");
+            likesCell.classList.add("td-center");
             const postNumber = startIndex - index;
             numberCell.textContent = postNumber;
 
@@ -180,9 +182,18 @@ function updatePostsTable(posts) {
             titleLink.onclick = function() { clickPost(post.id); };
             titleCell.appendChild(titleLink);
 
-            authorCell.textContent = post.userResponse.name;
+            if (post.hasImages) {
+                const imageIcon = document.createElement('img');
+                imageIcon.src = '/images/image.svg';
+                imageIcon.alt = 'Image';
+                imageIcon.className = 'image-icon';
+                titleCell.appendChild(imageIcon);
+            }
+
+            authorCell.textContent = post.userName;
             dateCell.textContent = getFormattedCreatedAt(post.createdAt);
             viewsCell.textContent = post.views;
+            likesCell.textContent = post.likeCount === null ? 0 : post.likeCount;
         });
     }
 
@@ -216,6 +227,13 @@ function updateMobilePostsList(posts) {
                 postTitleLink.style.fontStyle = 'italic'; // 이탤릭체 적용
             } else {
                 postTitleLink.textContent = `${post.title.substring(0, 30)}${post.title.length > 30 ? '...' : ''}`;
+                if (post.hasImages) {
+                    const imageIcon = document.createElement('img');
+                    imageIcon.src = '/images/image.svg';
+                    imageIcon.alt = 'Image';
+                    imageIcon.className = 'image-icon';
+                    postTitleLink.appendChild(imageIcon);
+                }
             }
 
             if (post.commentCount !== 0) {
@@ -237,20 +255,18 @@ function updateMobilePostsList(posts) {
 
             const authorSpan = document.createElement('span');
             authorSpan.className = 'author';
-            authorSpan.textContent = post.userResponse.name;
+            authorSpan.textContent = post.userName;
             postDetails.appendChild(authorSpan);
 
             const statsSpan = document.createElement('span');
             statsSpan.className = 'stats';
-            statsSpan.textContent = `작성일: ${getFormattedCreatedAt(post.createdAt)} | 조회수: ${post.views}`;
+            statsSpan.textContent = `작성일: ${getFormattedCreatedAt(post.createdAt)} | 조회수: ${post.views} | 추천수: ${post.likeCount === null ? 0 : post.likeCount}`;
             postDetails.appendChild(statsSpan);
 
             listItem.appendChild(postDetails);
             listGroup.appendChild(listItem);
         });
     }
-
-
 }
 
 function clickPost(postId) {

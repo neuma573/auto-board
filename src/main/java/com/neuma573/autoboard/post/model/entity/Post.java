@@ -43,6 +43,9 @@ public class Post extends BaseEntity {
     @NotAudited
     private Long views;
 
+    @NotAudited
+    private Long likeCount = 0L;
+
     private boolean isDeleted;
 
     @NotAudited
@@ -64,12 +67,24 @@ public class Post extends BaseEntity {
         super.delete();
     }
 
+    public void increaseLikes() {
+        likeCount++;
+    }
+
+    public void decreaseLikes() {
+        likeCount--;
+    }
+
     public Long getActiveCommentCount() {
         return comments == null
                 ? 0L
                 : comments.stream()
                 .filter(comment -> !comment.isDeleted())
                 .count();
+    }
+
+    public boolean hasImage() {
+        return content != null && content.contains("<img");
     }
 
 }

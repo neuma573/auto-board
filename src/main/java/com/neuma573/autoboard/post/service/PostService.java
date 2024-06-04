@@ -9,10 +9,8 @@ import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.global.service.OptionService;
-import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
-import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
-import com.neuma573.autoboard.post.model.dto.PostRequest;
-import com.neuma573.autoboard.post.model.dto.PostResponse;
+import com.neuma573.autoboard.global.utils.ContentSanitizer;
+import com.neuma573.autoboard.post.model.dto.*;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.model.enums.PostAction;
 import com.neuma573.autoboard.post.repository.PostRepository;
@@ -56,26 +54,34 @@ public class PostService {
     private final static long VIEW_COUNT_EXPIRATION = 24 * 60 * 60; // 24시간
 
     @Transactional
-    public Page<PostResponse> getPostList(Long boardId, Pageable pageable, Long userId) {
+    public Page<PostListResponse> getPostList(Long boardId, Pageable pageable, Long userId) {
         User user = userService.getUserByIdSafely(userId);
 
         Page<Post> posts = (user != null && userService.isAdmin(user))
                 ? postRepository.findAllByBoardId(boardId, pageable)
                 : postRepository.findAllByBoardIdAndIsDeletedFalse(boardId, pageable);
 
-        return posts.map(PostResponse::of);
+        return posts.map(PostListResponse::of);
     }
 
     @Transactional
-    public PostResponse savePost(Long userId, PostRequest postRequest) {
+    public PostResponse generatePost(Long userId, PostRequest postRequest) {
         Board destination = boardService.getBoardById(postRequest.getBoardId());
         User writer = userService.getUserById(userId);
-        Post post = postRepository.save(postRequest.of(
+        Post post = savePost(
+                postRequest,
                 destination,
-                writer)
+                writer
         );
         handlingTempFileToEntity(postRequest, post);
         return PostResponse.of(post);
+    }
+
+    public Post savePost(PostRequest postRequest, Board destination, User writer) {
+        return postRepository.save(postRequest.toEntity(
+                destination,
+                writer)
+        );
     }
 
     public void saveAiPost(OpenAiResponse openAiResponse) {
@@ -135,7 +141,14 @@ public class PostService {
     public PostResponse getPost(String ipAddress, Long postId) {
         Post post = getPostById(postId);
         increaseViewCount(ipAddress, postId);
-        return PostResponse.of(post);
+        return filterXSSCodes(
+                PostResponse.of(post)
+        );
+    }
+
+    private PostResponse filterXSSCodes(PostResponse postResponse) {
+        postResponse.setContent(ContentSanitizer.filterHtmlSource(postResponse.getContent()));
+        return postResponse;
     }
 
     @Async

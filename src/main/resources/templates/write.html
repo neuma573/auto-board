@@ -51,34 +51,35 @@
                             },
                             ckfinder: {
                                 uploadUrl : `/api/v1/file?tempId=${tempId}`
+                            },
+                            htmlSupport: {
+                                allow: [
+                                    {
+                                        name: /.*/,
+                                        attributes: true,
+                                        classes: true,
+                                        styles: true
+                                    }
+                                ],
+                                disallow: [
+                                    {
+                                        name: 'img',
+                                        attributes: {
+                                            onerror: true,
+                                            onload: true,
+                                            onmouseover: true
+                                        }
+                                    }
+                                ]
                             }
                         })
                         .then(editor => {
                             console.log('CKEditor initialized successfully');
                             editorInstance = editor;
-
-                            const style = document.createElement('style');
-                            document.head.appendChild(style);
-                            style.innerHTML =
-                                `
-                                    .ck.ck-content.ck-editor__editable, .ck.ck-content.ck-editor__editable_inline {
-                                        background-color: #495057;
-                                        border-radius: 0.25rem;
-                                        border-style: solid;
-                                        border-width: 1px;
-                                    }
-                                    .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused) {
-                                        border-color: #6c757d;
-                                    }
-                                    .ck-rounded-corners .ck.ck-editor__top .ck-sticky-panel .ck-toolbar, .ck.ck-editor__top .ck-sticky-panel .ck-toolbar.ck-rounded-corners {
-                                        background-color: #7b8187;
-                                    }
-                                `;
                         })
                         .catch(error => {
                             console.error('Error initializing CKEditor:', error);
                         });
-
                 });
             </script>
         </div>

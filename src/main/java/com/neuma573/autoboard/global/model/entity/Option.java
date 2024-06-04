@@ -19,6 +19,6 @@ public class Option {
 
     @Getter
     @Setter
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", name = "\"value\"")
     private String value;
 }

@@ -53,6 +53,7 @@ dependencies {
 
     // QueryDSL
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    testImplementation 'org.projectlombok:lombok:1.18.26'
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
@@ -84,6 +85,9 @@ dependencies {
 
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    //Jsoup
+    implementation 'org.jsoup:jsoup:1.17.2'
 
 }
 

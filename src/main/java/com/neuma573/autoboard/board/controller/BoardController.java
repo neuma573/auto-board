@@ -41,7 +41,7 @@ public class BoardController {
     @PostMapping("")
     public ResponseEntity<Response<BoardResponse>> saveBoard(@Valid @RequestBody BoardRequest boardRequest, HttpServletRequest httpServletRequest) {
         Long userId = jwtProvider.parseUserId(httpServletRequest);
-        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(boardService.saveBoard(userId, boardRequest)));
+        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(boardService.generateBoard(userId, boardRequest)));
     }
 
     @CheckBoardAccess(action = BoardAction.UPDATE)

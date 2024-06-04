@@ -4,75 +4,75 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 댓글 불러오기
-    function loadPage(pageNumber) {
-        const currentUserEmail = atob(localStorage.getItem("user"));
-        fetch(`/api/v1/comment/list?postId=${postId}&page=${pageNumber}`)
-            .then(response => response.json())
-            .then(data => {
-                const totalPages = data.data.totalPages; // 서버로부터 전체 페이지 수 받아오기
+function loadPage(pageNumber) {
+    const currentUserEmail = atob(localStorage.getItem("user"));
+    fetch(`/api/v1/comment/list?postId=${postId}&page=${pageNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            const totalPages = data.data.totalPages; // 서버로부터 전체 페이지 수 받아오기
 
-                // 페이지네이션 버튼 생성
-                generatePagination(totalPages);
-                let activeCommentsCount = 0;
-                // 댓글 목록 생성
-                const comments = data.data.content;
-                const commentsHtml = comments.map(comment => {
-                    const commentElement = document.createElement('div');
-                    commentElement.className = 'card mb-1';
-                    commentElement.id = `comment-container-${comment.id}`;
+            // 페이지네이션 버튼 생성
+            generatePagination(totalPages);
+            let activeCommentsCount = 0;
+            // 댓글 목록 생성
+            const comments = data.data.content;
+            const commentsHtml = comments.map(comment => {
+                const commentElement = document.createElement('div');
+                commentElement.className = 'card mb-1';
+                commentElement.id = `comment-container-${comment.id}`;
 
-                    const cardBody = document.createElement('div');
-                    cardBody.className = 'card-body';
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
 
-                    const subtitle = document.createElement('h6');
-                    subtitle.className = 'card-subtitle mb-1 text-muted';
-
-
-                    if (comment.deleted) {
-                        subtitle.textContent = `(삭제된 댓글입니다) ${comment.createdBy.name} (${comment.createdAt})`;
-                    } else {
-                        activeCommentsCount++; // 활성 댓글 수 증가
-                        subtitle.textContent = `${comment.createdBy.name} (${comment.createdAt})`;
-                    }
+                const subtitle = document.createElement('h6');
+                subtitle.className = 'card-subtitle mb-1 text-muted';
 
 
-
-                    const commentText = document.createElement('p');
-                    commentText.className = 'card-text';
-                    commentText.id = `comment-content-${comment.id}`;
-                    commentText.appendChild(document.createTextNode(comment.content)); // XSS 방지
+                if (comment.deleted) {
+                    subtitle.textContent = `(삭제된 댓글입니다) ${comment.createdBy.name} (${comment.createdAt})`;
+                } else {
+                    activeCommentsCount++; // 활성 댓글 수 증가
+                    subtitle.textContent = `${comment.createdBy.name} (${comment.createdAt})`;
+                }
 
 
 
-                    cardBody.appendChild(subtitle);
-                    cardBody.appendChild(commentText);
-                    // 현재 사용자가 댓글 작성자인 경우 수정/삭제 버튼 추가
-                    if (comment.createdBy.email === currentUserEmail && !comment.deleted) {
-                        const editButton = document.createElement('button');
-                        editButton.className = 'btn btn-sm btn-success';
-                        editButton.textContent = '수정';
-                        editButton.setAttribute('onclick', `editCommentForm('${comment.id}', '${comment.createdBy.name} (${comment.createdAt})')`);
+                const commentText = document.createElement('p');
+                commentText.className = 'card-text';
+                commentText.id = `comment-content-${comment.id}`;
+                commentText.appendChild(document.createTextNode(comment.content)); // XSS 방지
 
-                        const deleteButton = document.createElement('button');
-                        deleteButton.className = 'btn btn-sm btn-danger';
-                        deleteButton.textContent = '삭제';
-                        deleteButton.setAttribute('onclick', `deleteComment(${comment.id})`);
 
-                        cardBody.appendChild(editButton);
-                        cardBody.appendChild(deleteButton);
-                    }
 
-                    commentElement.appendChild(cardBody);
-                    return commentElement.outerHTML;
+                cardBody.appendChild(subtitle);
+                cardBody.appendChild(commentText);
+                // 현재 사용자가 댓글 작성자인 경우 수정/삭제 버튼 추가
+                if (comment.createdBy.email === currentUserEmail && !comment.deleted) {
+                    const editButton = document.createElement('button');
+                    editButton.className = 'btn btn-sm btn-success';
+                    editButton.textContent = '수정';
+                    editButton.setAttribute('onclick', `editCommentForm('${comment.id}', '${comment.createdBy.name} (${comment.createdAt})')`);
 
-                }).join('');
-                document.getElementById('comment-count').textContent = `(${data.data.totalElements})`; // 활성 댓글 수 업데이트
-                document.getElementById('comments-list').innerHTML = commentsHtml;
-            })
-            .catch(error => {
-                console.error('Error loading comments:', error);
-            });
-    }
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'btn btn-sm btn-danger';
+                    deleteButton.textContent = '삭제';
+                    deleteButton.setAttribute('onclick', `deleteComment(${comment.id})`);
+
+                    cardBody.appendChild(editButton);
+                    cardBody.appendChild(deleteButton);
+                }
+
+                commentElement.appendChild(cardBody);
+                return commentElement.outerHTML;
+
+            }).join('');
+            document.getElementById('comment-count').textContent = `(${data.data.totalElements})`; // 활성 댓글 수 업데이트
+            document.getElementById('comments-list').innerHTML = commentsHtml;
+        })
+        .catch(error => {
+            console.error('Error loading comments:', error);
+        });
+}
 
 // 댓글 작성
 async function saveComment() {

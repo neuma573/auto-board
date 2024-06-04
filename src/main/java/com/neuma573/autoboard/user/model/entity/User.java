@@ -19,7 +19,7 @@ import java.util.Set;
 @Getter
 @Audited
 @Entity
-@Table(name = "user", indexes = {@Index(name = "idx_user_email", columnList = "email", unique = true)})
+@Table(name = "users", indexes = {@Index(name = "idx_user_email", columnList = "email", unique = true)})
 public class User extends BaseEntity {
 
     @Id

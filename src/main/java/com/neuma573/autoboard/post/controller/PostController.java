@@ -6,10 +6,7 @@ import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.post.model.annotation.CheckPostAccess;
-import com.neuma573.autoboard.post.model.dto.PostModifyRequest;
-import com.neuma573.autoboard.post.model.dto.PostPermissionResponse;
-import com.neuma573.autoboard.post.model.dto.PostRequest;
-import com.neuma573.autoboard.post.model.dto.PostResponse;
+import com.neuma573.autoboard.post.model.dto.*;
 import com.neuma573.autoboard.post.model.enums.PostAction;
 import com.neuma573.autoboard.post.service.PostService;
 import com.neuma573.autoboard.security.utils.JwtProvider;
@@ -40,7 +37,7 @@ public class PostController {
 
     @CheckBoardAccess(action = BoardAction.READ)
     @GetMapping("/list")
-    public ResponseEntity<Response<Page<PostResponse>>> getPostList(
+    public ResponseEntity<Response<Page<PostListResponse>>> getPostList(
             @RequestParam(name = "boardId") Long boardId,
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
@@ -61,7 +58,7 @@ public class PostController {
             @Valid @RequestBody PostRequest postRequest,
             HttpServletRequest httpServletRequest) {
         Long userId = jwtProvider.parseUserId(httpServletRequest);
-        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(postService.savePost(userId, postRequest)));
+        return ResponseEntity.created(URI.create("/main")).body(responseUtils.created(postService.generatePost(userId, postRequest)));
     }
 
     @CheckPostAccess(action = PostAction.READ)
