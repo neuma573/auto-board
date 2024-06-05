@@ -87,4 +87,8 @@ public class Post extends BaseEntity {
         return content != null && content.contains("<img");
     }
 
+    public boolean hasVideo() {
+        return content != null && content.contains("<oembed");
+    }
+
 }
