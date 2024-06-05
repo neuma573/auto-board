@@ -15,14 +15,19 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static java.util.spi.ToolProvider.findFirst;
 
 @Aspect
 @RequiredArgsConstructor
@@ -87,7 +92,20 @@ public class PostAccessAspect {
                         }
                     });
         }
-
+        if (postId.get() == -1L) {
+            Parameter[] parameters = joinPoint.getSignature().getDeclaringType().getDeclaredMethods()[0].getParameters();
+            Arrays.stream(parameters)
+                    .flatMap(parameter -> Arrays.stream(parameter.getAnnotations())
+                            .filter(annotation -> annotation instanceof PathVariable)
+                            .map(annotation -> parameter))
+                    .forEach(parameter -> {
+                        int index = Arrays.asList(parameters).indexOf(parameter);
+                        if (joinPoint.getArgs()[index] instanceof Long) {
+                            postId.set((Long) joinPoint.getArgs()[index]);
+                            boardId.set(postService.findBoardIdByPostId(postId.get()));
+                        }
+                    });
+        }
 
         switch (action) {
             case READ -> {
