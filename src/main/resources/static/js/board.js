@@ -190,6 +190,14 @@ function updatePostsTable(posts) {
                 titleCell.appendChild(imageIcon);
             }
 
+            if (post.hasVideo) {
+                const imageIcon = document.createElement('img');
+                imageIcon.src = '/images/video.svg';
+                imageIcon.alt = 'Image';
+                imageIcon.className = 'image-icon';
+                titleCell.appendChild(imageIcon);
+            }
+
             authorCell.textContent = post.userName;
             dateCell.textContent = getFormattedCreatedAt(post.createdAt);
             viewsCell.textContent = post.views;
@@ -234,6 +242,15 @@ function updateMobilePostsList(posts) {
                     imageIcon.className = 'image-icon';
                     postTitleLink.appendChild(imageIcon);
                 }
+
+                if (post.hasVideo) {
+                    const imageIcon = document.createElement('img');
+                    imageIcon.src = '/images/video.svg';
+                    imageIcon.alt = 'Image';
+                    imageIcon.className = 'image-icon';
+                    postTitleLink.appendChild(imageIcon);
+                }
+
             }
 
             if (post.commentCount !== 0) {
