@@ -357,3 +357,7 @@ small, .small {
     width: 20px;
     vertical-align: middle;
 }
+
+.ck.ck-editor__main > .ck-editor__editable.ck-editor__editable_inline  {
+    background-color: #495057;
+}
