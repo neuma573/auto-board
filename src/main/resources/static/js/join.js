@@ -85,3 +85,12 @@ async function checkEmail() {
     }
 }
 
+function validateRecaptcha(response) {
+    if (!response) {
+        alert('reCaptcha 챌린지를 수행해주세요');
+        grecaptcha.reset();
+        return false;
+    }
+    return true;
+}
+
