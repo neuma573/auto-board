@@ -24,6 +24,8 @@ public class PostListResponse {
 
     private boolean hasImages;
 
+    private boolean hasVideo;
+
     public static PostListResponse of(Post post) {
         return PostListResponse.builder()
                 .id(post.getId())
@@ -34,6 +36,7 @@ public class PostListResponse {
                 .commentCount(post.getActiveCommentCount())
                 .likeCount(post.getLikeCount())
                 .hasImages(post.hasImage())
+                .hasVideo(post.hasVideo())
                 .build();
     }
 }
