@@ -65,6 +65,7 @@ function showLoginAndJoinButtons() {
     document.getElementById('logoutButton').style.display = 'none';
     document.getElementById('loginButton').style.display = '';
     document.getElementById('joinButton').style.display = '';
+    document.getElementById('loginButton').href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
 }
 
 async function checkAndRefreshToken() {
@@ -73,9 +74,8 @@ async function checkAndRefreshToken() {
     if ( !(await verifyToken(accessToken))) {
         const isRefreshed = await refreshAccessToken();
         if (!isRefreshed) {
-            deleteToken()
-            alert('세션이 만료되어 로그아웃됩니다.');
-            window.location.href = '/login'; // 로그인 페이지로 리다이렉션
+            deleteToken();
+            window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`; // 로그인 페이지로 리다이렉션
         }
     }
 }
@@ -132,7 +132,6 @@ async function logout() {
         });
 
         if (response.status === 401 || response.status === 500 || response.ok) {
-            alert("로그아웃 되었습니다");
             deleteToken();
             location.reload();
         }
