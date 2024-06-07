@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    initializePost();
     checkPermission();
 
     const modifyButton = document.getElementById('modify');
@@ -11,48 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
             commentForm.style.display = 'none';
         }
     }
-
 });
 
-async function initializePost() {
-    showSpinner();
-    if (!postId) {
-        console.error("No post ID found");
-        return;
-    }
-
-    try {
-        const response = await fetch(`/api/v1/post?postId=${postId}`);
-        const data = await response.json();
-
-        if (response.ok) {
-            updatePostContent(data.data);
-        } else {
-            throw new Error(data.message || "Failed to load post");
-
-        }
-    } catch (error) {
-        hideSpinner();
-        alert('접근할 수 없는 게시글입니다.');
-        location.href = '/';
-
-    }
-}
-
-function updatePostContent(postData) {
-    document.getElementById("title").textContent = postData.title;
-    document.getElementById("user").textContent = postData.userResponse.name;
-    document.getElementById("views").textContent = `조회 ${postData.views}`;
-    document.getElementById('ratingUp').innerText = postData.likeCount;
-    document.getElementById("content").innerHTML = postData.content;
-
-
-    const postDateElement = document.querySelector(".post-info time");
-    postDateElement.textContent = `작성일 ${postData.createdAt}`;
-    postDateElement.setAttribute("datetime", postData.createdAt);
-    document.title = postData.title;
-    hideSpinner();
-}
 function checkPermission() {
     fetch('/api/v1/post/permission?postId=' + postId)
         .then(response => {
@@ -84,7 +43,7 @@ function toggleButton(buttonId, isVisible) {
 async function deletePost() {
 
     if (confirm("이 게시글을 삭제하시겠습니까?")) { // 사용자에게 삭제 확인 요청
-
+        await checkAndRefreshToken();
         const recaptchaToken = await executeRecaptchaV3('post_delete');
 
         fetch('/api/v1/post?postId=' + postId, {
@@ -111,6 +70,7 @@ async function deletePost() {
 async function toggleLike(event) {
     showSpinner();
     event.preventDefault();
+    await checkAndRefreshToken();
     const recaptchaToken = await executeRecaptchaV3('post_like');
 
     fetch('/api/v1/like/' + postId, {
