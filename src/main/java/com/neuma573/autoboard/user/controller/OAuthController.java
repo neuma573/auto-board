@@ -55,6 +55,7 @@ public class OAuthController {
         return handleLoginAndRedirect(
                 naverUserResponse.getId(),
                 naverUserResponse.getEmail(),
+                state,
                 AuthenticationProviderType.NAVER,
                 httpServletResponse,
                 httpServletRequest
@@ -64,6 +65,7 @@ public class OAuthController {
     @GetMapping("/google/callback")
     public ResponseEntity<Void> getGoogleOAuthCallback(
             @RequestParam(value = "code") String code,
+            @RequestParam(value = "state", required = false) String state,
             HttpServletResponse httpServletResponse,
             HttpServletRequest httpServletRequest
     )
@@ -72,6 +74,7 @@ public class OAuthController {
         return handleLoginAndRedirect(
                 googleUserResponse.getId(),
                 googleUserResponse.getEmail(),
+                state,
                 AuthenticationProviderType.GOOGLE,
                 httpServletResponse,
                 httpServletRequest
@@ -86,6 +89,7 @@ public class OAuthController {
     private ResponseEntity<Void> handleLoginAndRedirect(
             String providerId,
             String email,
+            String redirectUrl,
             AuthenticationProviderType authenticationProviderType,
             HttpServletResponse httpServletResponse,
             HttpServletRequest httpServletRequest
@@ -104,7 +108,11 @@ public class OAuthController {
                     user
             );
             AccessTokenResponse accessTokenResponse = jwtProvider.createJwt(httpServletResponse, user.getId());
-            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create("/oauth-redirect?token=" + accessTokenResponse.getAccessToken() + "&email=" + email)).build();
+            String finalRedirectUrl = "/oauth-redirect?token=" + accessTokenResponse.getAccessToken() + "&email=" + email;
+            if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                finalRedirectUrl += "&redirect=" + URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8);
+            }
+            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(finalRedirectUrl)).build();
         }
     }
 }
