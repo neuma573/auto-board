@@ -5,7 +5,6 @@ import com.neuma573.autoboard.board.model.dto.BoardResponse;
 import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.global.utils.RequestUtils;
-import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.post.model.annotation.CheckPostAccess;
 import com.neuma573.autoboard.post.model.dto.PostResponse;
 import com.neuma573.autoboard.post.model.enums.PostAction;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Slf4j
@@ -50,7 +47,7 @@ public class MvcController {
     private String domain;
 
     @GetMapping("/login")
-    public ModelAndView showLoginForm(@RequestParam(value = "redirect", required = false) String redirectUrl) throws UnsupportedEncodingException {
+    public ModelAndView showLoginForm(@RequestParam(value = "redirect", required = false) String redirectUrl) {
         ModelAndView modelAndView = new ModelAndView("login");
         modelAndView.addObject("naverClientId", naverOAuthClientId);
         modelAndView.addObject("googleClientId", googleOAuthClientId);

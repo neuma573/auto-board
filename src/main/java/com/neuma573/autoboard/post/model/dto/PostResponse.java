@@ -1,7 +1,6 @@
 package com.neuma573.autoboard.post.model.dto;
 
 import com.neuma573.autoboard.post.model.entity.Post;
-import com.neuma573.autoboard.user.model.dto.UserResponse;
 import lombok.*;
 
 @Builder
