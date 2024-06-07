@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let email = document.getElementById('email').value;
         let password = document.getElementById('password').value;
         const recaptchaResponse = document.getElementById('g-recaptcha-response').value;
+        const redirectUrl = document.querySelector('input[name="redirect"]').value;
         if(recaptchaResponse === null || recaptchaResponse === '') {
             alert('reCaptcha 챌린지를 수행해주세요');
             hideSpinner();
@@ -32,7 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Success:', data);
                 localStorage.setItem("user", btoa(email));
                 localStorage.setItem("accessToken", data.data.accessToken);
-                window.location.href = "/";
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = "/";
+                }
             })
             .catch((error) => {
                 error.json().then(errMessage => {
