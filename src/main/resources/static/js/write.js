@@ -99,7 +99,7 @@ async function updatePost(postData) {
         throw new Error('Failed to update post');
     }
     hideSpinner();
-    window.location.href = '/';
+    window.location.href = '/post?postId=' + postData.postId;
     return true;
 }
 
@@ -130,6 +130,6 @@ async function submitPost(postData) {
         throw new Error('Failed to submit post');
     }
     hideSpinner();
-    window.location.href = '/';
-    return response.json();
+    const responseData = await response.json();
+    window.location.href = `/post?postId=${responseData.data.id}`;
 }
