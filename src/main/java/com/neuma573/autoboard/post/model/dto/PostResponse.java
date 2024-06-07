@@ -10,7 +10,7 @@ public class PostResponse {
 
     private Long id;
 
-    private UserResponse userResponse;
+    private String createdBy;
 
     private String title;
 
@@ -30,7 +30,7 @@ public class PostResponse {
     public static PostResponse of(Post post) {
        return PostResponse.builder()
                 .id(post.getId())
-                .userResponse(UserResponse.of(post.getCreatedBy()))
+                .createdBy(post.getCreatedBy().getName())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .views(post.getViews())
