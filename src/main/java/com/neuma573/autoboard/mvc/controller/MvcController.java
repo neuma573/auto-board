@@ -4,6 +4,12 @@ import com.neuma573.autoboard.board.model.annotation.CheckBoardAccess;
 import com.neuma573.autoboard.board.model.dto.BoardResponse;
 import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.board.service.BoardService;
+import com.neuma573.autoboard.global.utils.RequestUtils;
+import com.neuma573.autoboard.global.utils.ResponseUtils;
+import com.neuma573.autoboard.post.model.annotation.CheckPostAccess;
+import com.neuma573.autoboard.post.model.dto.PostResponse;
+import com.neuma573.autoboard.post.model.enums.PostAction;
+import com.neuma573.autoboard.post.service.PostService;
 import com.neuma573.autoboard.security.utils.JwtProvider;
 import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.service.UserService;
@@ -16,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -31,6 +38,8 @@ public class MvcController {
 
     private final JwtProvider jwtProvider;
 
+    private final PostService postService;
+
     @Value("${app.oauth2.naver.client-id}")
     private String naverOAuthClientId;
 
@@ -41,12 +50,12 @@ public class MvcController {
     private String domain;
 
     @GetMapping("/login")
-    public ModelAndView showLoginForm() {
+    public ModelAndView showLoginForm(@RequestParam(value = "redirect", required = false) String redirectUrl) throws UnsupportedEncodingException {
         ModelAndView modelAndView = new ModelAndView("login");
         modelAndView.addObject("naverClientId", naverOAuthClientId);
         modelAndView.addObject("googleClientId", googleOAuthClientId);
         modelAndView.addObject("domain", domain);
-        modelAndView.addObject("state", URLEncoder.encode(UUID.randomUUID().toString(), StandardCharsets.UTF_8));
+        modelAndView.addObject("state", redirectUrl != null ? redirectUrl : '/');
 
         return modelAndView;
     }
@@ -81,9 +90,14 @@ public class MvcController {
         return modelAndView;
     }
 
+    @CheckPostAccess(action = PostAction.READ)
+    @CheckBoardAccess(action = BoardAction.READ)
     @GetMapping("/post")
-    public ModelAndView showPost(@RequestParam(name = "postId") Long postId ) {
+    public ModelAndView showPost(@RequestParam(name = "postId") Long postId, HttpServletRequest httpServletRequest) {
         ModelAndView modelAndView = new ModelAndView("post");
+        String ipAddress = RequestUtils.getClientIpAddress(httpServletRequest);
+        PostResponse postResponse = postService.getPost(ipAddress, postId);
+        modelAndView.addObject("postResponse", postResponse);
         modelAndView.addObject("postId", postId);
         return modelAndView;
     }
@@ -100,11 +114,15 @@ public class MvcController {
     @GetMapping("/oauth-redirect")
     public ModelAndView oauthRedirect(
             @RequestParam(name = "token") String token,
-            @RequestParam(name = "email") String email
+            @RequestParam(name = "email") String email,
+            @RequestParam(value = "redirect", required = false) String redirectUrl
     ) {
         ModelAndView modelAndView = new ModelAndView("oauth_redirect");
         modelAndView.addObject("token", token);
         modelAndView.addObject("email", email);
+        if (redirectUrl != null) {
+            modelAndView.addObject("redirectUrl", redirectUrl);
+        }
         return modelAndView;
     }
 

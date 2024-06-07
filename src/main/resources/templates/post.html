@@ -1,35 +1,34 @@
 <!DOCTYPE html>
 <html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
-<title>게시글</title>
+<title>[[${postResponse.title}]]</title>
 <body>
 <div th:fragment="content">
   <script th:inline="javascript">
     /*<![CDATA[*/
-    let postId = [[${postId}]];
+    let postId = [[${postResponse.id}]];
     /*]]>*/
   </script>
   <div class="container mt-5">
     <article class="post-card">
       <header class="post-card-header">
-        <span id="title" class="post-title"></span>
+        <span id="title" class="post-title">[[${postResponse.title}]]</span>
         <div class="user-info post-meta">
-          <a href="#"><span id="user" class="post-user"></span></a>
+          <a href="#"><span id="user" class="post-user">[[${postResponse.createdBy}]]</span></a>
         </div>
         <div class="post-meta">
           <div class="post-info">
-            <span id="views" class="post-views"></span> |
-            <time datetime="2024-01-23T04:22:56"></time>
+            <span id="views" class="post-views">[[${postResponse.views}]]</span> |
+            <time datetime="2024-01-23T04:22:56">[[${postResponse.createdAt}]]</time>
           </div>
         </div>
       </header>
-      <section id="content" class="post-content">
-        <p></p>
+      <section id="content" class="post-content" th:utext="${postResponse.content}">
       </section>
       <div class="vote-area" id="vote">
         <form class="itemForm" id="rateUpForm">
           <button class="item unusable" id="rateUp" onclick="toggleLike(event)">
             추천! <br>
-            <small><span id="ratingUp">0</span></small>
+            <small><span id="ratingUp">[[${postResponse.likeCount}]]</span></small>
           </button>
         </form>
       </div>
