@@ -11,11 +11,16 @@
     // 서버에서 전달된 토큰을 로컬 스토리지에 저장
     let token = `'[[${token}]]'`;
     let email = `'[[${email}]]'`;
+    let redirectUrl = `[[${redirectUrl}]]`;
 
     if (oauthLogin(token)) {
       localStorage.setItem("user", btoa(email.replaceAll(`'`, '')));
       localStorage.setItem("accessToken", token);
-      window.location.href = "/";
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        window.location.href = "/";
+      }
     } else {
       alert('로그인 중 오류가 발생했습니다.')
       window.location.href = "/";
