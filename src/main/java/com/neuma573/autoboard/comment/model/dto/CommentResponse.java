@@ -16,17 +16,13 @@ public class CommentResponse {
 
     private boolean isDeleted;
 
-    private CommentResponse parent;
+    private Long childCount;
 
 
     public static CommentResponse of(Comment comment) {
 
-        CommentResponse parentResponse = comment.getParentComment() != null
-                ? CommentResponse.of(comment.getParentComment())
-                : null;
 
         UserResponse userResponse = UserResponse.builder()
-                .id(comment.getCreatedBy().getId())
                 .email(comment.getCreatedBy().getEmail())
                 .name(comment.getCreatedBy().getName())
                 .build();
@@ -36,9 +32,8 @@ public class CommentResponse {
                 .content(comment.getContent())
                 .createdBy(userResponse)
                 .createdAt(comment.getFormattedCreatedAt())
-                .parent(parentResponse)
                 .isDeleted(comment.isDeleted())
+                .childCount(comment.getReplies() == null ? 0 : (long) comment.getActiveReplies().size())
                 .build();
-
     }
 }
