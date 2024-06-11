@@ -319,12 +319,11 @@ async function submitReply(postId, parentId, content) {
 }
 
 function loadReply(commentId, lastCommentId) {
-    showSpinner();
     if (document.querySelector('div[data-comment-id="' + commentId + '"]').innerHTML.trim() !== "" && lastCommentId === undefined) {
         document.querySelector('div[data-comment-id="' + commentId + '"]').innerHTML = '';
         return;
     }
-
+    showSpinner();
     let fetchUrl = `/api/v1/comment/replies?commentId=${commentId}`;
 
     const loadMoreElement = document.getElementById('loadMore' + commentId);
