@@ -46,6 +46,12 @@ public class Comment extends BaseEntity {
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
     private List<Comment> replies;
 
+    public List<Comment> getActiveReplies() {
+        return replies.stream()
+                .filter(reply -> !reply.isDeleted)
+                .toList();
+    }
+
     private boolean isDeleted;
 
     @Override

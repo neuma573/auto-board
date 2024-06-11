@@ -4,6 +4,7 @@ import com.neuma573.autoboard.comment.model.annotation.CheckCommentAccess;
 import com.neuma573.autoboard.comment.model.dto.CommentModifyRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentRequest;
 import com.neuma573.autoboard.comment.model.dto.CommentResponse;
+import com.neuma573.autoboard.comment.model.dto.RepliesResponse;
 import com.neuma573.autoboard.comment.model.enums.CommentAction;
 import com.neuma573.autoboard.comment.service.CommentService;
 import com.neuma573.autoboard.global.model.dto.Response;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 
 @RequestMapping("/api/v1/comment")
@@ -58,6 +60,25 @@ public class CommentController {
         page = Math.max(page - 1, 0);
         Pageable pageable = PageRequest.of(page, 20, Sort.by(direction, "createdAt"));
         return ResponseEntity.ok().body(responseUtils.success(commentService.getCommentList(postId, pageable, userId)));
+    }
+
+    @CheckPostAccess(action = PostAction.READ)
+    @GetMapping("/replies")
+    public ResponseEntity<Response<RepliesResponse>> getRepliesList(
+            @RequestParam(name = "commentId") Long parentId,
+            @RequestParam(name = "lastCommentId", defaultValue = "0") Long lastCommentId,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        final int LOAD_SIZE = 10;
+
+        List<CommentResponse> replies = commentService.getReplies(parentId, lastCommentId, page, LOAD_SIZE);
+        boolean hasMore = replies.size() == LOAD_SIZE && commentService.hasMoreReplies(parentId, replies.get(replies.size() - 1).getId());
+        return ResponseEntity.ok().body(responseUtils.success(
+                RepliesResponse.builder()
+                        .replies(replies)
+                        .hasMore(hasMore)
+                        .build()
+        ));
     }
 
     @CheckPostAccess(action = PostAction.READ)

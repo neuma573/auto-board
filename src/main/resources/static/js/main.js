@@ -16,7 +16,6 @@ document.querySelector('.navbar-brand').addEventListener('click', function() {
     }
 });
 
-
 async function executeRecaptchaV3(action) {
     return new Promise((resolve, reject) => {
         grecaptcha.ready(async () => {
@@ -30,7 +29,6 @@ async function executeRecaptchaV3(action) {
     });
 }
 
-
 function checkLoginStatus() {
     const accessToken = getToken();
     if (accessToken != null) {
@@ -40,10 +38,13 @@ function checkLoginStatus() {
                 hideLoginAndJoinButtons();
             } else {
                 // Token is invalid or expired
-                refreshAccessToken().then(() => {
-                    hideLoginAndJoinButtons();
+                refreshAccessToken().then(isRefreshed => {
+                    if (isRefreshed) {
+                        hideLoginAndJoinButtons();
+                    } else {
+                        showLoginAndJoinButtons();
+                    }
                 }).catch(() => {
-                    // Handle error, for example, by redirecting to login page
                     showLoginAndJoinButtons();
                 });
             }
@@ -106,11 +107,9 @@ async function refreshAccessToken() {
     try {
         const response = await fetch('/api/v1/auth/refresh/token', {
             method: 'PUT',
-            // Add necessary headers, credentials, or other configurations
         });
         const data = await response.json();
         if (data.status === 200) {
-            // Update the token in the client
             setToken(data.data.accessToken);
             return true;
         } else {
