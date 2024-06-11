@@ -10,6 +10,7 @@
 
     <body>
         <div th:fragment="content" class="container mt-5">
+            <input type="hidden" th:name="redirect" th:value="${state}" />
             <div class="row">
                 <div class="col-md-6 offset-md-3">
                     <div class="card text-white">
