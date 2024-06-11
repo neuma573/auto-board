@@ -8,7 +8,12 @@ import org.springframework.data.repository.history.RevisionRepository;
 
 public interface CommentRepository extends JpaRepository<Comment, Long>, RevisionRepository<Comment, Long, Long> {
 
-    Page<Comment> findAllByPostId(Long postId, Pageable pageable);
+    Page<Comment> findAllByPostIdAndParentCommentIsNull(Long postId, Pageable pageable);
 
-    Page<Comment> findAllByPostIdAndIsDeletedFalse(Long postId, Pageable pageable);
+    Page<Comment> findAllByPostIdAndIsDeletedFalseAndParentCommentIsNull(Long postId, Pageable pageable);
+
+    Page<Comment> findByParentCommentIdAndIsDeletedFalseAndIdGreaterThanOrderByIdAsc(Long parentCommentId, Long lastCommentId, Pageable pageable);
+
+    long countByParentCommentIdAndIsDeletedFalseAndIdGreaterThan(Long parentCommentId, Long lastCommentId);
+
 }
