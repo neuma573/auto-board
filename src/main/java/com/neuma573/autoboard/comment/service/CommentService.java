@@ -15,13 +15,15 @@ import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,10 +47,7 @@ public class CommentService {
         Post parentPost = postService.getPostById(commentRequest.getPostId());
         User createdBy = userService.getUserById(userId);
 
-        Comment parentComment = null;
-        if (commentRequest.getParentId() != null) {
-            parentComment = getCommentById(commentRequest.getParentId());
-        }
+        Comment parentComment = validateParentComment(commentRequest.getParentId());
 
         return CommentResponse.of(commentRepository.save(commentRequest.toEntity(parentPost, createdBy, parentComment)));
     }
@@ -59,8 +58,8 @@ public class CommentService {
         User user = userService.getUserByIdSafely(userId);
 
         Page<Comment> comments = (user != null && userService.isAdmin(user))
-                ? commentRepository.findAllByPostId(postId, pageable)
-                : commentRepository.findAllByPostIdAndIsDeletedFalse(postId, pageable);
+                ? commentRepository.findAllByPostIdAndParentCommentIsNull(postId, pageable)
+                : commentRepository.findAllByPostIdAndIsDeletedFalseAndParentCommentIsNull(postId, pageable);
 
         return comments.map(CommentResponse::of);
     }
@@ -114,6 +113,33 @@ public class CommentService {
     @Transactional
     public boolean isCreatedBy(Long userId, Comment comment) {
         return Objects.equals(userId, comment.getCreatedBy().getId());
+    }
+
+    @Transactional
+    public Comment validateParentComment(Long parentId) {
+        if (parentId == null) {
+            return null;
+        }
+
+        Comment parentComment = getCommentById(parentId);
+        if (parentComment.getParentComment() != null) {
+            throw new IllegalArgumentException("대댓글에 대댓글을 작성할 수 없습니다");
+        }
+
+        return parentComment;
+    }
+
+    @Transactional
+    public List<CommentResponse> getReplies(Long parentCommentId, Long lastCommentId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Comment> repliesPage = commentRepository.findByParentCommentIdAndIsDeletedFalseAndIdGreaterThanOrderByIdAsc(parentCommentId, lastCommentId, pageable);
+        List<Comment> replies = repliesPage.getContent();
+        return replies.stream().map(CommentResponse::of).collect(Collectors.toList());
+    }
+
+    public boolean hasMoreReplies(Long parentCommentId, Long lastCommentId) {
+        long remainingReplies = commentRepository.countByParentCommentIdAndIsDeletedFalseAndIdGreaterThan(parentCommentId, lastCommentId);
+        return remainingReplies > 0;
     }
 
 }
