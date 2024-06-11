@@ -361,3 +361,18 @@ small, .small {
 .ck.ck-editor__main > .ck-editor__editable.ck-editor__editable_inline  {
     background-color: #495057;
 }
+
+.reply-form {
+    margin-left: 30px;
+    margin-bottom: 10px;
+}
+
+.reply-card {
+    margin-left: 20px;
+}
+
+.reply-text {
+    vertical-align: middle;
+    color: rgb(40, 167, 69);
+    margin-left: 10px;
+}
