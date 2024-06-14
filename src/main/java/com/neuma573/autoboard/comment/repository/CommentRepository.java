@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.history.RevisionRepository;
 
+import java.util.List;
+
 public interface CommentRepository extends JpaRepository<Comment, Long>, RevisionRepository<Comment, Long, Long> {
 
     Page<Comment> findAllByPostIdAndParentCommentIsNull(Long postId, Pageable pageable);
@@ -15,5 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Revisio
     Page<Comment> findByParentCommentIdAndIsDeletedFalseAndIdGreaterThanOrderByIdAsc(Long parentCommentId, Long lastCommentId, Pageable pageable);
 
     long countByParentCommentIdAndIsDeletedFalseAndIdGreaterThan(Long parentCommentId, Long lastCommentId);
+
+    Page<Comment> findByParentCommentIdAndIsDeletedFalseOrderByIdAsc(Long parentCommentId, Pageable pageable);
 
 }

@@ -66,12 +66,11 @@ public class CommentController {
     @GetMapping("/replies")
     public ResponseEntity<Response<RepliesResponse>> getRepliesList(
             @RequestParam(name = "commentId") Long parentId,
-            @RequestParam(name = "lastCommentId", defaultValue = "0") Long lastCommentId,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(name = "lastCommentId", defaultValue = "0") Long lastCommentId
     ) {
         final int LOAD_SIZE = 10;
 
-        List<CommentResponse> replies = commentService.getReplies(parentId, lastCommentId, page, LOAD_SIZE);
+        List<CommentResponse> replies = commentService.getReplies(parentId, lastCommentId, LOAD_SIZE);
         boolean hasMore = replies.size() == LOAD_SIZE && commentService.hasMoreReplies(parentId, replies.get(replies.size() - 1).getId());
         return ResponseEntity.ok().body(responseUtils.success(
                 RepliesResponse.builder()

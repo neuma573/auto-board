@@ -130,10 +130,14 @@ public class CommentService {
     }
 
     @Transactional
-    public List<CommentResponse> getReplies(Long parentCommentId, Long lastCommentId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Comment> repliesPage = commentRepository.findByParentCommentIdAndIsDeletedFalseAndIdGreaterThanOrderByIdAsc(parentCommentId, lastCommentId, pageable);
-        List<Comment> replies = repliesPage.getContent();
+    public List<CommentResponse> getReplies(Long parentCommentId, Long lastCommentId, int size) {
+        List<Comment> replies;
+
+        if (lastCommentId == 0) {
+            replies = commentRepository.findByParentCommentIdAndIsDeletedFalseOrderByIdAsc(parentCommentId, Pageable.ofSize(10)).getContent();
+        } else {
+            replies = commentRepository.findByParentCommentIdAndIsDeletedFalseAndIdGreaterThanOrderByIdAsc(parentCommentId, lastCommentId, PageRequest.of(0, size)).getContent();
+        }
         return replies.stream().map(CommentResponse::of).collect(Collectors.toList());
     }
 
