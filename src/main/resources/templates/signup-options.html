@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>회원가입</title>
+</head>
+<body>
+<div th:fragment="content">
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <div class="card text-white">
+          <div class="card-body">
+            <h5 class="card-title">회원가입</h5>
+            <p>소셜 회원가입 방식을 선택하세요:</p>
+
+            <!-- 소셜 회원가입 버튼들 -->
+            <div class="oauth-container">
+              <a th:href="@{https://nid.naver.com/oauth2.0/authorize(response_type='code', client_id=${naverClientId}, redirect_uri=${domain} + '/api/v1/oauth2/naver/callback', state=${state})}">
+                <img class="oauth-btn" src="/images/naver_oauth.png" alt="Naver OAuth Login"/>
+              </a>
+              <a th:href="@{https://accounts.google.com/o/oauth2/v2/auth(scope='https://www.googleapis.com/auth/userinfo.email',access_type='offline', include_granted_scopes='true',  response_type='code', state=${state},  redirect_uri=${domain} + '/api/v1/oauth2/google/callback', client_id=${googleClientId})}">
+                <img class="oauth-btn" src="/images/google_oauth.png" alt="Google OAuth Login"/>
+              </a>
+              <!--                                <a th:href="@{https://accounts.google.com/o/oauth2/v2/auth(scope='https://www.googleapis.com/auth/userinfo.email',access_type='offline', include_granted_scopes='true',  response_type='code', state=${state},  redirect_uri=${domain} + '/api/v1/oauth2/google/callback', client_id=${googleClientId})}">-->
+              <!--                                    <img class="oauth-btn" src="/images/kakao_oauth.png" alt="Kakao OAuth Login"/>-->
+              <!--                                </a>-->
+            </div>
+
+            <p>또는 이메일로 회원가입:</p>
+
+            <!-- 이메일 회원가입 폼 -->
+            <a id="joinButton" class="nav-item nav-link btn btn-outline-success my-2 my-lg-0" href="/join" style="">회원가입</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
