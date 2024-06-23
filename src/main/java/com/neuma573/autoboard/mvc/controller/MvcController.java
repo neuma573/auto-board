@@ -4,6 +4,7 @@ import com.neuma573.autoboard.board.model.annotation.CheckBoardAccess;
 import com.neuma573.autoboard.board.model.dto.BoardResponse;
 import com.neuma573.autoboard.board.model.enums.BoardAction;
 import com.neuma573.autoboard.board.service.BoardService;
+import com.neuma573.autoboard.global.service.PolicyService;
 import com.neuma573.autoboard.global.utils.RequestUtils;
 import com.neuma573.autoboard.post.model.annotation.CheckPostAccess;
 import com.neuma573.autoboard.post.model.dto.PostResponse;
@@ -37,6 +38,8 @@ public class MvcController {
 
     private final PostService postService;
 
+    private final PolicyService policyService;
+
     @Value("${app.oauth2.naver.client-id}")
     private String naverOAuthClientId;
 
@@ -62,9 +65,25 @@ public class MvcController {
         return new ModelAndView("main");
     }
 
+    @GetMapping("/signup-options")
+    public ModelAndView showSignupOptions() {
+        ModelAndView modelAndView = new ModelAndView("signup-options");
+
+        modelAndView.addObject("naverClientId", naverOAuthClientId);
+        modelAndView.addObject("googleClientId", googleOAuthClientId);
+        modelAndView.addObject("domain", domain);
+        modelAndView.addObject("state", "/");
+
+        return modelAndView;
+    }
+
     @GetMapping("/join")
     public ModelAndView showJoin() {
-        return new ModelAndView("join");
+        ModelAndView modelAndView = new ModelAndView("join");
+        modelAndView.addObject("consentPolicy", policyService.getConsentPolicy());
+        modelAndView.addObject("termOfUse", policyService.getTermOfUse());
+
+        return modelAndView;
     }
 
     @CheckBoardAccess(action = BoardAction.READ)
