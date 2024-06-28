@@ -18,6 +18,13 @@ async function handleOAuthSignupSubmit(event) {
             hideSpinner();
             return;
         }
+
+        if (!validateTermCheckbox()) {
+            hideSpinner();
+            alert('약관에 동의해주세요');
+            return;
+        }
+
         const response = await fetch('/api/v1/oauth2/user', {
             method: 'POST',
             headers: {

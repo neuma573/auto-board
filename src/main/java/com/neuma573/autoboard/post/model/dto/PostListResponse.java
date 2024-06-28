@@ -26,6 +26,8 @@ public class PostListResponse {
 
     private boolean hasVideo;
 
+    private boolean isDeleted;
+
     public static PostListResponse of(Post post) {
         return PostListResponse.builder()
                 .id(post.getId())
@@ -37,6 +39,7 @@ public class PostListResponse {
                 .likeCount(post.getLikeCount())
                 .hasImages(post.hasImage())
                 .hasVideo(post.hasVideo())
+                .isDeleted(post.isDeleted())
                 .build();
     }
 }

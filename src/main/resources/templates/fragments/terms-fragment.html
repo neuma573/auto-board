@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>약관</title>
+</head>
+<body>
+<div th:fragment="termsContent">
+  <!-- 가입 약관 -->
+  <div class="mb-3">
+    <div class="policy-box" id="consentPolicy" th:utext="${consentPolicy.policy}">
+    </div>
+  </div>
+
+  <!-- 약관 동의 체크박스 -->
+  <div class="mb-3">
+    <label>
+      <input type="checkbox" id="consentPolicyCheckbox" name="consentPolicyTerms" disabled>
+      <span th:text="${consentPolicy.policyName} + '에 동의합니다.'"></span>
+    </label>
+  </div>
+
+  <!-- 가입 약관 -->
+  <div class="mb-3">
+    <div class="policy-box" id="termsOfUse" th:utext="${termOfUse.policy}">
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label>
+      <input type="checkbox" id="termOfUseCheckbox" name="termOfUseTerms" disabled>
+      <span th:text="${termOfUse.policyName} + '에 동의합니다.'"></span>
+    </label>
+  </div>
+  <script src="/js/term.js"></script>
+</div>
+</body>
+</html>

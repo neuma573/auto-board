@@ -1,5 +1,6 @@
 package com.neuma573.autoboard.security.controller;
 
+import com.neuma573.autoboard.global.service.PolicyService;
 import com.neuma573.autoboard.user.model.dto.ProviderUserResponse;
 import com.neuma573.autoboard.user.service.OAuthService;
 import com.neuma573.autoboard.user.service.UserService;
@@ -20,6 +21,8 @@ public class AuthMvcController {
 
     private final OAuthService oAuthService;
 
+    private final PolicyService policyService;
+
     @GetMapping("/verify")
     public String verifyAccount(@RequestParam("token") String token, RedirectAttributes redirectAttributes) {
         if (userService.activateUserAccount(token)) {
@@ -36,6 +39,9 @@ public class AuthMvcController {
     public ModelAndView showOAuthJoin(@RequestParam(value = "code") String uuid, RedirectAttributes redirectAttributes) {
         ModelAndView modelAndView = new ModelAndView("oauth_join");
         ProviderUserResponse providerUserResponse = oAuthService.getUserByUuid(uuid);
+
+        modelAndView.addObject("consentPolicy", policyService.getConsentPolicy());
+        modelAndView.addObject("termOfUse", policyService.getTermOfUse());
 
         if (providerUserResponse == null) {
             modelAndView.setViewName("redirect:/login");
