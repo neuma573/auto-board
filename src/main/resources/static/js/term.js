@@ -1,3 +1,7 @@
+function validateTermCheckbox() {
+    return document.getElementById('consentPolicyCheckbox').checked && document.getElementById('termOfUseCheckbox').checked;
+}
+
 function enableCheckboxOnScroll(policyBoxId, checkboxId) {
     const policyBox = document.getElementById(policyBoxId);
     const checkbox = document.getElementById(checkboxId);
