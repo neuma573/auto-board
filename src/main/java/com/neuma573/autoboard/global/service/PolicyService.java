@@ -21,17 +21,17 @@ public class PolicyService {
 
     @Transactional(readOnly = true)
     public PolicyResponse getTermOfUse() {
-        return PolicyResponse.of(policyRepository.findByPolicyName(TERM_OF_USE).orElseThrow(AccessDeniedException::new));
+        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(TERM_OF_USE).orElseThrow(AccessDeniedException::new));
     }
 
     @Transactional(readOnly = true)
     public PolicyResponse getPrivacyPolicy() {
-        return PolicyResponse.of(policyRepository.findByPolicyName(PRIVACY_POLICY).orElseThrow(AccessDeniedException::new));
+        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(PRIVACY_POLICY).orElseThrow(AccessDeniedException::new));
     }
 
     @Transactional(readOnly = true)
     public PolicyResponse getConsentPolicy() {
-        return PolicyResponse.of(policyRepository.findByPolicyName(CONSENT_TO_COLLECTION_AND_USE_OF_PERSONAL_INFORMATION).orElseThrow(AccessDeniedException::new));
+        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(CONSENT_TO_COLLECTION_AND_USE_OF_PERSONAL_INFORMATION).orElseThrow(AccessDeniedException::new));
     }
 
 }

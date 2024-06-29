@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface PolicyRepository extends JpaRepository<Policy, Long> {
 
-    Optional<Policy> findByPolicyName(String policyName);
+    Optional<Policy> findFirstByPolicyNameOrderByCreatedAtDesc(String policyName);
 }
