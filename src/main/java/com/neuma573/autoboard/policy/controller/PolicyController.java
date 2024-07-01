@@ -1,9 +1,9 @@
-package com.neuma573.autoboard.global.controller;
+package com.neuma573.autoboard.policy.controller;
 
-import com.neuma573.autoboard.global.model.dto.PolicyResponse;
+import com.neuma573.autoboard.policy.model.dto.PolicyResponse;
 import com.neuma573.autoboard.global.model.dto.Response;
-import com.neuma573.autoboard.global.service.PolicyService;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
+import com.neuma573.autoboard.policy.service.PolicyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

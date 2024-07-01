@@ -1,6 +1,6 @@
 package com.neuma573.autoboard.security.controller;
 
-import com.neuma573.autoboard.global.service.PolicyService;
+import com.neuma573.autoboard.policy.service.PolicyService;
 import com.neuma573.autoboard.user.model.dto.ProviderUserResponse;
 import com.neuma573.autoboard.user.service.OAuthService;
 import com.neuma573.autoboard.user.service.UserService;

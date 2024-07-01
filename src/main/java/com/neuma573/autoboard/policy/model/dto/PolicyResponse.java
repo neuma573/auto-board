@@ -1,6 +1,6 @@
-package com.neuma573.autoboard.global.model.dto;
+package com.neuma573.autoboard.policy.model.dto;
 
-import com.neuma573.autoboard.global.model.entity.Policy;
+import com.neuma573.autoboard.policy.model.entity.Policy;
 import lombok.Builder;
 import lombok.Getter;
 

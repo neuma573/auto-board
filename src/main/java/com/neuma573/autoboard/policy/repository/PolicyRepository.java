@@ -1,6 +1,6 @@
-package com.neuma573.autoboard.global.repository;
+package com.neuma573.autoboard.policy.repository;
 
-import com.neuma573.autoboard.global.model.entity.Policy;
+import com.neuma573.autoboard.policy.model.entity.Policy;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
