@@ -9,7 +9,6 @@ import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -24,12 +23,12 @@ public class LikeService {
 
     private final PostService postService;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public LikeResponse toggleLike(Long postId, Long userId) {
         User user = userService.getUserById(userId);
         Post post = postService.getPostById(postId);
 
-        Optional<Like> existingLike = likeRepository.findByCreatedByAndPost(user, post);
+        Optional<Like> existingLike = likeRepository.findByCreatedByAndPostForUpdate(user, post);
 
         if (existingLike.isPresent()) {
             likeRepository.delete(existingLike.get());
