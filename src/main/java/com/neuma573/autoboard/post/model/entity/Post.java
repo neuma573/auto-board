@@ -43,6 +43,7 @@ public class Post extends BaseEntity {
     @NotAudited
     private Long views;
 
+    @Builder.Default
     @NotAudited
     private Long likeCount = 0L;
 
@@ -53,6 +54,7 @@ public class Post extends BaseEntity {
     private List<Comment> comments;
 
     @NotAudited
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UploadedFile> uploadedFiles = new ArrayList<>();
 
