@@ -4,6 +4,8 @@ import com.neuma573.autoboard.email.model.dto.MailRequest;
 import com.neuma573.autoboard.email.service.MailService;
 import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.global.model.enums.Status;
+import com.neuma573.autoboard.policy.model.dto.PolicyAgreementRequest;
+import com.neuma573.autoboard.policy.service.PolicyService;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
 import com.neuma573.autoboard.user.model.dto.UserRequest;
@@ -33,6 +35,8 @@ public class UserService {
 
     private final MailService mailService;
 
+    private final PolicyService policyService;
+
     private final RedisTemplate<String, VerificationToken> verificationTokenRedisTemplate;
 
     @Transactional
@@ -48,15 +52,32 @@ public class UserService {
                 .user(user)
                 .build();
         user.addRole(role);
-        saveUser(user);
+        User savedUser = saveUser(user);
         saveUserRole(role);
         mailService.sendVerifyEmail(
                 MailRequest.builder()
-                        .to(user.getEmail())
-                        .name(user.getName())
-                        .verificationToken(generateVerificationToken(user))
+                        .to(savedUser.getEmail())
+                        .name(savedUser.getName())
+                        .verificationToken(generateVerificationToken(savedUser))
                 .build()
         );
+
+        Long consentPolicyId = policyService.getLatestPolicyId(PolicyService.CONSENT_AGREEMENT);
+        Long termsOfUsePolicyId = policyService.getLatestPolicyId(PolicyService.TERM_OF_USE);
+
+        PolicyAgreementRequest consentPolicyAgreement = PolicyAgreementRequest.builder()
+                .policyId(consentPolicyId)
+                .user(savedUser)
+                .build();
+
+        PolicyAgreementRequest termsOfUseAgreement = PolicyAgreementRequest.builder()
+                .policyId(termsOfUsePolicyId)
+                .user(savedUser)
+                .build();
+
+        policyService.submitPolicyAgreement(consentPolicyAgreement);
+        policyService.submitPolicyAgreement(termsOfUseAgreement);
+
         return UserResponse.of(user);
     }
 
