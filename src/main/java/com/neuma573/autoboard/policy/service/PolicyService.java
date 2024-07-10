@@ -62,6 +62,4 @@ public class PolicyService {
 
         return PolicyAgreementResponse.of(policyAgreement);
     }
-
-
 }
