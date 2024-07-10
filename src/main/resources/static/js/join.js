@@ -24,7 +24,8 @@ async function handleSignupSubmit(event) {
             alert('약관에 동의해주세요');
             return;
         }
-
+        const agreeToConsentPolicy = document.getElementById("consentPolicyCheckbox").checked
+        const agreeToTermOfUse = document.getElementById("termOfUseCheckbox").checked
         const response = await fetch('/api/v1/users', {
             method: 'POST',
             headers: {
@@ -33,7 +34,7 @@ async function handleSignupSubmit(event) {
                 'Action-Name': 'signup',
                 'Recaptcha-version': 'v2'
             },
-            body: JSON.stringify({ email, name, password })
+            body: JSON.stringify({ email, name, password, agreeToConsentPolicy, agreeToTermOfUse })
         });
         const result = await response.json();
         if (!response.ok) {
