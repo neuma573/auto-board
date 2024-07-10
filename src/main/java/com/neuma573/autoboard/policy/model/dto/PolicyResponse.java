@@ -12,9 +12,12 @@ public class PolicyResponse {
 
     private String policy;
 
+    private Long id;
+
 
     public static PolicyResponse of(Policy policy) {
         return PolicyResponse.builder()
+                .id(policy.getId())
                 .policyName(policy.getPolicyName())
                 .policy(policy.getPolicy())
                 .build();
