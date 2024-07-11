@@ -7,6 +7,8 @@ import com.neuma573.autoboard.global.model.dto.Response;
 import com.neuma573.autoboard.global.utils.ResponseUtils;
 import com.neuma573.autoboard.policy.service.PolicyService;
 import com.neuma573.autoboard.security.utils.JwtProvider;
+import com.neuma573.autoboard.user.model.entity.User;
+import com.neuma573.autoboard.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ public class PolicyController {
 
     private final ResponseUtils responseUtils;
 
+    private final UserService userService;
+
     private final JwtProvider jwtProvider;
 
     @GetMapping("/tos")
@@ -31,8 +35,8 @@ public class PolicyController {
     @PostMapping("/agreement")
     public ResponseEntity<Response<PolicyAgreementResponse>> submitPolicyAgreement(@RequestBody PolicyAgreementRequest policyAgreementRequest,
                                                                                    HttpServletRequest httpServletRequest) {
-        Long userId = jwtProvider.parseUserId(httpServletRequest);
-        policyAgreementRequest.setUserId(userId);
+        User user = userService.getUserById(jwtProvider.parseUserId(httpServletRequest));
+        policyAgreementRequest.setUser(user);
         return ResponseEntity.ok().body(responseUtils.success(policyService.submitPolicyAgreement(policyAgreementRequest)));
     }
 }
