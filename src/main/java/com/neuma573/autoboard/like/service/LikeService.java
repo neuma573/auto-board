@@ -42,6 +42,7 @@ public class LikeService {
         return LikeResponse.of(postId, getLikeCount(postId));
     }
 
+    @Transactional(readOnly = true)
     public Long getLikeCount(Long postId) {
         return likeRepository.countByPostId(postId);
     }
