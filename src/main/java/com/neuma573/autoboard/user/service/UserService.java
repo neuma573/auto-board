@@ -5,6 +5,7 @@ import com.neuma573.autoboard.email.service.MailService;
 import com.neuma573.autoboard.global.exception.UserNotFoundException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.policy.model.dto.PolicyAgreementRequest;
+import com.neuma573.autoboard.policy.model.enums.AgreementType;
 import com.neuma573.autoboard.policy.service.PolicyService;
 import com.neuma573.autoboard.security.model.entity.VerificationToken;
 import com.neuma573.autoboard.security.utils.PasswordEncoder;
@@ -62,8 +63,8 @@ public class UserService {
                 .build()
         );
 
-        Long consentPolicyId = policyService.getLatestPolicyId(PolicyService.CONSENT_AGREEMENT);
-        Long termsOfUsePolicyId = policyService.getLatestPolicyId(PolicyService.TERM_OF_USE);
+        Long consentPolicyId = policyService.getLatestPolicyId(AgreementType.CONSENT_AGREEMENT.getName());
+        Long termsOfUsePolicyId = policyService.getLatestPolicyId(AgreementType.TERM_OF_USE.getName());
 
         PolicyAgreementRequest consentPolicyAgreement = PolicyAgreementRequest.builder()
                 .policyId(consentPolicyId)

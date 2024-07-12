@@ -7,6 +7,7 @@ import com.neuma573.autoboard.policy.model.dto.PolicyAgreementResponse;
 import com.neuma573.autoboard.policy.model.dto.PolicyResponse;
 import com.neuma573.autoboard.policy.model.entity.Policy;
 import com.neuma573.autoboard.policy.model.entity.PolicyAgreement;
+import com.neuma573.autoboard.policy.model.enums.AgreementType;
 import com.neuma573.autoboard.policy.repository.PolicyAgreementRepository;
 import com.neuma573.autoboard.policy.repository.PolicyRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,25 +24,19 @@ public class PolicyService {
 
     private final PolicyAgreementRepository policyAgreementRepository;
 
-    public static final String TERM_OF_USE = "이용약관";
-
-    public static final String PRIVACY_POLICY = "개인정보 처리방침";
-
-    public static final String CONSENT_AGREEMENT = "개인정보 수집 및 이용에 대한 동의";
-
     @Transactional(readOnly = true)
     public PolicyResponse getTermOfUse() {
-        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(TERM_OF_USE).orElseThrow(AccessDeniedException::new));
+        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(AgreementType.TERM_OF_USE.getName()).orElseThrow(AccessDeniedException::new));
     }
 
     @Transactional(readOnly = true)
     public PolicyResponse getPrivacyPolicy() {
-        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(PRIVACY_POLICY).orElseThrow(AccessDeniedException::new));
+        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(AgreementType.PRIVACY_POLICY.getName()).orElseThrow(AccessDeniedException::new));
     }
 
     @Transactional(readOnly = true)
     public PolicyResponse getConsentPolicy() {
-        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(CONSENT_AGREEMENT).orElseThrow(AccessDeniedException::new));
+        return PolicyResponse.of(policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(AgreementType.CONSENT_AGREEMENT.getName()).orElseThrow(AccessDeniedException::new));
     }
 
     @Transactional(readOnly = true)
