@@ -2,12 +2,13 @@ package com.neuma573.autoboard.ai.model.entity;
 
 import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Entity
 @Table(name = "open_ai_json")

@@ -13,8 +13,8 @@ import java.util.List;
 
 @Builder
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Audited
 @Table(name = "comment")

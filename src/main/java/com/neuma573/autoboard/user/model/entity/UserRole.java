@@ -8,8 +8,8 @@ import org.hibernate.envers.Audited;
 @Entity
 @Builder
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Audited
 @Table(name = "user_role")
 public class UserRole {
