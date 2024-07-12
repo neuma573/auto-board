@@ -1,6 +1,7 @@
-package com.neuma573.autoboard.global.model.entity;
+package com.neuma573.autoboard.policy.model.entity;
 
 
+import com.neuma573.autoboard.global.model.entity.BaseEntity;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;

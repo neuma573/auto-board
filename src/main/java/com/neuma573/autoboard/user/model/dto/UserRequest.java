@@ -4,10 +4,7 @@ import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.model.entity.UserRole;
 import com.neuma573.autoboard.user.validation.annotation.ValidEmailDomain;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,6 +35,12 @@ public class UserRequest {
     @NotEmpty(message = "패스워드는 비어있을 수 없습니다.")
     @Setter
     private String password;
+
+    @AssertTrue(message = "개인정보 수집 및 이용에 동의해야 합니다.")
+    private boolean agreeToConsentPolicy;
+
+    @AssertTrue(message = "이용약관에 동의해야 합니다.")
+    private boolean agreeToTermOfUse;
 
     public User toEntity() {
         Set<UserRole> initialRoles = ConcurrentHashMap.newKeySet();

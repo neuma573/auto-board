@@ -21,13 +21,14 @@ spring:
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
       username: ${REDIS_USERNAME}
+      repositories:
+        enabled: false
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -44,7 +45,9 @@ spring:
           starttls:
             enable: true
             required: true
-
+  cloud:
+    openfeign:
+      lazy-attributes-resolution: true
 app:
   jwt:
     secret: ${JWT_SECRET}

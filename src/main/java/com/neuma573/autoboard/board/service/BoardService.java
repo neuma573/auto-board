@@ -28,7 +28,7 @@ public class BoardService {
 
     private final UserService userService;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<BoardResponse> getBoardList(Long userId) {
 
         User user = userService.getUserByIdSafely(userId);
@@ -39,6 +39,7 @@ public class BoardService {
         }
     }
 
+    @Transactional(readOnly = true)
     @CheckPermission(role = Role.ADMIN)
     public List<BoardResponse> getBoardListForAdmin() {
         Iterable<Board> boardIterable = boardRepository.findAll();
@@ -49,7 +50,7 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-
+    @Transactional(readOnly = true)
     public List<BoardResponse> getBoardListForUser(User user) {
         List<Board> boards = boardRepository.findPublicAndNotDeletedBoardWith(user);
 
@@ -73,12 +74,12 @@ public class BoardService {
 
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     public BoardResponse getBoardInfo(Long boardId) {
         return BoardResponse.of(getBoardById(boardId));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Board getBoardById(Long boardId) {
         return boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("존재하지 않는 게시판입니다."));
     }
@@ -102,14 +103,14 @@ public class BoardService {
         return boardRepository.findByUsersAndId(user, boardId).isPresent();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean isCreatable(Long userId) {
         return userService.isAdmin(
                 userService.getUserById(userId)
         );
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean isBoardAccessible(Long userId, Long boardId, BoardAction action) {
         Board board = getBoardById(boardId);
         User user = userService.getUserByIdSafely(userId);

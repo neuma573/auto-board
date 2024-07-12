@@ -31,6 +31,10 @@ configurations {
     querydsl.extendsFrom compileClasspath
 }
 
+configurations.configureEach {
+    exclude group: 'commons-logging', module: 'commons-logging'
+}
+
 repositories {
     mavenCentral()
 }

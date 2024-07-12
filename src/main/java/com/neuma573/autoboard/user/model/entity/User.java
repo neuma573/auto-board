@@ -13,8 +13,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
 @Audited

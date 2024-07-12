@@ -5,18 +5,15 @@ import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.user.model.entity.User;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.envers.Audited;
 
 @Getter
 @Entity
 @Builder
 @Audited
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "likes", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"created_user_id", "post_id"})
 })
