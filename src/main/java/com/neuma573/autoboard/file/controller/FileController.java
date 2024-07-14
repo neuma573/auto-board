@@ -24,6 +24,7 @@ public class FileController {
 
     private final FileService fileService;
     private final JwtProvider jwtProvider;
+
     @PostMapping
     public ResponseEntity<CkEditorResponse> ckeditorUpload(
             MultipartHttpServletRequest multipartHttpServletRequest,
