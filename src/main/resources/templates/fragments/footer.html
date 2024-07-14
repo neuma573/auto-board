@@ -3,7 +3,16 @@
 <footer th:fragment="footer">
     <div class="footer">
         <div class="container">
-            <p>&copy; 2024 AUTO BOARD. All Rights Reserved.</p>
+            <div class="footer-content">
+                <p>&copy; 2024 AUTO BOARD. All Rights Reserved.</p>
+                <nav class="footer-nav">
+                    <ul class="footer-links">
+                        <li><a th:href="@{/policy/term-of-use}">이용약관</a></li>
+                        <li><a th:href="@{/policy/privacy-policy}">개인정보 처리방침</a></li>
+                        <li><a th:href="@{/policy/consent-agreement}">개인정보 수집 및 이용 동의</a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </footer>
