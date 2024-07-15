@@ -4,7 +4,7 @@
     <div class="footer">
         <div class="container">
             <div class="footer-content">
-                <p>&copy; 2024 AUTO BOARD. All Rights Reserved.</p>
+                <p>&copy; <span id="currentYear"></span> AUTO BOARD. All Rights Reserved.</p>
                 <nav class="footer-nav">
                     <ul class="footer-links">
                         <li><a th:href="@{/policy/term-of-use}">이용약관</a></li>
@@ -15,6 +15,9 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
 </footer>
 </body>
 </html>
