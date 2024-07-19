@@ -12,7 +12,7 @@ public enum ExceptionCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생했습니다"),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "대상이 존재하지 않습니다"),
-
+    NOT_FOUND(HttpStatus.NOT_FOUND, "자료가 존재하지 않습니다"),
     INVALID_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "JWT 토큰이 유효하지 않습니다"),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "JWT 토큰이 만료되었습니다"),
     UNSUPPORTED_JWT_TOKEN(HttpStatus.UNAUTHORIZED,"지원하지 않는 토큰입니다"),
