@@ -6,6 +6,7 @@
   <script th:inline="javascript">
     /*<![CDATA[*/
     let postId = [[${postResponse.id}]];
+    localStorage.setItem("dest", postId);
     /*]]>*/
   </script>
   <div class="container mt-5">
@@ -36,7 +37,7 @@
     <div class="d-flex justify-content-end mt-3">
       <a th:href="@{/main}" id="list" class="btn btn-dark" type="button" >목록</a>
       <a th:href="@{/modify}" id="modify" class="btn btn-success" type="button" style="display: none;">수정</a>
-      <a href="javascript:void(0);" onclick="deletePost();" id="delete" class="btn btn-danger" type="button"style="display: none;">삭제</a>
+      <a href="javascript:void(0);" onclick="deletePost();" id="delete" class="btn btn-danger" type="button" style="display: none;">삭제</a>
     </div>
   </div>
   <div class="container mt-5">
