@@ -11,6 +11,7 @@ import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
 import com.neuma573.autoboard.post.model.entity.Post;
 import com.neuma573.autoboard.post.service.PostService;
+import com.neuma573.autoboard.user.model.dto.UserResponse;
 import com.neuma573.autoboard.user.model.entity.User;
 import com.neuma573.autoboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -56,12 +57,28 @@ public class CommentService {
     public Page<CommentResponse> getCommentList(Long postId, Pageable pageable, Long userId) {
 
         User user = userService.getUserByIdSafely(userId);
+        boolean isAdmin = user != null && userService.isAdmin(user);
 
-        Page<Comment> comments = (user != null && userService.isAdmin(user))
+        Page<Comment> comments = isAdmin
                 ? commentRepository.findAllByPostIdAndParentCommentIsNull(postId, pageable)
-                : commentRepository.findAllByPostIdAndIsDeletedFalseAndParentCommentIsNull(postId, pageable);
+                : commentRepository.findParentCommentsByPostIdIncludingDeletedWithReplies(postId, pageable);
 
-        return comments.map(CommentResponse::of);
+        return comments.map(comment -> {
+            CommentResponse response = CommentResponse.of(comment);
+            if (comment.isDeleted() && !isAdmin) {
+                return CommentResponse.builder()
+                        .id(response.getId())
+                        .content("[삭제된 댓글입니다]")
+                        .createdBy(UserResponse.builder()
+                                .name(" ")
+                                .build())
+                        .isDeleted(true)
+                        .createdAt(response.getCreatedAt())
+                        .childCount(response.getChildCount())
+                        .build();
+            }
+            return response;
+        });
     }
 
     @Transactional

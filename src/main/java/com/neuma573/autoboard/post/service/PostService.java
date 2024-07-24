@@ -5,6 +5,7 @@ import com.neuma573.autoboard.board.model.entity.Board;
 import com.neuma573.autoboard.board.service.BoardService;
 import com.neuma573.autoboard.file.model.dto.UploadFileRequest;
 import com.neuma573.autoboard.file.service.FileService;
+import com.neuma573.autoboard.global.exception.NotFoundException;
 import com.neuma573.autoboard.global.exception.PostNotAccessibleException;
 import com.neuma573.autoboard.global.exception.UserBlockedException;
 import com.neuma573.autoboard.global.model.enums.Status;
@@ -222,7 +223,7 @@ public class PostService {
         return postRepository.findById(postId)
                 .map(Post::getBoard)
                 .map(Board::getId)
-                .orElse(null);
+                .orElse(-1L);
     }
 
     @Transactional
