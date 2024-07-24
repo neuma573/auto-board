@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html th:replace="~{fragments/base :: layout(~{::title},~{::content})}" xmlns:th="http://www.thymeleaf.org">
+<title>[[${policyResponse.policyName}]]</title>
+<body>
+<div th:fragment="content">
+  <div class="container mt-5">
+    <article class="post-card">
+      <header class="post-card-header">
+        <span id="title" class="post-title">[[${policyResponse.policyName}]]</span>
+      </header>
+      <section id="content" class="post-content" th:utext="${policyResponse.policy}">
+      </section>
+    </article>
+  </div>
+</div>
+</body>
+</html>
