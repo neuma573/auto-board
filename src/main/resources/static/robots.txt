@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /login
+Disallow: /write
+Disallow: /modify
+Disallow: /signup-options
+Disallow: /join
+Disallow: /auth/oauth
+Disallow: /mypage
+Disallow: /oauth-redirect
+allow: /

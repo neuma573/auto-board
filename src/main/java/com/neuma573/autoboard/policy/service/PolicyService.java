@@ -51,6 +51,13 @@ public class PolicyService {
                 .orElseThrow(() -> new NotFoundException("정책이 존재하지 않습니다."));
     }
 
+    @Transactional(readOnly = true)
+    public PolicyResponse getPolicyByType(String policyType) {
+        AgreementType agreementType = AgreementType.fromUrlPath(policyType);
+        return policyRepository.findFirstByPolicyNameOrderByCreatedAtDesc(agreementType.getName()).map(PolicyResponse::of)
+                .orElseThrow(() -> new NotFoundException("정책이 존재하지 않습니다."));
+    }
+
     @Transactional
     public PolicyAgreementResponse submitPolicyAgreement(PolicyAgreementRequest policyAgreementRequest) {
         Policy policy = getPolicyById(policyAgreementRequest.getPolicyId());

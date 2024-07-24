@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -138,6 +139,13 @@ public class MvcController {
         if (redirectUrl != null) {
             modelAndView.addObject("redirectUrl", redirectUrl);
         }
+        return modelAndView;
+    }
+
+    @GetMapping("/policy/{policyType}")
+    public ModelAndView showTerms(@PathVariable String policyType) {
+        ModelAndView modelAndView = new ModelAndView("policy");
+        modelAndView.addObject("policyResponse", policyService.getPolicyByType(policyType));
         return modelAndView;
     }
 

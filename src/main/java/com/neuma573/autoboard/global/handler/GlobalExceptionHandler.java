@@ -130,8 +130,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BoardNotFoundException.class)
     public ResponseEntity<Response<String>> handleBoardNotFoundException(BoardNotFoundException ex) {
         log.error("Exception : {}, Message : {}", ex.getClass().getSimpleName(), ex.getMessage());
-        Response<String> response = responseUtils.error(UNAUTHORIZED, ex);
-        return new ResponseEntity<>(response, UNAUTHORIZED.getStatus());
+        Response<String> response = responseUtils.error(NOT_FOUND, ex);
+        return new ResponseEntity<>(response, NOT_FOUND.getStatus());
     }
 
     @ExceptionHandler(CommentNotAccessibleException.class)
@@ -169,6 +169,29 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, ENTITY_NOT_FOUND.getStatus());
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public Object handleException(NotFoundException ex, HttpServletRequest httpServletRequest) {
+
+        ex.printStackTrace();
+
+        if (isApiRequest(httpServletRequest)) {
+            Response<String> response = responseUtils.error(NOT_FOUND, ex);
+            return new ResponseEntity<>(response, NOT_FOUND.getStatus());
+        } else {
+            ModelAndView modelAndView = new ModelAndView("error/error");
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            Object statusObject = httpServletRequest.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+            if (statusObject != null) {
+                int statusCode = Integer.parseInt(statusObject.toString());
+                status = HttpStatus.valueOf(statusCode);
+            }
+
+            modelAndView.addObject("code", status.value());
+            modelAndView.addObject("message", status.getReasonPhrase());
+            return modelAndView;
+        }
+    }
+
     @ExceptionHandler(Exception.class)
     public Object handleException(Exception ex, HttpServletRequest httpServletRequest) {
 
@@ -190,7 +213,6 @@ public class GlobalExceptionHandler {
             modelAndView.addObject("message", status.getReasonPhrase());
             return modelAndView;
         }
-
     }
 
     private boolean isApiRequest(HttpServletRequest httpServletRequest) {
