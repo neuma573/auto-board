@@ -1,6 +1,7 @@
 package com.neuma573.autoboard.global.client;
 
 import com.neuma573.autoboard.user.model.dto.GoogleTokenResponse;
+import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,4 +16,6 @@ public interface GoogleAuthClient {
                                  @RequestParam("redirect_uri") String redirect_uri,
                                  @RequestParam("grant_type") String state);
 
+    @PostMapping("/revoke")
+    Response revoke(@RequestParam("token") String token);
 }
